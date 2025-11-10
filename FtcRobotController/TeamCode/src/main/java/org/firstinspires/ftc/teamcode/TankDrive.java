@@ -154,6 +154,7 @@ public final class TankDrive {
                 this.rightEncs = Collections.unmodifiableList(rightEncs);
             }
 
+
             // TODO: reverse encoder directions if needed
             //   leftEncs.get(0).setDirection(DcMotorSimple.Direction.REVERSE);
 
