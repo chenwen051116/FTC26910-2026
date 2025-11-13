@@ -76,6 +76,7 @@ public class MyLimelight extends SubsystemBase {
         }
         return 0;
     }
+    // NOTE for AprilTag: size is 16.5cm * 16.5cm
 
     public boolean isFocused(){
         return abs(getTx()) < 0.1;

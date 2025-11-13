@@ -9,16 +9,30 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+
+// TODO: Adapt the system into our robot
 public class Intake extends SubsystemBase {
-    private final DcMotor intake, transfer;
+    // battery is not yet installed and configured
+    // shooter is not yet installed and configured
+    // battery controls the rotational angle of the battery
+    // shooter controls the power while shooting
+    private final DcMotor intake, transfer, battery, shooter;
+
+    // swingBar is not yet configured and installed
     private final Servo swingBar;
+
+    // we have two more servo controlling the hood
+    private final Servo hood;
+
+    // we do not have distance sensor
     private final DistanceSensor transferBreakBeam;
     public IntakeTransferState intakeCurrentState = IntakeTransferState.Intake_Steady;
 
-    public boolean shooterauto = false;
-    public boolean autotrans = false;
+    // set the 3 status as false in default
+    public boolean shooterAuto = false;
+    public boolean autoTrans = false;
 
-    public boolean autoforce = false;
+    public boolean autoForce = false;
     public Intake(HardwareMap hardwareMap) {      //Constructor,新建对象时需要
         intake = hardwareMap.get(DcMotor.class, "intake");
         transfer = hardwareMap.get(DcMotor.class, "transfer");
@@ -61,12 +75,12 @@ public class Intake extends SubsystemBase {
     }
     public void setIntakeState(IntakeTransferState intakeTransferState) {
         intakeCurrentState = intakeTransferState;
-        if(!shooterauto || autoforce) {
+        if(!shooterAuto || autoForce) {
             intake.setPower(intakeCurrentState.intakePower);
             transfer.setPower(intakeCurrentState.transferPower);
         }
         else{
-            if(autotrans){
+            if(autoTrans){
                 intakeCurrentState = IntakeTransferState.Send_It_Up;
             }
             else{
@@ -77,21 +91,21 @@ public class Intake extends SubsystemBase {
     }
 
     public void updateAutoshoot(boolean auto){
-        shooterauto = auto;
+        shooterAuto = auto;
     }
 
     public void updateautotranse(boolean auto){
-        autotrans = auto;
+        autoTrans = auto;
     }
 
     @Override
     public void periodic() { // FTC 0.001s cycle
-        if(!shooterauto || autoforce) {
+        if(!shooterAuto || autoForce) {
             intake.setPower(intakeCurrentState.intakePower);
             transfer.setPower(intakeCurrentState.transferPower);
         }
         else{
-            if(autotrans){
+            if(autoTrans){
                 intakeCurrentState = IntakeTransferState.Send_It_Up;
             }
             else{

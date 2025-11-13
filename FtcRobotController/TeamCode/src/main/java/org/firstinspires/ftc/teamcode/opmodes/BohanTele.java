@@ -36,10 +36,10 @@ public class BohanTele extends CommandOpMode {
     private Shooter shooter;
     private MyLimelight limelight;
 
-    private boolean xjustpressed = false;
-    private boolean xholding = false;
-    private boolean yjustpressed = false;
-    private boolean yholding = false;
+    private boolean xJustPressed = false;
+    private boolean xHolding = false;
+    private boolean yJustPressed = false;
+    private boolean yHolding = false;
 
 
 
@@ -48,6 +48,7 @@ public class BohanTele extends CommandOpMode {
         //Settings Stuff....Make sure to create a "xxx = new...." before using it to avoid nullPointerObject error
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
+        // Setup the two gamepads
         GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
         GamepadEx gamepadEx2 = new GamepadEx(gamepad2);
         //Subsystems
@@ -77,53 +78,53 @@ public class BohanTele extends CommandOpMode {
         CommandScheduler.getInstance().run();
         shooter.periodic();
         if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
-            intake.updateAutoshoot(true);
-            intake.updateautotranse(shooter.isAtTargetRPM());
+            intake.updateAutoShoot(true);
+            intake.updateAutoTranse(shooter.isAtTargetRPM());
             shooter.updateDis(limelight.getDis());
             shooter.updateFocused(limelight.isFocused());
         }
         else{
-            intake.updateAutoshoot(false);
+            intake.updateAutoShoot(false);
         }
 
         if(gamepad1.x){
-            if(!xholding){
-                xjustpressed = true;
-                xholding = true;
+            if(!xHolding){
+                xJustPressed = true;
+                xHolding = true;
             }
         }
         else{
-            xholding = false;
-            xjustpressed = false;
+            xHolding = false;
+            xJustPressed = false;
         }
 
         if(gamepad1.y){
-            if(!yholding){
-                yjustpressed = true;
-                yholding = true;
+            if(!yHolding){
+                yJustPressed = true;
+                yHolding = true;
             }
         }
         else{
-            yholding = false;
-            yjustpressed = false;
+            yHolding = false;
+            yJustPressed = false;
         }
-        if(yjustpressed&&shooter.shooterStatus != Shooter.ShooterStatus.Shooting){
+        if(yJustPressed &&shooter.shooterStatus != Shooter.ShooterStatus.Shooting){
             if(shooter.shooterStatus == Shooter.ShooterStatus.Idling) {
                 shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
             }
             else{
                 shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
             }
-            yjustpressed = false;
+            yJustPressed = false;
         }
-        if(xjustpressed){
+        if(xJustPressed){
             if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
                 shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
             }
             else{
                 shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
             }
-            xjustpressed = false;
+            xJustPressed = false;
 
         }
         telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());

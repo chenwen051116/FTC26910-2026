@@ -129,15 +129,15 @@ public class Shooter extends SubsystemBase {
      * Update PID controller and set motor powers
      * Call this method in main loop for continuous control
      */
-    public void settoShooting(){
+    public void setToShooting(){
         shooterStatus = ShooterStatus.Shooting;
     }
-    public void settoStop(){
+    public void setToStop(){
         shooterStatus = ShooterStatus.Stop;
     }
 
 
-    public void settoIdle(){
+    public void setToIdle(){
         shooterStatus = ShooterStatus.Idling;
     }
     public void updateFlywheelPID() {
