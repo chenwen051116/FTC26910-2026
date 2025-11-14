@@ -52,7 +52,7 @@ public class teleOp extends LinearOpMode {
 
         intake = new Intake(hardwareMap);
         limeLight.initRedPipeline();
-
+        limeLight.startDetect();
 
         waitForStart();
         while (opModeIsActive()){
