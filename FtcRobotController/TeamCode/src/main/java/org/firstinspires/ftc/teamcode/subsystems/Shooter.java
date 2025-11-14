@@ -247,9 +247,14 @@ public class Shooter extends SubsystemBase {
         rightHood.setPosition(rightHoodDefaultAngle);
     }
 
-    public void changeHoodAngle() {
-        leftHoodAngle += changeHoodAngle;
-        rightHoodAngle -= changeHoodAngle;
+    public void changeHoodAngle(double angle) {
+        leftHoodAngle = leftHoodDefaultAngle+angle;
+        rightHoodAngle = rightHoodDefaultAngle-angle;
+        updateLeftHoodAngle();
+        updateRightHoodAngle();
+    }
+
+    public void updateHoodAngle(){
         updateLeftHoodAngle();
         updateRightHoodAngle();
     }
@@ -257,27 +262,27 @@ public class Shooter extends SubsystemBase {
 
     // TODO: Rewrite the updateAim method
     public void updateAim() {
-        distance = abs(distance);
-        if (distance > 3.25){
-            setTargetRPM(3850);
-        }
-        else if (distance < 1.4){
-            setTargetRPM(100*distance+2750);
-        }
-        else{
-            setTargetRPM(300*distance+2750);
-        }
-
-        if (distance < 0.01){
-            setTargetRPM(3500);
-        }
-
-        if(automode&&autoLonger){
-            setTargetRPM(3500);
-        }
-        else if(automode&&!autoLonger){
-            setTargetRPM(3100);
-        }
+//        distance = abs(distance);
+//        if (distance > 3.25){
+//            setTargetRPM(3850);
+//        }
+//        else if (distance < 1.4){
+//            setTargetRPM(100*distance+2750);
+//        }
+//        else{
+//            setTargetRPM(300*distance+2750);
+//        }
+//
+//        if (distance < 0.01){
+//            setTargetRPM(3500);
+//        }
+//
+//        if(automode&&autoLonger){
+//            setTargetRPM(3500);
+//        }
+//        else if(automode&&!autoLonger){
+//            setTargetRPM(3100);
+//        }
     }
 
 
@@ -298,6 +303,7 @@ public class Shooter extends SubsystemBase {
     }
     @Override
     public void periodic(){
+        updateHoodAngle();
         updateFlywheelPID();
         if(shooterStatus == ShooterStatus.Shooting && focused){
             updateAim();
