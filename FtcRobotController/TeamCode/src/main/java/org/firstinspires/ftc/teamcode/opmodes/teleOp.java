@@ -51,6 +51,7 @@ public class teleOp extends LinearOpMode {
         drivetrain = new Drivetrain(hardwareMap);
 
         intake = new Intake(hardwareMap);
+        limeLight = new MyLimelight(hardwareMap);
         limeLight.initRedPipeline();
         limeLight.startDetect();
 
