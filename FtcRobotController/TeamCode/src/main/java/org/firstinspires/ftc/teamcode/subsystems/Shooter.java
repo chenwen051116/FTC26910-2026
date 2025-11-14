@@ -24,7 +24,8 @@ public class Shooter extends SubsystemBase {
 
     private final DcMotorEx battery;
     private final DcMotorEx shooter;
-    private final Servo hood;
+    private final Servo hoodLeft;
+    private final Servo hoodRight;
     private final PIDController pidController;
 
     // Tunable PID parameters - can be adjusted via FTC Dashboard
@@ -33,6 +34,10 @@ public class Shooter extends SubsystemBase {
     public static double Kd = -10;    // Derivative gain
     public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
+
+    public static double leftHoodAngle = 0.5; // The value is not necessarily 0.5
+    public static double rightHoodAngle = 0.5; // The value is not necessarily 0.5
+    public static double changeHoodAngle = 0;
 
     public static double aimRPM = 0;
 
@@ -215,6 +220,13 @@ public class Shooter extends SubsystemBase {
 
     }
 
+    public void setLeftHoodangle(double angle){
+        shooterLeft.setPosition(angle);
+    }
+    public void setRightHoodAngle(double angle){
+        shooterRight.setPosition(angle);
+    }
+
     public void updateAim() {
         distance = abs(distance);
         if (distance > 3.25){
@@ -267,6 +279,16 @@ public class Shooter extends SubsystemBase {
         else if(shooterStatus == ShooterStatus.Idling) {
             setTargetRPM(3000);
         }
+
+        // changeHoodAngle should be a number between -1 and 1.
+        public void setHoodAngle(double changeHoodAngle){
+            leftHoodAngle += changeHoodAngle;
+            rightHoodAngle -= changeHoodAngle;
+            setLeftHoodangle(leftHoodAngle);
+            setRightHoodAngle(rightHoodAngle);
+        }
+
+
     }
     public void updateTelemetry() {
         telemetry.addData("Target RPM", targetRPM);
