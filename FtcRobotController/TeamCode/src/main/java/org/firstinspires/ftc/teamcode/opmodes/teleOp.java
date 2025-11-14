@@ -32,17 +32,18 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class teleOp implements LinearOpMode {
+public class teleOp extends LinearOpMode {
 
     private Telemetry telemetry;
     private Drivetrain drivetrain;
     private Intake intake;
 //    private Shooter shooter;
-//    private MyLimeLight limeLight;
+    private MyLimelight limeLight;
 //    private boolean xJustPressed = false;
 //    private boolean xHolding = false;
 //    private boolean yJustPressed = false;
 //    private boolean yHolding = false;
+    private double x, y, rx;
 
 
     @Override
@@ -56,27 +57,27 @@ public class teleOp implements LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
             // check keys
-            if(gamepad1.x){
-                if(!xHolding){
-                    xJustPressed = true;
-                    xHolding = true;
-                }
-            }
-            else{
-                xHolding = false;
-                xJustPressed = false;
-            }
-
-            if(gamepad1.y){
-                if(!yHolding){
-                    yJustPressed = true;
-                    yHolding = true;
-                }
-            }
-            else{
-                yHolding = false;
-                yJustPressed = false;
-            }
+//            if(gamepad1.x){
+//                if(!xHolding){
+//                    xJustPressed = true;
+//                    xHolding = true;
+//                }
+//            }
+//            else{
+//                xHolding = false;
+//                xJustPressed = false;
+//            }
+//
+//            if(gamepad1.y){
+//                if(!yHolding){
+//                    yJustPressed = true;
+//                    yHolding = true;
+//                }
+//            }
+//            else{
+//                yHolding = false;
+//                yJustPressed = false;
+//            }
 
             // set shooter status
 //            if(yJustPressed &&shooter.shooterStatus != Shooter.ShooterStatus.Shooting){
@@ -102,9 +103,10 @@ public class teleOp implements LinearOpMode {
 
             // drivetrain
             // set drivetrain status
-            x = gamepad1.left_stick_x;
-            y = gamepad1.left_stick_y;
-            rx = gamepad1.right_stick_x;
+
+            double x = gamepad1.left_stick_x;
+            double y = gamepad1.left_stick_y;
+            double rx = gamepad1.right_stick_x;
             drivetrain.teleDrive(y, x, rx);
 
             // telemetry output
@@ -127,11 +129,11 @@ public class teleOp implements LinearOpMode {
 
             // limelight
             // telemetry
-            telemetry.addData("Apriltag dist", limelight.getDis());
-            telemetry.addData("Apriltag X", limelight.getX());
-            telemetry.addData("Apriltag(PoI) Tx", limelight.getTx());
-            telemetry.addData("Apriltag ID", limelight.getAprilTagID());
-            telemetry.addData("Pitch", limelight.getPitch());
+            telemetry.addData("Apriltag dist", limeLight.getDis());
+            telemetry.addData("Apriltag X", limeLight.getX());
+            telemetry.addData("Apriltag(PoI) Tx", limeLight.getTx());
+            telemetry.addData("Apriltag ID", limeLight.getAprilTagID());
+            telemetry.addData("Pitch", limeLight.getPitch());
 
             // shooter
             // telemetry

@@ -4,29 +4,27 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 
 import static java.lang.Math.abs;
 
-import android.health.connect.datatypes.units.Power;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 @Config
 public class Shooter extends SubsystemBase {
+
+    // shooterLeft and shooterRight to be removed
     private final DcMotorEx shooterLeft;
     private final DcMotorEx shooterRight;
 
-    private final DcMotorEx battery;
     private final DcMotorEx shooter;
-    private final Servo hoodLeft;
-    private final Servo hoodRight;
+    private final Servo leftHood;
+    private final Servo rightHood;
     private final PIDController pidController;
+
 
     // Tunable PID parameters - can be adjusted via FTC Dashboard
     public static double Kp = 27;  // Proportional gain
@@ -35,11 +33,15 @@ public class Shooter extends SubsystemBase {
     public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
 
-    public static double leftHoodAngle = 0.5; // The value is not necessarily 0.5
-    public static double rightHoodAngle = 0.5; // The value is not necessarily 0.5
+    public static double leftHoodAngle = 0.5;
+    public static double rightHoodAngle = 0.5;
     public static double changeHoodAngle = 0;
 
     public static double aimRPM = 0;
+
+    // Records the default value of the hood. Used in resetHoodAngle()
+    public static double leftHoodDefaultAngle = 0.5; // The value is to be adjusted
+    public static double rightHoodDefaultAngle = 0.5; // The value is to be adjusted
 
     // Target RPM for the flywheel
     private double targetRPM = 0.0;
@@ -69,15 +71,27 @@ public class Shooter extends SubsystemBase {
 
 
     public Shooter(HardwareMap hardwareMap) {
+        // shooterLeft and shooterRight to be removed
         shooterLeft = hardwareMap.get(DcMotorEx.class, "shooterLeft");
         shooterRight = hardwareMap.get(DcMotorEx.class, "shooterRight");
+
+
+        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        leftHood = hardwareMap.get(Servo.class, "leftHood");
+        rightHood = hardwareMap.get(Servo.class, "rightHood");
 
         // Initialize PID controller
         pidController = new PIDController(Kp, Ki, Kd);
 
         // Configure motors
+        // shooterLeft and shooterRight to be removed
         shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         shooterLeft.setDirection(DcMotor.Direction.FORWARD);
         shooterRight.setDirection(DcMotor.Direction.REVERSE);
@@ -220,13 +234,28 @@ public class Shooter extends SubsystemBase {
 
     }
 
-    public void setLeftHoodangle(double angle){
-        shooterLeft.setPosition(angle);
+    public void updateLeftHoodAngle(){
+        leftHood.setPosition(leftHoodAngle);
     }
-    public void setRightHoodAngle(double angle){
-        shooterRight.setPosition(angle);
+    public void updateRightHoodAngle(){
+        rightHood.setPosition(leftHoodAngle);
     }
 
+    // reset the hood angles
+    public void resetHoodAngle(){
+        leftHood.setPosition(leftHoodDefaultAngle);
+        rightHood.setPosition(rightHoodDefaultAngle);
+    }
+
+    public void changeHoodAngle() {
+        leftHoodAngle += changeHoodAngle;
+        rightHoodAngle -= changeHoodAngle;
+        updateLeftHoodAngle();
+        updateRightHoodAngle();
+    }
+
+
+    // TODO: Rewrite the updateAim method
     public void updateAim() {
         distance = abs(distance);
         if (distance > 3.25){
@@ -280,13 +309,7 @@ public class Shooter extends SubsystemBase {
             setTargetRPM(3000);
         }
 
-        // changeHoodAngle should be a number between -1 and 1.
-        public void setHoodAngle(double changeHoodAngle){
-            leftHoodAngle += changeHoodAngle;
-            rightHoodAngle -= changeHoodAngle;
-            setLeftHoodangle(leftHoodAngle);
-            setRightHoodAngle(rightHoodAngle);
-        }
+
 
 
     }
