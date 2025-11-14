@@ -15,10 +15,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+
+
 @Config
 public class Shooter extends SubsystemBase {
     private final DcMotorEx shooterLeft;
     private final DcMotorEx shooterRight;
+
+    private final DcMotorEx battery;
+    private final DcMotorEx shooter;
+    private final Servo hood;
     private final PIDController pidController;
 
     // Tunable PID parameters - can be adjusted via FTC Dashboard

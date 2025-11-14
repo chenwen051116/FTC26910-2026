@@ -86,6 +86,8 @@ public class MyLimelight extends SubsystemBase {
         if (llenable && hasTarget()){
             List<LLResultTypes.FiducialResult> fiducialResults = aprilTagLatestResult.getFiducialResults();
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                // this will return the distance by pythag. The relative x, y, z position
+                // of the target to the robot is first aquired, then calculated
                     return sqrt(fr.getTargetPoseCameraSpace().getPosition().y * fr.getTargetPoseCameraSpace().getPosition().y
                             + (fr.getTargetPoseCameraSpace().getPosition().x) * (fr.getTargetPoseCameraSpace().getPosition().x)
                             + (fr.getTargetPoseCameraSpace().getPosition().z) * (fr.getTargetPoseCameraSpace().getPosition().z)

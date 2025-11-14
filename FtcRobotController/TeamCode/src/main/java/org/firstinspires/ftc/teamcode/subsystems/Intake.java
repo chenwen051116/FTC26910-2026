@@ -14,18 +14,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Intake extends SubsystemBase {
     // battery is not yet installed and configured
     // shooter is not yet installed and configured
-    // battery controls the rotational angle of the battery
-    // shooter controls the power while shooting
-    private final DcMotor intake, transfer, battery, shooter;
+
+    private final DcMotor intake, transfer;
 
     // swingBar is not yet configured and installed
     private final Servo swingBar;
 
-    // we have two more servo controlling the hood
-    private final Servo hood;
-
     // we do not have distance sensor
-    private final DistanceSensor transferBreakBeam;
     public IntakeTransferState intakeCurrentState = IntakeTransferState.Intake_Steady;
 
     // set the 3 status as false in default
@@ -33,24 +28,27 @@ public class Intake extends SubsystemBase {
     public boolean autoTrans = false;
 
     public boolean autoForce = false;
-    public Intake(HardwareMap hardwareMap) {      //Constructor,新建对象时需要
+
+    // Constructor for intake motors
+    public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotor.class, "intake");
         transfer = hardwareMap.get(DcMotor.class, "transfer");
         swingBar = hardwareMap.get(Servo.class, "swingBar");
-        transferBreakBeam = hardwareMap.get(DistanceSensor.class, "transferBreakBeam");
 
+        // We do not have distance sensor thus the following object should be removed
+        // in future updates
+
+        // The intake does not need to necessarily move at steady
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        // The transfer has to be steady for the case where there are already balls in the
+        // transfer stage
         transfer.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void setSwingBarPos(double pos) {
         swingBar.setPosition(pos);
     }
 
-    public double getDist(){
-        return transferBreakBeam.getDistance(DistanceUnit.MM);
-    }
 
     public void setIntakePower(double power) {
 
@@ -61,6 +59,8 @@ public class Intake extends SubsystemBase {
     public void setTransferPower(double power) {
         transfer.setPower(power);
     }
+
+    // Enum which stores all the power needed for each state of the intake motors
     public enum IntakeTransferState {
         Suck_In(1,0),
         Split_Out(-0.7, -1),
@@ -68,11 +68,15 @@ public class Intake extends SubsystemBase {
         Intake_Steady(0,0);
         private final double intakePower;
         private final double transferPower;
+        // Set update the transfer state
         IntakeTransferState(double InPower, double TrPower) {
             this.intakePower = InPower;
             this.transferPower = TrPower;
         }
     }
+
+    // This function is not necessary
+    // used to update the state of the intake motors when called
     public void setIntakeState(IntakeTransferState intakeTransferState) {
         intakeCurrentState = intakeTransferState;
         if(!shooterAuto || autoForce) {
@@ -90,27 +94,34 @@ public class Intake extends SubsystemBase {
 
     }
 
-    public void updateAutoshoot(boolean auto){
+    // Standardization of the two functions
+    public void updateAutoShoot(boolean auto){
         shooterAuto = auto;
     }
 
-    public void updateautotranse(boolean auto){
+    public void updateAutoTrans(boolean auto){
         autoTrans = auto;
     }
 
     @Override
     public void periodic() { // FTC 0.001s cycle
         if(!shooterAuto || autoForce) {
+            // at shooterAuto or autoForce, the power of the DC motors are set separately
+            // thus you will need to make sure that the robot is not in these two states
             intake.setPower(intakeCurrentState.intakePower);
             transfer.setPower(intakeCurrentState.transferPower);
         }
         else{
             if(autoTrans){
+                // autoTrans is the state of sending the ball from intake position to shooting
+                // position
                 intakeCurrentState = IntakeTransferState.Send_It_Up;
             }
             else{
+                // if not, then the intake doesn't need to do anything
                 intakeCurrentState = IntakeTransferState.Intake_Steady;
             }
+            // update the power to the motors
             intake.setPower(intakeCurrentState.intakePower);
             transfer.setPower(intakeCurrentState.transferPower);
         }
