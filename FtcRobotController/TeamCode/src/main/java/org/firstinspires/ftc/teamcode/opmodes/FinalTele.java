@@ -61,7 +61,7 @@ public class FinalTele extends LinearOpMode {
         limeLight.initRedPipeline();
         limeLight.startDetect();
         turret.initEncoder();
-
+        shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
         waitForStart();
         while (opModeIsActive()){
             shooter.periodic();

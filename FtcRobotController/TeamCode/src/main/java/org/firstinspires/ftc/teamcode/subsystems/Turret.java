@@ -23,7 +23,7 @@ public class Turret extends SubsystemBase {
 
     public boolean autoForce = false;
 
-    public static double kp = 10;
+    public static double kp = 0;
 
     public static int targetpos = 0;
 
@@ -60,12 +60,14 @@ public class Turret extends SubsystemBase {
         int dpos = (int) floor(kp*tx);
         targetpos += dpos;
         turretMotor.setTargetPosition(targetpos);
+        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void centering(){
         turretMotor.setPower(0.4);
         targetpos = 0;
         turretMotor.setTargetPosition(targetpos);
+        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     // This function is not necessary
     // used to update the state of the intake motors when called
