@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
@@ -133,11 +132,6 @@ public class FinalTele extends LinearOpMode {
             double rx = -gamepad1.right_stick_x;
             drivetrain.teleDrive(y, x, rx);
 
-            // telemetry output
-            telemetry.addData("Gamepad1 Left Stick X", x);
-            telemetry.addData("Gamepad1 Left Stick Y", y);
-            telemetry.addData("Gamepad1 Right Stick X", rx);
-
             // intake
             // set intake status
             if (gamepad1.right_trigger > 0.3 ){
@@ -158,13 +152,14 @@ public class FinalTele extends LinearOpMode {
             telemetry.addData("Apriltag(PoI) Tx", limeLight.getTx());
             telemetry.addData("Apriltag ID", limeLight.getAprilTagID());
             telemetry.addData("Pitch", limeLight.getPitch());
-            telemetry.update();
+
             // shooter
             // telemetry
             telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());
             telemetry.addData("Shooter Current RPM", shooter.getFlyWheelRPM());
             telemetry.addData("PIDoutput", shooter.getCurrentPIDOutput());
             telemetry.addData("Shooter At Target", shooter.isAtTargetRPM() ? "YES" : "NO");
+            telemetry.update();
         }
 
     }

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import static java.lang.Math.abs;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -299,17 +297,5 @@ public class Shooter extends SubsystemBase {
 
 
 
-    }
-    public void updateTelemetry() {
-        telemetry.addData("Target RPM", targetRPM);
-        telemetry.addData("Current RPM", getFlyWheelRPM());
-        telemetry.addData("At Target", isAtTargetRPM());
-        telemetry.addData("Motor Power", currentMotorPower);
-        telemetry.addData("PID Output", PIDoutput);
-        telemetry.addData("Kp", Kp);
-        telemetry.addData("Ki", Ki);
-        telemetry.addData("Kd", Kd);
-        telemetry.addData("PID Threshold", pidThreshold);
-        telemetry.addData("Tolerance", tolerance);
     }
 }
