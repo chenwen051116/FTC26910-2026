@@ -311,7 +311,7 @@ public class Shooter extends SubsystemBase {
         else if(shooterStatus == ShooterStatus.Stop){
             completeStop();
         }
-        else if(shooterStatus == ShooterStatus.Idling) {
+        else if(shooterStatus == ShooterStatus.Idling){
             setTargetRPM(3000);
         }
 

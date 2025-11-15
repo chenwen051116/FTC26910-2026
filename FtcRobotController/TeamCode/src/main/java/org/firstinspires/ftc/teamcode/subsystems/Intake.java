@@ -12,15 +12,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 // TODO: Adapt the system into our robot
 public class Intake extends SubsystemBase {
-    // battery is not yet installed and configured
-    // shooter is not yet installed and configured
 
     private final DcMotor intake, transfer;
 
-    // swingBar is not yet configured and installed
-    private final Servo swingBar;
-
-    // we do not have distance sensor
     public IntakeTransferState intakeCurrentState = IntakeTransferState.Intake_Steady;
 
     // set the 3 status as false in default
@@ -33,10 +27,7 @@ public class Intake extends SubsystemBase {
     public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotor.class, "intake");
         transfer = hardwareMap.get(DcMotor.class, "transfer");
-        swingBar = hardwareMap.get(Servo.class, "swingBar");
 
-        // We do not have distance sensor thus the following object should be removed
-        // in future updates
 
         // The intake does not need to necessarily move at steady
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -44,9 +35,6 @@ public class Intake extends SubsystemBase {
         // transfer stage
         transfer.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
-    }
-    public void setSwingBarPos(double pos) {
-        swingBar.setPosition(pos);
     }
 
 
