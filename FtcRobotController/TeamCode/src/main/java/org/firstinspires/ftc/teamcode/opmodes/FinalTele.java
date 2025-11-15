@@ -160,6 +160,7 @@ public class FinalTele extends LinearOpMode {
 
             // shooter
             // telemetry
+            telemetry.addData("Turret pos", turret.currentpos);
             telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());
             telemetry.addData("Shooter Current RPM", shooter.getFlyWheelRPM());
             telemetry.addData("PIDoutput", shooter.getCurrentPIDOutput());

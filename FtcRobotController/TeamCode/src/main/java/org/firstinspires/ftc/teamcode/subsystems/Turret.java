@@ -32,6 +32,8 @@ public class Turret extends SubsystemBase {
 
     public static int targetpos = 0;
 
+    public int currentpos = 0;
+
     public double tx =0;
 
     // Constructor for intake motors
@@ -92,6 +94,7 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() { // FTC 0.001s cycle
+        currentpos = turretMotor.getCurrentPosition();
         if(shooterAuto || autoForce) {
             // at shooterAuto or autoForce, the power of the DC motors are set separately
             // thus you will need to make sure that the robot is not in these two states
