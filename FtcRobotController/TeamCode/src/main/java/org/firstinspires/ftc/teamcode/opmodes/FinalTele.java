@@ -35,7 +35,7 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class FinalTele extends LinearOpMode {
 
-    private Telemetry telemetry;
+  //  private Telemetry telemetry;
     private Drivetrain drivetrain;
     private Intake intake;
     private Shooter shooter;

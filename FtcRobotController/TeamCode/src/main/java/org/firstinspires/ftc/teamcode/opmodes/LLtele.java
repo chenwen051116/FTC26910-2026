@@ -34,7 +34,7 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class LLtele extends LinearOpMode {
 
-    private Telemetry telemetry;
+    //private Telemetry telemetry;
     private MyLimelight limeLight;
     //    private boolean xJustPressed = false;
 //    private boolean xHolding = false;

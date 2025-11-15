@@ -34,7 +34,7 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class teleOp extends LinearOpMode {
 
-    private Telemetry telemetry;
+    //private Telemetry telemetry;
     private Drivetrain drivetrain;
     private Intake intake;
 //    private Shooter shooter;
@@ -107,8 +107,8 @@ public class teleOp extends LinearOpMode {
             // set drivetrain status
 
             double x = gamepad1.left_stick_x;
-            double y = gamepad1.left_stick_y;
-            double rx = gamepad1.right_stick_x;
+            double y = -gamepad1.left_stick_y;
+            double rx = -gamepad1.right_stick_x;
             drivetrain.teleDrive(y, x, rx);
 
 

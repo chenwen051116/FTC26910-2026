@@ -35,6 +35,7 @@ public class Intake extends SubsystemBase {
         // transfer stage
         transfer.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        transfer.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
 
