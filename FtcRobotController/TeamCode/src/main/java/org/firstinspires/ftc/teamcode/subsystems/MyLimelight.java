@@ -31,13 +31,19 @@ public class MyLimelight extends SubsystemBase {
 
 
     public void initBluePipeline(){
-        limelight.pipelineSwitch(7);
+        limelight.pipelineSwitch(1);
         limelight.start();
     }
     public void initRedPipeline(){
-        limelight.pipelineSwitch(8);
+        limelight.pipelineSwitch(0);
         limelight.start();
     }
+
+    // pattern:
+    // 23 = PPG
+    // 22 = PGP
+    // 21 = GPP
+
     public void initPatternPipeline(){
         limelight.pipelineSwitch(9);
         limelight.start();

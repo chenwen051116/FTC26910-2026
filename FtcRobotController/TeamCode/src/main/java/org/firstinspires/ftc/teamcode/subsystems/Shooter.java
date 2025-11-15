@@ -21,8 +21,7 @@ public class Shooter extends SubsystemBase {
     private final DcMotorEx shooterRight;
 
     private final DcMotorEx shooter;
-    private final Servo leftHood;
-    private final Servo rightHood;
+    private final Servo Hood;
     private final PIDController pidController;
 
 
@@ -33,15 +32,11 @@ public class Shooter extends SubsystemBase {
     public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
 
-    public static double leftHoodAngle = 0.5;
-    public static double rightHoodAngle = 0.5;
-    public static double changeHoodAngle = 0;
+    public static double hoodAngle = 0.5;
 
     public static double aimRPM = 0;
 
     // Records the default value of the hood. Used in resetHoodAngle()
-    public static double leftHoodDefaultAngle = 0.5; // The value is to be adjusted
-    public static double rightHoodDefaultAngle = 0.5; // The value is to be adjusted
 
     // Target RPM for the flywheel
     private double targetRPM = 0.0;
@@ -77,8 +72,7 @@ public class Shooter extends SubsystemBase {
 
 
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        leftHood = hardwareMap.get(Servo.class, "leftHood");
-        rightHood = hardwareMap.get(Servo.class, "rightHood");
+        Hood = hardwareMap.get(Servo.class, "Hood");
 
         // Initialize PID controller
         pidController = new PIDController(Kp, Ki, Kd);
@@ -234,30 +228,14 @@ public class Shooter extends SubsystemBase {
 
     }
 
-    public void updateLeftHoodAngle(){
-        leftHood.setPosition(leftHoodAngle);
-    }
-    public void updateRightHoodAngle(){
-        rightHood.setPosition(leftHoodAngle);
-    }
-
-    // reset the hood angles
-    public void resetHoodAngle(){
-        leftHood.setPosition(leftHoodDefaultAngle);
-        rightHood.setPosition(rightHoodDefaultAngle);
-    }
-
-    public void changeHoodAngle(double angle) {
-        leftHoodAngle = leftHoodDefaultAngle+angle;
-        rightHoodAngle = rightHoodDefaultAngle-angle;
-        updateLeftHoodAngle();
-        updateRightHoodAngle();
-    }
-
     public void updateHoodAngle(){
-        updateLeftHoodAngle();
-        updateRightHoodAngle();
+        Hood.setPosition(hoodAngle);
     }
+
+    public void setHoodAngle(double angle){
+        hoodAngle = hoodAngle + angle;
+    }
+
 
 
     // TODO: Rewrite the updateAim method
