@@ -106,8 +106,8 @@ public class teleOp extends LinearOpMode {
             // drivetrain
             // set drivetrain status
 
-            double x = gamepad1.left_stick_x;
-            double y = -gamepad1.left_stick_y;
+            double x = -gamepad1.left_stick_x;
+            double y = gamepad1.left_stick_y;
             double rx = -gamepad1.right_stick_x;
             drivetrain.teleDrive(y, x, rx);
 

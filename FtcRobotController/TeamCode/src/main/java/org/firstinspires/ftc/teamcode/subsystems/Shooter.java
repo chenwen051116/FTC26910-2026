@@ -17,8 +17,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Shooter extends SubsystemBase {
 
     // shooterLeft and shooterRight to be removed
-    private final DcMotorEx shooterLeft;
-    private final DcMotorEx shooterRight;
+//    private final DcMotorEx shooterLeft;
+//    private final DcMotorEx shooterRight;
 
     private final DcMotorEx shooter;
     private final Servo Hood;
@@ -40,6 +40,7 @@ public class Shooter extends SubsystemBase {
 
     // Target RPM for the flywheel
     private double targetRPM = 0.0;
+    public static double publicRPM = 0.0;
 
     public double distance = 0;
 
@@ -67,8 +68,8 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(HardwareMap hardwareMap) {
         // shooterLeft and shooterRight to be removed
-        shooterLeft = hardwareMap.get(DcMotorEx.class, "shooterLeft");
-        shooterRight = hardwareMap.get(DcMotorEx.class, "shooterRight");
+//        shooterLeft = hardwareMap.get(DcMotorEx.class, "shooterLeft");
+//        shooterRight = hardwareMap.get(DcMotorEx.class, "shooterRight");
 
 
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
@@ -79,20 +80,20 @@ public class Shooter extends SubsystemBase {
 
         // Configure motors
         // shooterLeft and shooterRight to be removed
-        shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+ //       shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        shooterLeft.setDirection(DcMotor.Direction.FORWARD);
-        shooterRight.setDirection(DcMotor.Direction.REVERSE);
+//        shooterLeft.setDirection(DcMotor.Direction.FORWARD);
+//        shooterRight.setDirection(DcMotor.Direction.REVERSE);
 
         // Configure motor modes - only shooterLeft has encoder
-        shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);  // Has encoder
-        shooterRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // No encoder
+//        shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);  // Has encoder
+      shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // No encoder
 
         // Set PID tolerance (adjustable via static parameter)
         pidController.setTolerance(tolerance);
@@ -109,7 +110,7 @@ public class Shooter extends SubsystemBase {
         shooterStatus = status;
     }
     public double getFlyWheelVelocity() {
-        return shooterLeft.getVelocity() * (2.0 * Math.PI) / 60.0; // Convert RPM to rad/s
+        return shooter.getVelocity() * (2.0 * Math.PI) / 60.0; // Convert RPM to rad/s
 
     }
 
@@ -125,7 +126,7 @@ public class Shooter extends SubsystemBase {
         // shooterLeft has encoder, so we use its velocity as representative
         // of the entire flywheel speed (both motors should spin at same speed)
         // getVelocity() returns encoder ticks per second, convert to RPM
-        return shooterLeft.getVelocity() * 60.0 / 28.0; // 28 ticks per revolution
+        return shooter.getVelocity() * 60.0 / 28.0; // 28 ticks per revolution
     }
     public void setTargetRPM(double targetRPM) {
         this.targetRPM = targetRPM;
@@ -160,11 +161,9 @@ public class Shooter extends SubsystemBase {
         shooterStatus = ShooterStatus.Idling;
     }
     public void updateFlywheelPID() {
-        shooterLeft.setVelocityPIDFCoefficients(Kp,Ki,Kd,0);
-        shooterRight.setVelocityPIDFCoefficients(Kp,Ki,Kd,0);
+        shooter.setVelocityPIDFCoefficients(Kp,Ki,Kd,0);
 
-        shooterLeft.setVelocity(targetRPM*28/60);
-        shooterRight.setVelocity(targetRPM*28/60);
+        shooter.setVelocity(targetRPM*28/60);
 //        if (targetRPM > 0) {
 //            // Update PID parameters and tolerance in case they were changed via dashboard
 //            pidController.setPID(Kp, Ki, Kd);
@@ -211,8 +210,7 @@ public class Shooter extends SubsystemBase {
      * Set flywheel power directly (bypasses PID)
      */
     public void setFlywheelPower(double power) {
-        shooterLeft.setPower(power);
-        shooterRight.setPower(power);
+        shooter.setPower(power);
         // Reset target when using manual power
         targetRPM = 0;
     }
@@ -240,6 +238,7 @@ public class Shooter extends SubsystemBase {
 
     // TODO: Rewrite the updateAim method
     public void updateAim() {
+        setTargetRPM(publicRPM);
 //        distance = abs(distance);
 //        if (distance > 3.25){
 //            setTargetRPM(3850);
