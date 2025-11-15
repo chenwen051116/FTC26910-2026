@@ -54,6 +54,7 @@ public class teleOp extends LinearOpMode {
         limeLight = new MyLimelight(hardwareMap);
         limeLight.initRedPipeline();
         limeLight.startDetect();
+        telemetry.setMsTransmissionInterval(200);
 
         waitForStart();
         while (opModeIsActive()){
@@ -110,10 +111,6 @@ public class teleOp extends LinearOpMode {
             double rx = gamepad1.right_stick_x;
             drivetrain.teleDrive(y, x, rx);
 
-            // telemetry output
-            telemetry.addData("Gamepad1 Left Stick X", x);
-            telemetry.addData("Gamepad1 Left Stick Y", y);
-            telemetry.addData("Gamepad1 Right Stick X", rx);
 
             // intake
             // set intake status
@@ -135,7 +132,7 @@ public class teleOp extends LinearOpMode {
             telemetry.addData("Apriltag(PoI) Tx", limeLight.getTx());
             telemetry.addData("Apriltag ID", limeLight.getAprilTagID());
             telemetry.addData("Pitch", limeLight.getPitch());
-
+            telemetry.update();
             // shooter
             // telemetry
 //            telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());
