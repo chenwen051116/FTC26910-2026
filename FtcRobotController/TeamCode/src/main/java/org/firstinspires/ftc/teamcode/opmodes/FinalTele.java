@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
@@ -34,7 +35,8 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class FinalTele extends LinearOpMode {
 
-  //  private Telemetry telemetry;
+    private MultipleTelemetry telemetry;
+
     private Drivetrain drivetrain;
     private Intake intake;
     private Shooter shooter;
@@ -50,6 +52,7 @@ public class FinalTele extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drivetrain = new Drivetrain(hardwareMap);
 
         intake = new Intake(hardwareMap);
