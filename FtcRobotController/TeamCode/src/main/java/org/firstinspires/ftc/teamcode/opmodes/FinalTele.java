@@ -62,6 +62,7 @@ public class FinalTele extends LinearOpMode {
         limeLight.startDetect();
         turret.initEncoder();
         shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
+        telemetry.setMsTransmissionInterval(200);
         waitForStart();
         while (opModeIsActive()){
             shooter.periodic();
@@ -157,7 +158,7 @@ public class FinalTele extends LinearOpMode {
             telemetry.addData("Apriltag(PoI) Tx", limeLight.getTx());
             telemetry.addData("Apriltag ID", limeLight.getAprilTagID());
             telemetry.addData("Pitch", limeLight.getPitch());
-
+            telemetry.update();
             // shooter
             // telemetry
             telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());

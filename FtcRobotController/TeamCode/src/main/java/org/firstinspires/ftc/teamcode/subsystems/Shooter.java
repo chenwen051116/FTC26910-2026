@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -26,9 +27,9 @@ public class Shooter extends SubsystemBase {
 
 
     // Tunable PID parameters - can be adjusted via FTC Dashboard
-    public static double Kp = 27;  // Proportional gain
-    public static double Ki = 0.01; // Integral gain
-    public static double Kd = -10;    // Derivative gain
+    public static double Kp = 15;  // Proportional gain
+    public static double Ki = 0; // Integral gain
+    public static double Kd = 0;    // Derivative gain
     public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
 
@@ -53,6 +54,8 @@ public class Shooter extends SubsystemBase {
     public boolean autoLonger = true;
 
     public double PIDoutput;
+
+
 
 
 
@@ -84,6 +87,7 @@ public class Shooter extends SubsystemBase {
 //        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
  //       shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
