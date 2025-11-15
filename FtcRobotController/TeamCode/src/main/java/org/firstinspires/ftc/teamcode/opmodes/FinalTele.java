@@ -72,6 +72,7 @@ public class FinalTele extends LinearOpMode {
                 intake.updateAutoTrans(shooter.isAtTargetRPM());
                 shooter.updateDis(limeLight.getDis());
                 shooter.updateFocused(limeLight.isFocused());
+                turret.tx = limeLight.getTx();
                 turret.updateAutoShoot(true);
             }
             else{
