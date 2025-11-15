@@ -264,7 +264,9 @@ public class Shooter extends SubsystemBase {
 //        }
     }
 
-
+    public void passRPM(){
+        targetRPM = aimRPM;
+    }
 
 
     /**
@@ -282,6 +284,7 @@ public class Shooter extends SubsystemBase {
     }
     @Override
     public void periodic(){
+        passRPM();
         updateHoodAngle();
         updateFlywheelPID();
         if(shooterStatus == ShooterStatus.Shooting && focused){

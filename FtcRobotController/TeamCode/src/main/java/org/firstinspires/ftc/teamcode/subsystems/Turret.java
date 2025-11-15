@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static java.lang.Math.floor;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 // TODO: Adapt the system into our robot
+@Config
 public class Turret extends SubsystemBase {
     // battery is not yet installed and configured
     // shooter is not yet installed and configured
@@ -23,13 +25,14 @@ public class Turret extends SubsystemBase {
 
     public boolean autoForce = false;
 
-    public static double kp = 0;
+    public static double kp = -0.375;
 
     public static int targetpos = 0;
 
     public double tx =0;
 
     // Constructor for intake motors
+
     public Turret(HardwareMap hardwareMap) {
         turretMotor = hardwareMap.get(DcMotor.class, "turret");
         // We do not have distance sensor thus the following object should be removed

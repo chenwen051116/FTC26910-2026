@@ -35,7 +35,7 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class FinalTele extends LinearOpMode {
 
-    private MultipleTelemetry telemetry;
+   // private MultipleTelemetry telemetry;
 
     private Drivetrain drivetrain;
     private Intake intake;
@@ -69,10 +69,12 @@ public class FinalTele extends LinearOpMode {
         while (opModeIsActive()){
             shooter.periodic();
             turret.periodic();
+            limeLight.periodic();
 
             if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
                 intake.updateAutoShoot(true);
-                intake.updateAutoTrans(shooter.isAtTargetRPM());
+                //intake.updateAutoTrans(shooter.isAtTargetRPM());
+                intake.updateAutoTrans(true);
                 shooter.updateDis(limeLight.getDis());
                 shooter.updateFocused(limeLight.isFocused());
                 turret.tx = limeLight.getTx();
