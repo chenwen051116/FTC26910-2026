@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -26,6 +27,8 @@ public class Turret extends SubsystemBase {
     public boolean autoForce = false;
 
     public static double kp = -0.375;
+    public static double highkp = -2;
+    public static double txbar = 5;
 
     public static int targetpos = 0;
 
@@ -54,16 +57,21 @@ public class Turret extends SubsystemBase {
     }
 
     public void focusMode(){
-        if(tx < 1){
-            turretMotor.setPower(0.4);
+        if(abs(tx) < txbar){
+            turretMotor.setPower(0.6);
+            int dpos = (int) floor(kp*tx);
+            targetpos += dpos;
+            turretMotor.setTargetPosition(targetpos);
+            turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         else{
-            turretMotor.setPower(0.8);
+            turretMotor.setPower(1);
+            int dpos = (int) floor(highkp*tx);
+            targetpos += dpos;
+            turretMotor.setTargetPosition(targetpos);
+            turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-        int dpos = (int) floor(kp*tx);
-        targetpos += dpos;
-        turretMotor.setTargetPosition(targetpos);
-        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
     }
 
     public void centering(){
