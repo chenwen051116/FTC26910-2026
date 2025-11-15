@@ -36,6 +36,7 @@ public class Turret extends SubsystemBase {
         // in future updates
         // The intake does not need to necessarily move at steady
         turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // The transfer has to be steady for the case where there are already balls in the
         // transfer stage
@@ -46,6 +47,7 @@ public class Turret extends SubsystemBase {
     // Enum which stores all the power needed for each state of the intake motors
     public void initEncoder(){
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void focusMode(){

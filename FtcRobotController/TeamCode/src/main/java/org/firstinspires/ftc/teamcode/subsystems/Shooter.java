@@ -74,7 +74,7 @@ public class Shooter extends SubsystemBase {
 
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
         Hood = hardwareMap.get(Servo.class, "Hood");
-
+        Hood.setPosition(hoodAngle);
         // Initialize PID controller
         pidController = new PIDController(Kp, Ki, Kd);
 

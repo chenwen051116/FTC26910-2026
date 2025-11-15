@@ -60,7 +60,7 @@ public class FinalTele extends LinearOpMode {
 
         limeLight.initRedPipeline();
         limeLight.startDetect();
-
+        turret.initEncoder();
 
         waitForStart();
         while (opModeIsActive()){

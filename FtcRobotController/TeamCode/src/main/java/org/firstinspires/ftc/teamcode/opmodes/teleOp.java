@@ -133,6 +133,7 @@ public class teleOp extends LinearOpMode {
             telemetry.addData("Apriltag ID", limeLight.getAprilTagID());
             telemetry.addData("Pitch", limeLight.getPitch());
             telemetry.update();
+            limeLight.periodic();
             // shooter
             // telemetry
 //            telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());
