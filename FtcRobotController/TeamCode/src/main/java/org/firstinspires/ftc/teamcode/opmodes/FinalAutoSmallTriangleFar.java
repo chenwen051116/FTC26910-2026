@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.fwd2;
-import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.fwd3;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.fwd1;
 
 
 import com.pedropathing.util.Timer;
@@ -51,7 +50,10 @@ public class FinalAutoSmallTriangleFar extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            drivetrain.forward(fwd3);
+            drivetrain.forward(fwd1);
+            timer.resetTimer();
+            while(timer.getElapsedTimeSeconds()<3){
+            }
             return;
 
 
