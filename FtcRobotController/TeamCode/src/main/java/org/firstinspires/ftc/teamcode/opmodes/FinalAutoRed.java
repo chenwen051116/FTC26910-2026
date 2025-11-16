@@ -62,10 +62,6 @@ public class FinalAutoRed extends LinearOpMode {
             timer.resetTimer();
             while(timer.getElapsedTimeSeconds()<3){
             }
-            drivetrain.turn(turn1);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
 
             shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
             timer.resetTimer();
@@ -83,62 +79,6 @@ public class FinalAutoRed extends LinearOpMode {
             intake.updateAutoShoot(false);
             shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
 
-            drivetrain.turn(-turn1);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
-
-            drivetrain.forward(fwd2);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
-            drivetrain.turn(turn2);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
-            intake.setIntakeState(Intake.IntakeTransferState.Suck_In);
-            drivetrain.forward(fwd3);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<5){
-                intake.periodic();
-            }
-            intake.setIntakeState(Intake.IntakeTransferState.Intake_Steady);
-
-            drivetrain.forward(-fwd4);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
-            drivetrain.turn(turn3);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
-
-
-            shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<5){
-                shooter.periodic();
-                //turret.periodic();
-                limeLight.periodic();
-                intake.periodic();
-                intake.updateAutoShoot(true);
-                intake.updateAutoTrans(shooter.isAtTargetRPM());
-                //intake.updateAutoTrans(true);
-                shooter.updateDis(limeLight.getDis());
-                shooter.updateFocused(true);
-            }
-            intake.updateAutoShoot(false);
-            shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
-
-            drivetrain.turn(turn4);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
-
-            drivetrain.forward(fwd5);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
             return;
 
 
