@@ -18,7 +18,7 @@ public class Shooter extends SubsystemBase {
     // shooterLeft and shooterRight to be removed
 //    private final DcMotorEx shooterLeft;
 //    private final DcMotorEx shooterRight;
-
+    public static int baseRPM = 3400;
     private final DcMotorEx shooter;
     private final Servo Hood;
     private final PIDController pidController;
@@ -254,7 +254,7 @@ public class Shooter extends SubsystemBase {
 //            setTargetRPM(3850);
 //        }
         if (distance < 1.4&&distance>0.58){
-            setTargetRPM(1300*distance+3400);
+            setTargetRPM(1300*distance+baseRPM);
             setHoodAngle(0.55*distance+0.5);
         }
         else{
