@@ -30,7 +30,7 @@ public class    Constants {
             .rightRearEncoderDirection(Encoder.FORWARD);
 
     public static FollowerConstants followerConstants = new FollowerConstants()
-//            .mass(11.337)
+            .mass(11.337)
 //            .forwardZeroPowerAcceleration(-26.465452204903155)
 //            .lateralZeroPowerAcceleration(-67.6584184654734)
 //            .useSecondaryTranslationalPIDF(true)
@@ -73,8 +73,8 @@ public class    Constants {
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
-                .driveEncoderLocalizer(localizerConstants)
-                /* other builder steps */
+                .pathConstraints(pathConstraints)
+                .mecanumDrivetrain(driveConstants)
                 .build();
     }
 
