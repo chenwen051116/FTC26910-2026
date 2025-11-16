@@ -163,7 +163,7 @@ public class Shooter extends SubsystemBase {
         shooterStatus = ShooterStatus.Idling;
     }
     public void updateFlywheelPID() {
-        //shooter.setVelocityPIDFCoefficients(Kp,Ki,Kd,0);
+//        shooter.setVelocityPIDFCoefficients(Kp,Ki,Kd,0);
 
         shooter.setVelocity(targetRPM*28/60);
 //        if (targetRPM > 0) {
