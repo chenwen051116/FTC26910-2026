@@ -22,7 +22,9 @@ public class Constants {
             .leftFrontEncoderDirection(Encoder.FORWARD)
             .leftRearEncoderDirection(Encoder.FORWARD)
             .rightFrontEncoderDirection(Encoder.FORWARD)
-            .rightRearEncoderDirection(Encoder.FORWARD);
+            .rightRearEncoderDirection(Encoder.FORWARD)
+            ;
+
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(0.8)
             .rightFrontMotorName("frontRight")
