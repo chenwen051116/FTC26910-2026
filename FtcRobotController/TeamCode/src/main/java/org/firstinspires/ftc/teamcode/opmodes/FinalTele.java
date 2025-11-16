@@ -43,7 +43,7 @@ public class FinalTele extends LinearOpMode {
     //    private Shooter shooter;
     private MyLimelight limeLight;
     private Turret turret;
-        private boolean xJustPressed = false;
+    private boolean xJustPressed = false;
     private boolean xHolding = false;
     private boolean yJustPressed = false;
     private boolean yHolding = false;

@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase {
     public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
 
-    public static double hoodAngle = 0.5;
+    public static double hoodAngle = 0;
 
     public static double aimRPM = 0;
 
@@ -163,7 +163,7 @@ public class Shooter extends SubsystemBase {
         shooterStatus = ShooterStatus.Idling;
     }
     public void updateFlywheelPID() {
-        shooter.setVelocityPIDFCoefficients(Kp,Ki,Kd,0);
+        //shooter.setVelocityPIDFCoefficients(Kp,Ki,Kd,0);
 
         shooter.setVelocity(targetRPM*28/60);
 //        if (targetRPM > 0) {
@@ -284,11 +284,12 @@ public class Shooter extends SubsystemBase {
     }
     @Override
     public void periodic(){
-        passRPM();
+
         updateHoodAngle();
         updateFlywheelPID();
         if(shooterStatus == ShooterStatus.Shooting && focused){
             updateAim();
+            passRPM();
         }
         else if(shooterStatus == ShooterStatus.Stop){
             completeStop();

@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -33,10 +34,11 @@ import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class shooterTestTeleOp extends LinearOpMode{
-    private Telemetry telemetry;
-
+    private Shooter shooter = new Shooter(hardwareMap);
+    private Intake intake = new Intake(hardwareMap);
 
     public void runOpMode(){
+        telemetry.setMsTransmissionInterval(200);
 
     }
 }
