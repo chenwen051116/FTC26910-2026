@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Drivetrain extends SubsystemBase {
     //declare motors.. 声明，赋值...
     private final DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
-    public static double kpll = 0.018;
+    public static double kpll = -0.040;
     //servos
 
     public Drivetrain(HardwareMap hardwareMap) {      //Constructor,新建对象时需要
