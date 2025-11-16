@@ -10,17 +10,8 @@ public class AutoDrivetrain extends SubsystemBase {
     //declare motors.. 声明，赋值...
     private final DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
     public static double power = 0.4;
-    public static int fwd1 = -2000;
-    public static int turn1 = 400;
-
-    public static int fwd2 = 1000;
-    public static int turn2 = 400;
-    public static int turn3 = 400;
-    public static int turn4 = 400;
-    public static int fwd3 = 1000;
-    public static int fwd4 = 1000;
-    public static int fwd5 = 1000;
-    //servos
+    public static int fwd1 = 700;
+    public static int stf1 = 400;
     public int fltar = 0;
     public int frtar = 0;
     public int bltar = 0;
@@ -55,6 +46,25 @@ public class AutoDrivetrain extends SubsystemBase {
         fltar+=dis;
         frtar+=dis;
         bltar+=dis;
+        brtar+=dis;
+        frontLeftMotor.setTargetPosition(fltar);
+        frontRightMotor.setTargetPosition(frtar);
+        backLeftMotor.setTargetPosition(bltar);
+        backRightMotor.setTargetPosition(brtar);
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void strafe (int dis){
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(power);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(power);
+        fltar+=dis;
+        frtar-=dis;
+        bltar-=dis;
         brtar+=dis;
         frontLeftMotor.setTargetPosition(fltar);
         frontRightMotor.setTargetPosition(frtar);

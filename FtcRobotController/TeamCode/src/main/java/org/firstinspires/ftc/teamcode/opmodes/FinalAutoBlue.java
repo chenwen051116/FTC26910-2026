@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @Autonomous
-public class FinalAutoRed extends LinearOpMode {
+public class FinalAutoBlue extends LinearOpMode {
 
     // private MultipleTelemetry telemetry;
     private Timer timer;
@@ -43,7 +43,7 @@ public class FinalAutoRed extends LinearOpMode {
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
 
-        limeLight.initRedPipeline();
+        limeLight.initBluePipeline();
         limeLight.startDetect();
         turret.initEncoder();
         shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
@@ -73,7 +73,7 @@ public class FinalAutoRed extends LinearOpMode {
             intake.updateAutoShoot(false);
             shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
 
-            drivetrain.strafe(stf1);
+            drivetrain.strafe(-stf1);
             timer.resetTimer();
             while(timer.getElapsedTimeSeconds()<3){
             }
