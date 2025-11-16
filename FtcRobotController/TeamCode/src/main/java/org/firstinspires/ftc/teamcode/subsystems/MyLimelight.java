@@ -85,7 +85,7 @@ public class MyLimelight extends SubsystemBase {
     // NOTE for AprilTag: size is 16.5cm * 16.5cm
 
     public boolean isFocused(){
-        return abs(getTx()) < 0.1;
+        return abs(getTx()) < 1;
     }
     public double getDis() {
         // Fetch most recent vision result each scheduler loop
