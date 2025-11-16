@@ -33,7 +33,7 @@ public class Shooter extends SubsystemBase {
 
     public static double hoodAngle = 0;
 
-    public static double aimRPM = 0;
+    public static double aimRPM = 4000;
 
     // Records the default value of the hood. Used in resetHoodAngle()
 

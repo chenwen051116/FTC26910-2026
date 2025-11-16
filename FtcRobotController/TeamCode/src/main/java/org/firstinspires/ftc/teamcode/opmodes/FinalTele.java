@@ -68,7 +68,7 @@ public class FinalTele extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
             shooter.periodic();
-            turret.periodic();
+            //turret.periodic();
             limeLight.periodic();
 
             if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
@@ -77,12 +77,12 @@ public class FinalTele extends LinearOpMode {
                 intake.updateAutoTrans(true);
                 shooter.updateDis(limeLight.getDis());
                 shooter.updateFocused(limeLight.isFocused());
-                turret.tx = limeLight.getTx();
-                turret.updateAutoShoot(true);
+                //turret.tx = limeLight.getTx();
+                //turret.updateAutoShoot(true);
             }
             else{
                 intake.updateAutoShoot(false);
-                turret.updateAutoShoot(false);
+                //turret.updateAutoShoot(false);
             }
             // check keys
             if(gamepad1.x){
@@ -135,7 +135,12 @@ public class FinalTele extends LinearOpMode {
             double x = -gamepad1.left_stick_x;
             double y = gamepad1.left_stick_y;
             double rx = -gamepad1.right_stick_x;
-            drivetrain.teleDrive(y, x, rx);
+            if(shooter.shooterStatus== Shooter.ShooterStatus.Shooting){
+                drivetrain.teleDrive(y, x,Drivetrain.kpll*limeLight.getTx());
+            }
+            else{
+                drivetrain.teleDrive(y, x, rx);
+            }
 
             // intake
             // set intake status
