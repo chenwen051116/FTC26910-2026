@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase {
     public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
 
-    public static double hoodAngle = 0;
+    public static double hoodAngle = 0.5;
 
     public static double aimRPM = 4000;
 
