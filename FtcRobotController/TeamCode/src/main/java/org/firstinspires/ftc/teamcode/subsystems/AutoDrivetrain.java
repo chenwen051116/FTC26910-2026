@@ -11,7 +11,7 @@ public class AutoDrivetrain extends SubsystemBase {
     private final DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
     public static double power = 0.4;
     public static int fwd1 = 700;
-    public static int stf1 = 000;
+    public static double stf1 = 0.4;
     public int fltar = 0;
     public int frtar = 0;
     public int bltar = 0;
@@ -70,6 +70,26 @@ public class AutoDrivetrain extends SubsystemBase {
         double frontLeftPower = (rx) / denominator;
         double backLeftPower = (rx) / denominator;
         double frontRightPower = (rx) / denominator;
+        double backRightPower = (rx) / denominator;
+
+        frontLeftMotor.setPower(frontLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backLeftMotor.setPower(backLeftPower);
+        backRightMotor.setPower(backRightPower);
+    }
+
+
+    public void strafe(double power){
+
+        double rx = power;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(rx), 1);
+        double frontLeftPower = (rx) / denominator;
+        double backLeftPower = (-rx) / denominator;
+        double frontRightPower = (-rx) / denominator;
         double backRightPower = (rx) / denominator;
 
         frontLeftMotor.setPower(frontLeftPower);

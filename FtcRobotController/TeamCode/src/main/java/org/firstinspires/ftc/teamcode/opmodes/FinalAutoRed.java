@@ -75,10 +75,10 @@ public class FinalAutoRed extends LinearOpMode {
             intake.updateAutoShoot(false);
             shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
 //
-//            drivetrain.strafe(stf1);
-//            timer.resetTimer();
-//            while(timer.getElapsedTimeSeconds()<3){
-//            }
+            drivetrain.strafe(stf1);
+            timer.resetTimer();
+            while(timer.getElapsedTimeSeconds()<1){
+            }
             return;
 
 
