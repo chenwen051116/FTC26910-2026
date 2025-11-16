@@ -233,21 +233,32 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setHoodAngle(double angle){
-        hoodAngle = hoodAngle + angle;
+        if(angle<0.5){
+            angle = 0.5;
+        }
+        if(angle>1){
+            angle = 1;
+        }
+        hoodAngle = angle;
     }
 
 
 
     // TODO: Rewrite the updateAim method
     public void updateAim() {
-        setTargetRPM(publicRPM);
-//        distance = abs(distance);
+//        setTargetRPM(publicRPM);
+        distance = abs(distance);
 //        if (distance > 3.25){
 //            setTargetRPM(3850);
 //        }
-//        else if (distance < 1.4){
-//            setTargetRPM(100*distance+2750);
-//        }
+        if (distance < 1.4&&distance>0.58){
+            setTargetRPM(1300*distance+4000);
+            setHoodAngle(0.55*distance+0.5);
+        }
+        else{
+            setHoodAngle(0.5);
+            setTargetRPM(4000);
+        }
 //        else{
 //            setTargetRPM(300*distance+2750);
 //        }
@@ -256,7 +267,7 @@ public class Shooter extends SubsystemBase {
 //            setTargetRPM(3500);
 //        }
 //
-//        if(automode&&autoLonger){
+ //        if(automode&&autoLonger){
 //            setTargetRPM(3500);
 //        }
 //        else if(automode&&!autoLonger){
@@ -287,9 +298,9 @@ public class Shooter extends SubsystemBase {
 
         updateHoodAngle();
         updateFlywheelPID();
-        if(shooterStatus == ShooterStatus.Shooting && focused){
+        if(shooterStatus == ShooterStatus.Shooting){
             updateAim();
-            passRPM();
+            //passRPM();
         }
         else if(shooterStatus == ShooterStatus.Stop){
             completeStop();
