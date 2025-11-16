@@ -11,14 +11,12 @@ public class AutoDrivetrain extends SubsystemBase {
     private final DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
     public static double power = 0.4;
     public static int fwd1 = 700;
-
-    public static int fwd2 = 500;
-    public static int fwd3 = 700;
-    public static int stf1 = 200;
+    public static int stf1 = 000;
     public int fltar = 0;
     public int frtar = 0;
     public int bltar = 0;
     public int brtar = 0;
+    public static double kp = -0.040;
     public AutoDrivetrain(HardwareMap hardwareMap) {      //Constructor,新建对象时需要
         frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRightMotor = hardwareMap.get(DcMotor.class, "frontRight");
@@ -41,6 +39,44 @@ public class AutoDrivetrain extends SubsystemBase {
 
     }
 
+    public void changemode(){
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
+    }
+
+    public void focus(double tx){
+
+        double rx = kp*tx;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(rx), 1);
+        double frontLeftPower = (rx) / denominator;
+        double backLeftPower = (rx) / denominator;
+        double frontRightPower = (rx) / denominator;
+        double backRightPower = (rx) / denominator;
+
+        frontLeftMotor.setPower(frontLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backLeftMotor.setPower(backLeftPower);
+        backRightMotor.setPower(backRightPower);
+    }
     public void forward (int dis){
         frontLeftMotor.setPower(power);
         frontRightMotor.setPower(power);

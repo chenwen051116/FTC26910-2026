@@ -58,8 +58,10 @@ public class FinalAutoRed extends LinearOpMode {
             }
 
             shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
+            drivetrain.changemode();
             timer.resetTimer();
             while(timer.getElapsedTimeSeconds()<5){
+                drivetrain.focus(limeLight.getTx());
                 shooter.periodic();
                 //turret.periodic();
                 limeLight.periodic();
@@ -72,11 +74,11 @@ public class FinalAutoRed extends LinearOpMode {
             }
             intake.updateAutoShoot(false);
             shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
-
-            drivetrain.strafe(stf1);
-            timer.resetTimer();
-            while(timer.getElapsedTimeSeconds()<3){
-            }
+//
+//            drivetrain.strafe(stf1);
+//            timer.resetTimer();
+//            while(timer.getElapsedTimeSeconds()<3){
+//            }
             return;
 
 
