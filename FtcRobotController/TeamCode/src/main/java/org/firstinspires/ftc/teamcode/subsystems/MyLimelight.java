@@ -123,7 +123,7 @@ public class MyLimelight extends SubsystemBase {
     @Override
     public void periodic() {
         // This is called automatically by FTCLib’s scheduler every cycle
-        if (llenable) {
+        if (llenable && limelight.getLatestResult() != null) {
             aprilTagLatestResult = limelight.getLatestResult();
         }
     }

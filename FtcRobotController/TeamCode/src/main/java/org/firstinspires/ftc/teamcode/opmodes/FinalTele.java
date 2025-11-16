@@ -70,6 +70,7 @@ public class FinalTele extends LinearOpMode {
             shooter.periodic();
             //turret.periodic();
             limeLight.periodic();
+            intake.periodic();
 
             if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
                 intake.updateAutoShoot(true);
@@ -135,7 +136,7 @@ public class FinalTele extends LinearOpMode {
             double x = -gamepad1.left_stick_x;
             double y = gamepad1.left_stick_y;
             double rx = -gamepad1.right_stick_x;
-            if(shooter.shooterStatus== Shooter.ShooterStatus.Shooting){
+            if(gamepad1.left_bumper){
                 drivetrain.teleDrive(y, x,Drivetrain.kpll*limeLight.getTx());
             }
             else{

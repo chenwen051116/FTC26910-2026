@@ -35,6 +35,8 @@ public class Shooter extends SubsystemBase {
 
     public static double aimRPM = 4000;
 
+    public static int RPMshift = 3400;
+
     // Records the default value of the hood. Used in resetHoodAngle()
 
     // Target RPM for the flywheel
@@ -252,7 +254,7 @@ public class Shooter extends SubsystemBase {
 //            setTargetRPM(3850);
 //        }
         if (distance < 1.4&&distance>0.58){
-            setTargetRPM(1300*distance+4000);
+            setTargetRPM(1300*distance+3400);
             setHoodAngle(0.55*distance+0.5);
         }
         else{
