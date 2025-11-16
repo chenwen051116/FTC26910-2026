@@ -10,6 +10,16 @@ public class AutoDrivetrain extends SubsystemBase {
     //declare motors.. 声明，赋值...
     private final DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
     public static double power = 0.4;
+    public static int fwd1 = 1000;
+    public static int turn1 = 400;
+
+    public static int fwd2 = 1000;
+    public static int turn2 = 400;
+    public static int turn3 = 400;
+    public static int turn4 = 400;
+    public static int fwd3 = 1000;
+    public static int fwd4 = 1000;
+    public static int fwd5 = 1000;
     //servos
     public int fltar = 0;
     public int frtar = 0;

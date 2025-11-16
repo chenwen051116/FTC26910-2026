@@ -1,5 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.fwd1;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.fwd2;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.fwd3;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.fwd4;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.fwd5;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.turn1;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.turn2;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.turn3;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain.turn4;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.util.Timer;
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -15,7 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @Autonomous
-@Config
 public class FinalAutoRed extends LinearOpMode {
 
     // private MultipleTelemetry telemetry;
@@ -28,16 +37,7 @@ public class FinalAutoRed extends LinearOpMode {
     private Turret turret;
     private double x, y, rx;
 
-    public static int fwd1 = 1000;
-    public static int turn1 = 400;
 
-    public static int fwd2 = 1000;
-    public static int turn2 = 400;
-    public static int turn3 = 400;
-    public static int turn4 = 400;
-    public static int fwd3 = 1000;
-    public static int fwd4 = 1000;
-    public static int fwd5 = 1000;
 
     @Override
     public void runOpMode() {
