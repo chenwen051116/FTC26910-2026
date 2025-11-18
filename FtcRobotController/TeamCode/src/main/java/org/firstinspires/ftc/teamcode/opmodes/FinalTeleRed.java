@@ -26,7 +26,13 @@ public class FinalTeleRed extends LinearOpMode {
     private boolean xHolding = false;
     private boolean yJustPressed = false;
     private boolean yHolding = false;
+    private boolean slowMode = false;
+    private boolean dPadUpHolding = false;
+    private boolean dPadUpJustPressed = false;
+    private boolean dPadDownHolding = false;
+    private boolean dPadDownJustPressed = false;
     private double x, y, rx;
+    private double speedMultiplier = 1;
 
 
     @Override
@@ -39,6 +45,7 @@ public class FinalTeleRed extends LinearOpMode {
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
 
+        // default red
         limeLight.initRedPipeline();
         limeLight.startDetect();
         turret.initEncoder();
@@ -87,6 +94,24 @@ public class FinalTeleRed extends LinearOpMode {
                 yJustPressed = false;
             }
 
+            if(gamepad1.dpad_up){
+                if(!dPadUpHolding){
+                    dPadUpJustPressed = true;
+                    dPadUpHolding = true;
+                }
+            }
+            else{
+                dPadUpHolding = false;
+                dPadUpJustPressed = false;
+            }
+
+            if(gamepad1.dpad_down){
+                if(!dPadDownHolding){
+                    dPadDownJustPressed = true;
+                    dPadDownHolding = true;
+                }
+            }
+
             // set shooter status
             if(yJustPressed &&shooter.shooterStatus != Shooter.ShooterStatus.Shooting){
                 if(shooter.shooterStatus == Shooter.ShooterStatus.Idling) {
@@ -98,11 +123,11 @@ public class FinalTeleRed extends LinearOpMode {
                 yJustPressed = false;
             }
             if(xJustPressed){
-                if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
+                if(shooter.shooterStatus == Shooter.ShooterStatus.Idling){
+                    shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
                 }
                 else{
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
+                    shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
                 }
                 xJustPressed = false;
 
@@ -112,9 +137,9 @@ public class FinalTeleRed extends LinearOpMode {
             // drivetrain
             // set drivetrain status
 
-            double x = -gamepad1.left_stick_x;
-            double y = gamepad1.left_stick_y;
-            double rx = -gamepad1.right_stick_x;
+            double x = -gamepad1.left_stick_x * speedMultiplier;
+            double y = gamepad1.left_stick_y * speedMultiplier;
+            double rx = -gamepad1.right_stick_x * speedMultiplier;
             if(gamepad1.left_bumper){
                 drivetrain.teleDrive(y, x,Drivetrain.kpll*limeLight.getTx());
             }
@@ -122,11 +147,25 @@ public class FinalTeleRed extends LinearOpMode {
                 drivetrain.teleDrive(y, x, rx);
             }
 
+            if(gamepad1.left_trigger > 0.3){
+                slowMode = true;
+            }
+            else{
+                slowMode = false;
+            }
+
+            if (slowMode){
+                speedMultiplier = 0.3;
+            }
+            else{
+                speedMultiplier = 1;
+            }
+
             // intake
             // set intake status
-            if (gamepad1.right_trigger > 0.3 ){
+            if (gamepad1.right_trigger > 0.3){
                 intake.setIntakeState(Intake.IntakeTransferState.Suck_In);
-            } else if (gamepad1.left_trigger > 0.3){
+            } else if (gamepad1.dpad_up){
                 intake.setIntakeState(Intake.IntakeTransferState.Split_Out);
             } else if (gamepad1.right_bumper) {
                 intake.setIntakeState(Intake.IntakeTransferState.Send_It_Up);
@@ -136,6 +175,15 @@ public class FinalTeleRed extends LinearOpMode {
 
 
             // limelight
+            if (gamepad1.dpad_left){
+                limeLight.initRedPipeline();
+                limeLight.startDetect();
+            }
+            else if(gamepad1.dpad_right){
+                limeLight.initBluePipeline();
+                limeLight.startDetect();
+            }
+
             // telemetry
             telemetry.addData("Apriltag dist", limeLight.getDis());
             telemetry.addData("Apriltag X", limeLight.getX());

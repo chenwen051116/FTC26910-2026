@@ -11,7 +11,7 @@ public class AutoDrivetrain extends SubsystemBase {
     private final DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
     public static double power = 0.4;
     public static int fwd1 = 700;
-    public static double stf1 = 0.4;
+    public static double stf1 = -0.5;
     public int fltar = 0;
     public int frtar = 0;
     public int bltar = 0;
