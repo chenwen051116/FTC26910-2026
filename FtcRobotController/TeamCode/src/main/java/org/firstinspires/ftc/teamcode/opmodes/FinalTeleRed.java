@@ -54,7 +54,7 @@ public class FinalTeleRed extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
             shooter.periodic();
-            //turret.periodic();
+            turret.periodic();
             limeLight.periodic();
             intake.periodic();
 
@@ -64,8 +64,8 @@ public class FinalTeleRed extends LinearOpMode {
                 //intake.updateAutoTrans(true);
                 shooter.updateDis(limeLight.getDis());
                 shooter.updateFocused(limeLight.isFocused());
-                //turret.tx = limeLight.getTx();
-                //turret.updateAutoShoot(true);
+                turret.tx = limeLight.getTx();
+                turret.updateAutoShoot(true);
             }
             else{
                 intake.updateAutoShoot(false);
@@ -140,11 +140,16 @@ public class FinalTeleRed extends LinearOpMode {
             double x = -gamepad1.left_stick_x * speedMultiplier;
             double y = gamepad1.left_stick_y * speedMultiplier;
             double rx = -gamepad1.right_stick_x * speedMultiplier;
+            drivetrain.teleDrive(y, x, rx);
             if(gamepad1.left_bumper){
-                drivetrain.teleDrive(y, x,Drivetrain.kpll*limeLight.getTx());
+                //drivetrain.teleDrive(y, x,Drivetrain.kpll*limeLight.getTx());
+                turret.tx = limeLight.getTx();
+                turret.updateAutoShoot(true);
             }
             else{
-                drivetrain.teleDrive(y, x, rx);
+                if(shooter.shooterStatus != Shooter.ShooterStatus.Shooting){
+                    turret.updateAutoShoot(false);
+                }
             }
 
             if(gamepad1.left_trigger > 0.3){

@@ -82,9 +82,6 @@ public class Turret extends SubsystemBase {
         turretMotor.setTargetPosition(targetpos);
         turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-    // This function is not necessary
-    // used to update the state of the intake motors when called
-
 
     // Standardization of the two functions
     public void updateAutoShoot(boolean auto){
