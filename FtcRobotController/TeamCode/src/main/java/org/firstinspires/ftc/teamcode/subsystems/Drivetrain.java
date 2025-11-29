@@ -30,6 +30,8 @@ public class Drivetrain extends SubsystemBase {
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public void teleDrive (double frontBackVelocity, double strafeVelocity, double turnVelocity){
@@ -41,10 +43,10 @@ public class Drivetrain extends SubsystemBase {
         // This ensures all the powers maintain the same ratio, but only when
         // at least one is out of the range [-1, 1]
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y + x + rx) / denominator;
-        double backLeftPower = (y - x + rx) / denominator;
-        double frontRightPower = (y - x - rx) / denominator;
-        double backRightPower = (y + x - rx) / denominator;
+        double frontLeftPower = (y - x + rx) / denominator;
+        double backLeftPower = (y + x + rx) / denominator;
+        double frontRightPower = (y + x - rx) / denominator;
+        double backRightPower = (y - x - rx) / denominator;
 
         frontLeftMotor.setPower(frontLeftPower);
         frontRightMotor.setPower(frontRightPower);

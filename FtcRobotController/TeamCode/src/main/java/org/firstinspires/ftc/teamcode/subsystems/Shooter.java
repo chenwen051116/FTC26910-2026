@@ -16,8 +16,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Shooter extends SubsystemBase {
 
     // shooterLeft and shooterRight to be removed
-//    private final DcMotorEx shooterLeft;
-//    private final DcMotorEx shooterRight;
     public static int baseRPM = 3400;
     private final DcMotorEx shooter;
     private final Servo Hood;
@@ -165,49 +163,7 @@ public class Shooter extends SubsystemBase {
         shooterStatus = ShooterStatus.Idling;
     }
     public void updateFlywheelPID() {
-//        shooter.setVelocityPIDFCoefficients(Kp,Ki,Kd,0);
-
         shooter.setVelocity(targetRPM*28/60);
-//        if (targetRPM > 0) {
-//            // Update PID parameters and tolerance in case they were changed via dashboard
-//            pidController.setPID(Kp, Ki, Kd);
-//            pidController.setTolerance(tolerance);
-//
-//            double currentRPM = getFlyWheelRPM();
-//            double rpmDifference = currentRPM - targetRPM;
-//
-//            double pidinput = rpmDifference/100.0;
-//            double power;
-//            double pidOutput = 0.0;
-//
-//            if (abs(rpmDifference) <= pidThreshold) {
-//                // Use PID control for fine-tuning within ±pidThreshold RPM
-//                pidOutput = pidController.calculate(pidinput)+0.5;
-//                power = Math.max(0.0, Math.min(1.0, pidOutput)); //smart brahhh
-//            } else if (rpmDifference < pidThreshold) {
-//                // Large speed increase needed - use full power
-//                power = 1.0;
-//                pidOutput = 1.0; // PID would output 1.0 but we're overriding
-//            } else {
-//                // Large speed decrease needed - use no power (let inertia slow it down)
-//                power = 0.0;
-//                pidOutput = 0.0; // PID would output negative but we're overriding
-//            }
-//            PIDoutput = power;
-//            // Store values for telemetry/graphing
-//            currentMotorPower = power;
-//            currentPIDOutput = pidOutput;
-//
-//            // Apply power to both motors
-//            shooterLeft.setPower(power);
-//            shooterRight.setPower(power);
-//        } else {
-//            // Stop motors if no target set
-//            currentMotorPower = 0.0;
-//            currentPIDOutput = 0.0;
-//            shooterLeft.setPower(0);
-//            shooterRight.setPower(0);
-//        }
     }
 
     /**

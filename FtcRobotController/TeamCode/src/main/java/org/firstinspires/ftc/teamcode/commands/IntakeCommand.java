@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 public class IntakeCommand extends CommandBase {
@@ -18,13 +17,13 @@ public class IntakeCommand extends CommandBase {
 
     public void execute() {
         if (gamepad1.right_trigger > 0.3 ){
-        intake.setIntakeState(Intake.IntakeTransferState.Suck_In);
+        intake.setIntakeState(Intake.IntakeStates.Ball_In);
     }else if (gamepad1.left_trigger > 0.3){
-            intake.setIntakeState(Intake.IntakeTransferState.Split_Out);
+            intake.setIntakeState(Intake.IntakeStates.Ball_Out);
     }else if (gamepad1.right_bumper) {
-            intake.setIntakeState(Intake.IntakeTransferState.Send_It_Up);
+            intake.setIntakeState(Intake.IntakeStates.Send_Ball);
     }else {
-            intake.setIntakeState(Intake.IntakeTransferState.Intake_Steady);
+            intake.setIntakeState(Intake.IntakeStates.Stop);
     }
     }
 

@@ -5,17 +5,16 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.MyLimelight;
+import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 
 @Config
 public class LimelightLockInCommand extends CommandBase {
     Drivetrain drivetrain;
-    MyLimelight limelight;
+    Limelight limelight;
     Gamepad gamepad1;
     public static double Kp = 0.018;
 
-    public LimelightLockInCommand(Drivetrain drivetrain, MyLimelight limelight, Gamepad gamepad1) { //()里传参
+    public LimelightLockInCommand(Drivetrain drivetrain, Limelight limelight, Gamepad gamepad1) { //()里传参
         this.drivetrain = drivetrain; //this. = instance variable(上面的), 右面的 = ()里的
         this.limelight = limelight;
         this.gamepad1 = gamepad1;

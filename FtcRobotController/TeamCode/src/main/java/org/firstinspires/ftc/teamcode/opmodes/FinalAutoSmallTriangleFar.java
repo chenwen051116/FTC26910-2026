@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.subsystems.AutoDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.MyLimelight;
+import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
@@ -25,7 +25,7 @@ public class FinalAutoSmallTriangleFar extends LinearOpMode {
     private Intake intake;
     private Shooter shooter;
     //    private Shooter shooter;
-    private MyLimelight limeLight;
+    private Limelight limeLight;
     private Turret turret;
     private double x, y, rx;
 
@@ -37,7 +37,7 @@ public class FinalAutoSmallTriangleFar extends LinearOpMode {
         drivetrain = new AutoDrivetrain(hardwareMap);
 
         intake = new Intake(hardwareMap);
-        limeLight = new MyLimelight(hardwareMap);
+        limeLight = new Limelight(hardwareMap);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
 

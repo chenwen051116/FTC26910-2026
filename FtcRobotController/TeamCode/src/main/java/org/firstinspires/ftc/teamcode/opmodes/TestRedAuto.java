@@ -10,10 +10,10 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode; // 更改为 LinearOpMode
-import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.MyLimelight;
+import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
@@ -28,7 +28,7 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
     // 硬件定义（如果你的操作需要）
     private Shooter shooter;
     private Intake intake;
-    private MyLimelight limelight;
+    private Limelight limelight;
     private Turret turret;
 
     public static int shootingTime = 1500;
@@ -48,10 +48,10 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
         turret = new Turret(hardwareMap);
-        limelight = new MyLimelight(hardwareMap);
+        limelight = new Limelight(hardwareMap);
 
         shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
-        intake.setIntakeState(Intake.IntakeTransferState.Intake_Steady);
+        intake.setIntakeState(Intake.IntakeStates.Stop);
 
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
@@ -169,11 +169,11 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
     }
 
     public void startIntake(){
-        intake.setIntakeState(Intake.IntakeTransferState.Suck_In);
+        intake.setIntakeState(Intake.IntakeStates.Ball_In);
     }
 
     public void stopIntake(){
-        intake.setIntakeState(Intake.IntakeTransferState.Intake_Steady);
+        intake.setIntakeState(Intake.IntakeStates.Stop);
     }
 
     public void waitForPath(){

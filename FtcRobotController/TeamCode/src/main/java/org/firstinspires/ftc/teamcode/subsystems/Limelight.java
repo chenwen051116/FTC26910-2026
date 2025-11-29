@@ -4,7 +4,6 @@ import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -15,14 +14,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.List;
 
-public class MyLimelight extends SubsystemBase {
+public class Limelight extends SubsystemBase {
     // Hardware (motor servo...)
     private final Limelight3A limelight;
     private LLResult aprilTagLatestResult;
     private final ElapsedTime timer = new ElapsedTime();
     private boolean llenable = false;
 
-    public MyLimelight(HardwareMap hardwareMap) {
+    public Limelight(HardwareMap hardwareMap) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // fast updates
 
