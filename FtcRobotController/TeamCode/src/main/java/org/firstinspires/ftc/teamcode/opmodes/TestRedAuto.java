@@ -287,7 +287,4 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
                     .build();
         }
     }
-
-
-
 }
