@@ -9,46 +9,184 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode; // 更改为 LinearOpMode
+import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.MyLimelight;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
-@Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
-@Configurable // Panels
-public class TestRedAuto extends OpMode {
+@Autonomous(name = "Pedro Pathing Linear Autonomous", group = "Autonomous")
+@Configurable
+public class TestRedAuto extends LinearOpMode { // 类名和继承更改
 
-    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
-    public Follower follower; // Pedro Pathing follower instance
-    private int pathState; // Current autonomous path state (state machine)
-    private Paths paths; // Paths defined in the Paths class
+    private TelemetryManager panelsTelemetry;
+    public Follower follower;
+    private Paths paths;
+
+    // 硬件定义（如果你的操作需要）
+    private Shooter shooter;
+    private Intake intake;
+    private MyLimelight limelight;
+    private Turret turret;
+
+    public static int shootingTime = 1500;
+
+
+
 
     @Override
-    public void init() {
+    public void runOpMode() throws InterruptedException { // 核心方法
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
+        // 1. 初始化
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(72, 8, Math.toRadians(90)));
+        paths = new Paths(follower);
+        // robot = new MyRobotHardware(hardwareMap); // 假设你有一个硬件类
+        shooter = new Shooter(hardwareMap);
+        intake = new Intake(hardwareMap);
+        turret = new Turret(hardwareMap);
+        limelight = new MyLimelight(hardwareMap);
 
-        paths = new Paths(follower); // Build paths
+        shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
+        intake.setIntakeState(Intake.IntakeTransferState.Intake_Steady);
 
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
+
+
+        // 2. 等待 Start 信号
+        waitForStart();
+
+        if (isStopRequested()) return;
+
+        // --- 3. 路径执行序列（顺序执行）---
+
+        // MovetoShoot0
+        panelsTelemetry.debug("Current Task", "Starting MovetoShoot0");
+        follower.followPath(paths.MovetoShoot0);
+        waitForPath();
+
+        // Shooting 0
+        panelsTelemetry.debug("Current Task", "Executing Shooting 0");
+        startShooting();
+        sleep(shootingTime);
+        stopShooting();
+
+
+        // Take 1
+        panelsTelemetry.debug("Current Task", "Starting Take1");
+        follower.followPath(paths.Take1);
+        startIntake();
+        waitForPath();
+        stopIntake();
+
+
+        // MovetoShoot1
+        panelsTelemetry.debug("Current Task", "Starting MovetoShoot1");
+        follower.followPath(paths.MovetoShoot1);
+        waitForPath();
+
+        // Shooting 1
+        panelsTelemetry.debug("Current Task", "Executing Shooting 1");
+        startShooting();
+        sleep(shootingTime);
+        stopShooting();
+
+
+        // Take2
+        panelsTelemetry.debug("Current Task", "Starting Take2");
+        follower.followPath(paths.Take2);
+
+        startIntake();
+        waitForPath();
+        stopIntake();
+
+        // MovetoShoot2
+        panelsTelemetry.debug("Current Task", "Starting MovetoShoot2");
+        follower.followPath(paths.MovetoShoot2);
+        waitForPath();
+
+        // Shooting 2
+        panelsTelemetry.debug("Current Task", "Executing Shooting 2");
+        startShooting();
+        sleep(shootingTime);
+        stopShooting();
+
+        // Take3
+        panelsTelemetry.debug("Current Task", "Starting Take3");
+        follower.followPath(paths.Take3);
+
+        startIntake();
+        waitForPath();
+        stopIntake();
+
+        // MovetoShoot3
+        panelsTelemetry.debug("Current Task", "Starting MovetoShoot3");
+        follower.followPath(paths.MovetoShoot3);
+        waitForPath();
+
+        // Shooting 3
+        panelsTelemetry.debug("Current Task", "Executing Shooting3");
+        startShooting();
+        sleep(shootingTime);
+        stopShooting();
+
+        // Moveout
+        panelsTelemetry.debug("Current Task", "Starting MoveoutAuto");
+        follower.followPath(paths.MoveoutAuto);
+        waitForPath();
+
+
+
     }
 
-    @Override
-    public void loop() {
-        follower.update(); // Update Pedro Pathing
-        pathState = autonomousPathUpdate(); // Update autonomous state machine
-
-        // Log values to Panels and Driver Station
-        panelsTelemetry.debug("Path State", pathState);
+    // 辅助方法：将遥测记录移到单独的方法中
+    private void logTelemetry() {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
         panelsTelemetry.update(telemetry);
     }
 
+    public void periodics(){
+        turret.periodic();
+        shooter.periodic();
+        intake.periodic();
+    }
+
+    public void startShooting(){
+        turret.tx = limelight.getTx();
+        shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
+        turret.updateAutoShoot(true);
+    }
+
+    public void stopShooting(){
+        turret.updateAutoShoot(false);
+        shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
+    }
+
+    public void startIntake(){
+        intake.setIntakeState(Intake.IntakeTransferState.Suck_In);
+    }
+
+    public void stopIntake(){
+        intake.setIntakeState(Intake.IntakeTransferState.Intake_Steady);
+    }
+
+    public void waitForPath(){
+        while (opModeIsActive() && follower.isBusy()) {
+            periodics();
+            follower.update();
+            logTelemetry(); // 持续记录数据
+        }
+    }
+
+    // Paths 类的定义保持不变
     public static class Paths {
+        // ... (你的路径定义) ...
 
         public PathChain MovetoShoot0;
         public PathChain Take1;
@@ -146,10 +284,6 @@ public class TestRedAuto extends OpMode {
         }
     }
 
-    public int autonomousPathUpdate() {
-        // Add your state machine Here
-        // Access paths with paths.pathName
-        // Refer to the Pedro Pathing Docs (Auto Example) for an example state machine
-        return pathState;
-    }
+
+
 }
