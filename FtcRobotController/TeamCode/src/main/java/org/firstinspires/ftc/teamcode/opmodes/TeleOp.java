@@ -7,12 +7,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.MyLimelight;
+import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class FinalTeleRed extends LinearOpMode {
+public class TeleOp extends LinearOpMode {
 
    // private MultipleTelemetry telemetry;
 
@@ -20,7 +20,7 @@ public class FinalTeleRed extends LinearOpMode {
     private Intake intake;
     private Shooter shooter;
     //    private Shooter shooter;
-    private MyLimelight limeLight;
+    private Limelight limelight;
     private Turret turret;
     private boolean xJustPressed = false;
     private boolean xHolding = false;
@@ -33,6 +33,7 @@ public class FinalTeleRed extends LinearOpMode {
     private boolean dPadDownJustPressed = false;
     private double x, y, rx;
     private double speedMultiplier = 1;
+    private int limelightState = 0;
 
 
     @Override
@@ -41,13 +42,13 @@ public class FinalTeleRed extends LinearOpMode {
         drivetrain = new Drivetrain(hardwareMap);
 
         intake = new Intake(hardwareMap);
-        limeLight = new MyLimelight(hardwareMap);
+        limelight = new Limelight(hardwareMap);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
 
         // default red
-        limeLight.initRedPipeline();
-        limeLight.startDetect();
+        limelight.initRedPipeline();
+        limelight.startDetect();
         turret.initEncoder();
         shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
         telemetry.setMsTransmissionInterval(200);
@@ -55,16 +56,15 @@ public class FinalTeleRed extends LinearOpMode {
         while (opModeIsActive()){
             shooter.periodic();
             turret.periodic();
-            limeLight.periodic();
+            limelight.periodic();
             intake.periodic();
 
             if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
                 intake.updateAutoShoot(true);
                 intake.updateAutoTrans(shooter.isAtTargetRPM());
-                //intake.updateAutoTrans(true);
-                shooter.updateDis(limeLight.getDis());
-                shooter.updateFocused(limeLight.isFocused());
-                turret.tx = limeLight.getTx();
+                shooter.updateDis(limelight.getDis());
+                shooter.updateFocused(limelight.isFocused());
+                turret.tx = limelight.getTx();
                 turret.updateAutoShoot(true);
             }
             else{
@@ -72,6 +72,7 @@ public class FinalTeleRed extends LinearOpMode {
                 //turret.updateAutoShoot(false);
             }
             // check keys
+            // check if x is being hold
             if(gamepad1.x){
                 if(!xHolding){
                     xJustPressed = true;
@@ -83,6 +84,7 @@ public class FinalTeleRed extends LinearOpMode {
                 xJustPressed = false;
             }
 
+            // check if y is being hold
             if(gamepad1.y){
                 if(!yHolding){
                     yJustPressed = true;
@@ -94,6 +96,7 @@ public class FinalTeleRed extends LinearOpMode {
                 yJustPressed = false;
             }
 
+            // check if up is being hold
             if(gamepad1.dpad_up){
                 if(!dPadUpHolding){
                     dPadUpJustPressed = true;
@@ -105,6 +108,7 @@ public class FinalTeleRed extends LinearOpMode {
                 dPadUpJustPressed = false;
             }
 
+            // check if down is being hold
             if(gamepad1.dpad_down){
                 if(!dPadDownHolding){
                     dPadDownJustPressed = true;
@@ -113,6 +117,7 @@ public class FinalTeleRed extends LinearOpMode {
             }
 
             // set shooter status
+            // press y to stop the shooter when it is in idle state
             if(yJustPressed &&shooter.shooterStatus != Shooter.ShooterStatus.Shooting){
                 if(shooter.shooterStatus == Shooter.ShooterStatus.Idling) {
                     shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
@@ -122,9 +127,13 @@ public class FinalTeleRed extends LinearOpMode {
                 }
                 yJustPressed = false;
             }
+
+            // press x to shoot when the shooter is in idle state
+            // set the shooter to idle state if the shooter is in shooting state or stop state
             if(xJustPressed){
                 if(shooter.shooterStatus == Shooter.ShooterStatus.Idling){
                     shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
+                    turret.updateAutoShoot(true);
                 }
                 else{
                     shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
@@ -143,7 +152,7 @@ public class FinalTeleRed extends LinearOpMode {
             drivetrain.teleDrive(y, x, rx);
             if(gamepad1.left_bumper){
                 //drivetrain.teleDrive(y, x,Drivetrain.kpll*limeLight.getTx());
-                turret.tx = limeLight.getTx();
+                turret.tx = limelight.getTx();
                 turret.updateAutoShoot(true);
             }
             else{
@@ -169,40 +178,49 @@ public class FinalTeleRed extends LinearOpMode {
             // intake
             // set intake status
             if (gamepad1.right_trigger > 0.3){
-                intake.setIntakeState(Intake.IntakeTransferState.Suck_In);
+                intake.setIntakeState(Intake.IntakeStates.Ball_In);
             } else if (gamepad1.dpad_up){
-                intake.setIntakeState(Intake.IntakeTransferState.Split_Out);
+                intake.setIntakeState(Intake.IntakeStates.Ball_Out);
             } else if (gamepad1.right_bumper) {
-                intake.setIntakeState(Intake.IntakeTransferState.Send_It_Up);
+                intake.setIntakeState(Intake.IntakeStates.Send_Ball);
             } else {
-                intake.setIntakeState(Intake.IntakeTransferState.Intake_Steady);
+                intake.setIntakeState(Intake.IntakeStates.Stop);
             }
 
 
             // limelight
+            // press left to initiate as red, right to initiate as blue
+            // changable during game
             if (gamepad1.dpad_left){
-                limeLight.initRedPipeline();
-                limeLight.startDetect();
+                limelightState = -1;
+                limelight.initRedPipeline();
+                limelight.startDetect();
             }
             else if(gamepad1.dpad_right){
-                limeLight.initBluePipeline();
-                limeLight.startDetect();
+                limelightState = 1;
+                limelight.initBluePipeline();
+                limelight.startDetect();
             }
 
             // telemetry
-            telemetry.addData("Apriltag dist", limeLight.getDis());
-            telemetry.addData("Apriltag X", limeLight.getX());
-            telemetry.addData("Apriltag(PoI) Tx", limeLight.getTx());
-            telemetry.addData("Apriltag ID", limeLight.getAprilTagID());
-            telemetry.addData("Pitch", limeLight.getPitch());
-
-            // shooter
-            // telemetry
+            if (limelightState == 1){
+                telemetry.addData("Detecting for color", "BLUE");
+            } else if (limelightState == -1){
+                telemetry.addData("Detecting for color", "RED");
+            } else{
+                telemetry.addData("Detecting for color", "NONE");
+            }
+            telemetry.addData("Apriltag dist", limelight.getDis());
+            telemetry.addData("Apriltag X", limelight.getX());
+            telemetry.addData("Apriltag(PoI) Tx", limelight.getTx());
+            telemetry.addData("Apriltag ID", limelight.getAprilTagID());
+            telemetry.addData("Pitch", limelight.getPitch());
             telemetry.addData("Turret pos", turret.currentpos);
             telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());
             telemetry.addData("Shooter Current RPM", shooter.getFlyWheelRPM());
             telemetry.addData("PIDoutput", shooter.getCurrentPIDOutput());
             telemetry.addData("Shooter At Target", shooter.isAtTargetRPM() ? "YES" : "NO");
+
             telemetry.update();
         }
 

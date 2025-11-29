@@ -26,8 +26,8 @@ public class Turret extends SubsystemBase {
 
     public boolean autoForce = false;
 
-    public static double kp = -0.375;
-    public static double highkp = -2;
+    public static double kp = -0.2;
+    public static double highkp = -1.5;
     public static double txbar = 5;
 
     public static int targetpos = 0;

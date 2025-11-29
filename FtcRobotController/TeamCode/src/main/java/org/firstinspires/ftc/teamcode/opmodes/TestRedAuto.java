@@ -226,6 +226,8 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
                     .build();
 
+
+
             Take2 = follower
                     .pathBuilder()
                     .addPath(
@@ -242,8 +244,10 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(130.032, 58.864),
-                                    new Pose(94.282, 55.538),
+                                    new Pose(128.370, 58.864),
+                                    new Pose(106.420, 80.647),
+                                    new Pose(130.199, 56.203),
+                                    new Pose(143.501, 88.296),
                                     new Pose(93.949, 113.404)
                             )
                     )
