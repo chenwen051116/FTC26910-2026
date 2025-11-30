@@ -31,8 +31,11 @@ public class Constants {
 //            .rightRearEncoderDirection(Encoder.FORWARD)
 //            ;
 
-    //1: -642.10
-    //2:
+    //1: -47.44
+    //2: -43.27
+    //3: -42.66
+    //4: -42.89
+    //5: -41.49
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(-5)
@@ -47,8 +50,8 @@ public class Constants {
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .xVelocity(72.63)
-            .yVelocity(41.50)
+            .xVelocity(78)
+            .yVelocity(58)
             .rightFrontMotorName("frontRight")
             .rightRearMotorName("backRight")
             .leftRearMotorName("backLeft")

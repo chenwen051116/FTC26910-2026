@@ -146,7 +146,7 @@ public class TeleOp extends LinearOpMode {
             // drivetrain
             // set drivetrain status
 
-            double x = -gamepad1.left_stick_x * speedMultiplier;
+            double x = gamepad1.left_stick_x * speedMultiplier;
             double y = gamepad1.left_stick_y * speedMultiplier;
             double rx = -gamepad1.right_stick_x * speedMultiplier;
             drivetrain.teleDrive(y, x, rx);
@@ -220,6 +220,7 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Shooter Current RPM", shooter.getFlyWheelRPM());
             telemetry.addData("PIDoutput", shooter.getCurrentPIDOutput());
             telemetry.addData("Shooter At Target", shooter.isAtTargetRPM() ? "YES" : "NO");
+            telemetry.addData("Hood Angle", shooter.getHoodAngle());
 
             telemetry.update();
         }

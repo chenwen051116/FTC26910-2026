@@ -16,14 +16,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Shooter extends SubsystemBase {
 
     // shooterLeft and shooterRight to be removed
-    public static int baseRPM = 3400;
+    public static int baseRPM = 3900;
     private final DcMotorEx shooter;
     private final Servo Hood;
     private final PIDController pidController;
 
 
     // Tunable PID parameters - can be adjusted via FTC Dashboard
-    public static double Kp = 15;  // Proportional gain
+    public static double Kp = 10;  // Proportional gain
     public static double Ki = 0; // Integral gain
     public static double Kd = 0;    // Derivative gain
     public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
@@ -140,7 +140,7 @@ public class Shooter extends SubsystemBase {
         return targetRPM;
     }
     public boolean isAtTargetRPM() {
-        return (getTargetRPM() < getFlyWheelRPM() + 100 && getTargetRPM() > getFlyWheelRPM() - 100)&&getFlyWheelRPM()>1000;
+        return (getTargetRPM() < getFlyWheelRPM() + 150 && getTargetRPM() > getFlyWheelRPM() - 150)&&getFlyWheelRPM()>1000;
     }
 
     // Store current motor power for telemetry/graphing
@@ -191,13 +191,17 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setHoodAngle(double angle){
-        if(angle<0.5){
-            angle = 0.5;
+        if(angle<0.4){
+            angle = 0.4;
         }
         if(angle>1){
             angle = 1;
         }
         hoodAngle = angle;
+    }
+
+    public double getHoodAngle(){
+        return hoodAngle;
     }
 
 
@@ -209,14 +213,31 @@ public class Shooter extends SubsystemBase {
 //        if (distance > 3.25){
 //            setTargetRPM(3850);
 //        }
-        if (distance < 1.4&&distance>0.58){
-            setTargetRPM(1300*distance+baseRPM);
-            setHoodAngle(0.55*distance+0.5);
+
+        // kp = 10
+        // data
+        // GROUP | DIST | AIMRPM | HOOD
+        // 1 | 0.60 | 4500 | 0.4
+        // 2 | 0.70 | 4500 | 0.45
+        // 3 | 0.80 | 4500 | 0.45
+        // 4 | 0.90 | 4500 | 0.5
+        // 5 | 1.00 | 4750 | 0.5
+        // 6 | 1.10 | 5000 | 0.5
+
+        //
+
+        // target code
+
+        if (distance < 1.1&&distance>0.58){
+            setTargetRPM(1000*distance+baseRPM);
+            setHoodAngle(0.2*distance+0.28);
         }
         else{
-            setHoodAngle(0.5);
-            setTargetRPM(4000);
+            setHoodAngle(0.4);
+            setTargetRPM(4500);
         }
+
+
 //        else{
 //            setTargetRPM(300*distance+2750);
 //        }

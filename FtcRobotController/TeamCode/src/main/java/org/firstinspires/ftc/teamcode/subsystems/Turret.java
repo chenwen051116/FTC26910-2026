@@ -27,7 +27,10 @@ public class Turret extends SubsystemBase {
     public boolean autoForce = false;
 
     public static double kp = -0.2;
-    public static double highkp = -1.5;
+    public static double highkp = -1;
+
+    public static double maxkp = -1.5;
+    // maximum tx = +- 20
     public static double txbar = 5;
 
     public static int targetpos = 0;
@@ -60,7 +63,7 @@ public class Turret extends SubsystemBase {
 
     public void focusMode(){
         if(abs(tx) < txbar){
-            turretMotor.setPower(0.6);
+            turretMotor.setPower(0.3);
             int dpos = (int) floor(kp*tx);
             targetpos += dpos;
             turretMotor.setTargetPosition(targetpos);
@@ -73,7 +76,6 @@ public class Turret extends SubsystemBase {
             turretMotor.setTargetPosition(targetpos);
             turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-
     }
 
     public void centering(){
