@@ -33,7 +33,7 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
 
     public static int shootingTime = 1500;
 
-
+    public static int deg = 180;
 
 
     @Override
@@ -203,7 +203,8 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
                     .addPath(
                             new BezierLine(new Pose(116.730, 130.697), new Pose(93.949, 113.238))
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(37))
+                    .setLinearHeadingInterpolation(Math.toRadians(deg + 37), Math.toRadians(deg + 37))
+                    .setGlobalDeceleration(0.95)
                     .build();
 
             Take1 = follower
@@ -223,7 +224,7 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
                     .addPath(
                             new BezierLine(new Pose(130.531, 83.806), new Pose(93.783, 113.570))
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
+                    .setLinearHeadingInterpolation(Math.toRadians(deg + 0), Math.toRadians(deg + 37))
                     .build();
 
 
@@ -251,7 +252,7 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
                                     new Pose(93.949, 113.404)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
+                    .setLinearHeadingInterpolation(Math.toRadians(deg - 0), Math.toRadians(deg - 37))
                     .build();
 
             Take3 = follower
@@ -275,7 +276,7 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
                                     new Pose(93.949, 113.404)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
+                    .setLinearHeadingInterpolation(Math.toRadians(deg - 0), Math.toRadians(deg - 37))
                     .build();
 
             MoveoutAuto = follower
@@ -283,7 +284,7 @@ public class TestRedAuto extends LinearOpMode { // 类名和继承更改
                     .addPath(
                             new BezierLine(new Pose(93.949, 113.404), new Pose(112.573, 92.785))
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(37))
+                    .setLinearHeadingInterpolation(Math.toRadians(deg - 37), Math.toRadians(deg - 37))
                     .build();
         }
     }
