@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Scheduler;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @Autonomous(name = "RED_Near_12ball_gate")
 public class Red_near_12_balls extends OpMode {
@@ -22,7 +23,7 @@ public class Red_near_12_balls extends OpMode {
     //private final ElapsedTime timer  = new ElapsedTime();
 
     private int pathState = 0;
-    private final Pose startPose = new Pose(0, 0, 0); // Start Pose of our robot.
+    private final Pose startPose = new Pose(0, 2, 0); // Start Pose of our robot.
     private final Pose ShootPose1 = new Pose(-36.53817, -24.4827, 0.83604);
     private final Pose GatePose = new Pose(-0.6099,-34.4572, 1.600);
     private final Pose PrepGather1 = new Pose(-32.0954, -27.4628, 0);
@@ -48,6 +49,7 @@ public class Red_near_12_balls extends OpMode {
     public Shooter shooter;
     public Limelight limelight;
     public Scheduler scheduler;
+    public Turret turret;
 
     public void buildPaths() {
 
@@ -341,15 +343,17 @@ public class Red_near_12_balls extends OpMode {
         follower.update();
         intake.periodic();
         shooter.periodic();
+        turret.periodic();
         if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
             intake.updateAutoShoot(true);
             intake.updateAutoTrans(shooter.isAtTargetRPM());
             shooter.updateDis(limelight.getDis());
-            shooter.updateFocused(true);
+            shooter.updateFocused(limelight.isFocused());
+            turret.tx = limelight.getTx();
+            turret.updateAutoShoot(true);
         }
         else{
             intake.updateAutoShoot(false);
-            shooter.updateFocused(false);
         }
         autonomousPathUpdate();
 
@@ -379,6 +383,8 @@ public class Red_near_12_balls extends OpMode {
         limelight = new Limelight(hardwareMap);
         limelight.initRedPipeline();
         limelight.startDetect();
+        turret = new Turret(hardwareMap);
+        turret.initEncoder();
         intake.setIntakeState(Intake.IntakeStates.Stop);
         shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
         buildPaths();
