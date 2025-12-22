@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Scheduler;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @Autonomous(name = "RED_Near_12ball_gate")
-public class Red_near_12_balls extends OpMode {
+public class RedNearAuto extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer, timer;
