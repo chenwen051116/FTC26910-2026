@@ -18,7 +18,7 @@ public class Shooter extends SubsystemBase {
     // shooterLeft and shooterRight to be removed
     public static int baseRPM = 3900;
     private final DcMotorEx shooter;
-    private final Servo Hood;
+    private final Servo hood;
     private final PIDController pidController;
 
 
@@ -74,8 +74,8 @@ public class Shooter extends SubsystemBase {
 
 
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        Hood = hardwareMap.get(Servo.class, "Hood");
-        Hood.setPosition(hoodAngle);
+        hood = hardwareMap.get(Servo.class, "Hood");
+        hood.setPosition(hoodAngle);
         // Initialize PID controller
         pidController = new PIDController(Kp, Ki, Kd);
 
@@ -187,7 +187,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void updateHoodAngle(){
-        Hood.setPosition(hoodAngle);
+        hood.setPosition(hoodAngle);
     }
 
     public void setHoodAngle(double angle){
