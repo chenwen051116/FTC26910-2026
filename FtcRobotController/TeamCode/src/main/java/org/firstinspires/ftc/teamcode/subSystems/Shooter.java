@@ -32,7 +32,8 @@ public class Shooter extends SubsystemBase {
     public static double aimRPM = 4000;
     public static double hoodUpperBar = 1;
     public static double hoodLowerBar = 0.4;
-    public static int RPMshift = 3400;
+    public static int idleRPM = 3000;
+    public static int RPMThreshold = 150;
 
 
     // Target RPM for the flywheel
@@ -170,11 +171,7 @@ public class Shooter extends SubsystemBase {
 
     // TODO: Rewrite the updateAim method
     public void updateAim() {
-//        setTargetRPM(publicRPM);
         distance = abs(distance);
-//        if (distance > 3.25){
-//            setTargetRPM(3850);
-//        }
 
         // kp = 10
         // data
@@ -198,22 +195,6 @@ public class Shooter extends SubsystemBase {
             setHoodAngle(0.4);
             setTargetRPM(4500);
         }
-
-
-//        else{
-//            setTargetRPM(300*distance+2750);
-//        }
-//
-//        if (distance < 0.01){
-//            setTargetRPM(3500);
-//        }
-//
- //        if(automode&&autoLonger){
-//            setTargetRPM(3500);
-//        }
-//        else if(automode&&!autoLonger){
-//            setTargetRPM(3100);
-//        }
     }
 
     public void passRPM(){
@@ -247,7 +228,7 @@ public class Shooter extends SubsystemBase {
             completeStop();
         }
         else if(shooterStatus == ShooterStatus.Idling){
-            setTargetRPM(3000);
+            setTargetRPM(idleRPM);
         }
 
 

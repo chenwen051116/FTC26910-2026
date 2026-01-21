@@ -33,7 +33,9 @@ public class DoubleShooter extends SubsystemBase {
     public static double aimRPM = 4000;
     public static double hoodUpperBar = 1;
     public static double hoodLowerBar = 0.4;
-    public static int RPMshift = 3400;
+    public static int maxRPM = 4500;
+    public static int idleRPM = 3000;
+    public static int RPMThreshold = 150;
 
 
     // Target RPM for the flywheel
@@ -108,7 +110,7 @@ public class DoubleShooter extends SubsystemBase {
         return targetRPM;
     }
     public boolean isAtTargetRPM() {
-        return (getTargetRPM() < getFlyWheelRPM() + 150 && getTargetRPM() > getFlyWheelRPM() - 150)&&getFlyWheelRPM()>1000;
+        return (getTargetRPM() < getFlyWheelRPM() + RPMThreshold && getTargetRPM() > getFlyWheelRPM() - RPMThreshold)&&getFlyWheelRPM()>1000;
     }
 
     // Store current motor power for telemetry/graphing
@@ -150,10 +152,10 @@ public class DoubleShooter extends SubsystemBase {
         pidController.reset();
     }
 
+    // ManualRPM Setting
     public void toggleRPM() {
         setTargetRPM(aimRPM);
         shooterStatus = ShooterStatus.Shooting;
-
     }
 
     // Hood
@@ -163,11 +165,11 @@ public class DoubleShooter extends SubsystemBase {
 
     // Set the angle of the hood
     public void setHoodAngle(double angle){
-        if(angle<0.4){
-            angle = 0.4;
+        if(angle<hoodLowerBar){
+            angle = hoodLowerBar;
         }
-        if(angle>1){
-            angle = 1;
+        if(angle > hoodUpperBar){
+            angle = hoodUpperBar;
         }
         hoodAngle = angle;
     }
@@ -193,8 +195,8 @@ public class DoubleShooter extends SubsystemBase {
             setHoodAngle(0.2*distance+0.28);
         }
         else{
-            setHoodAngle(0.4);
-            setTargetRPM(4500);
+            setHoodAngle(hoodLowerBar);
+            setTargetRPM(maxRPM);
         }
 
 
@@ -245,7 +247,7 @@ public class DoubleShooter extends SubsystemBase {
             completeStop();
         }
         else if(shooterStatus == ShooterStatus.Idling){
-            setTargetRPM(3000);
+            setTargetRPM(idleRPM);
         }
 
 
