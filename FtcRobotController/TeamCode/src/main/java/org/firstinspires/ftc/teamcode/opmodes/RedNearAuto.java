@@ -9,11 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Limelight;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.Scheduler;
-import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subSystems.Intake;
+import org.firstinspires.ftc.teamcode.subSystems.Limelight;
+import org.firstinspires.ftc.teamcode.subSystems.Shooter;
+import org.firstinspires.ftc.teamcode.subSystems.Scheduler;
+import org.firstinspires.ftc.teamcode.subSystems.Turret;
 
 @Autonomous(name = "RED_Near_12ball_gate")
 public class RedNearAuto extends OpMode {
@@ -379,7 +379,7 @@ public class RedNearAuto extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         intake = new Intake(hardwareMap);
         shooter = new Shooter(hardwareMap);
-        shooter.automode = true;
+        shooter.autoMode = true;
         limelight = new Limelight(hardwareMap);
         limelight.initRedPipeline();
         limelight.startDetect();

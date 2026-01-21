@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
 
 public class DriveInTeleOpCommand extends CommandBase {
     Drivetrain drivetrain;
@@ -20,7 +20,7 @@ public class DriveInTeleOpCommand extends CommandBase {
 
     @Override
     public void execute() { //scheduler periodically calls the function
-            drivetrain.teleDrive(-0.9*gamepad1.left_stick_y, 0.9*gamepad1.left_stick_x, 0.7*gamepad1.right_stick_x);
+            drivetrain.move(-0.9*gamepad1.left_stick_y, 0.9*gamepad1.left_stick_x, 0.7*gamepad1.right_stick_x);
     }
 
     @Override

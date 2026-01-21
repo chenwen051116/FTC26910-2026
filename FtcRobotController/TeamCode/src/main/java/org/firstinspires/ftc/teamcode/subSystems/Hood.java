@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subSystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
@@ -11,6 +11,7 @@ public class Hood extends SubsystemBase {
 
     public static double hoodAngle = 0;
 
+    // Constructor for hood motor
     public Hood(HardwareMap hardwareMap){
         hood = hardwareMap.get(Servo.class, "Hood");
         hood.setPosition(hoodAngle);

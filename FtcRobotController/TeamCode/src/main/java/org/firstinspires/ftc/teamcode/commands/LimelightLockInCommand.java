@@ -4,8 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.Limelight;
+import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subSystems.Limelight;
 
 @Config
 public class LimelightLockInCommand extends CommandBase {
@@ -29,7 +29,7 @@ public class LimelightLockInCommand extends CommandBase {
 
     @Override
     public void execute() { // scheduler periodically calls the function
-        drivetrain.teleDrive(-0.9 * gamepad1.left_stick_y, 0.9 * gamepad1.left_stick_x,
+        drivetrain.move(-0.9 * gamepad1.left_stick_y, 0.9 * gamepad1.left_stick_x,
                 Kp * limelight.getTx());
 
     }

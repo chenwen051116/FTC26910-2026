@@ -12,10 +12,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode; // 更改为 LinearOpMode
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Limelight;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subSystems.Intake;
+import org.firstinspires.ftc.teamcode.subSystems.Limelight;
+import org.firstinspires.ftc.teamcode.subSystems.Shooter;
+import org.firstinspires.ftc.teamcode.subSystems.Turret;
 
 @Autonomous(name = "Pedro Pathing Linear Autonomous", group = "Autonomous")
 @Configurable

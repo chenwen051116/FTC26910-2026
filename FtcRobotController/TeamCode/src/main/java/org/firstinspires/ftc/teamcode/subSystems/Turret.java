@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subSystems;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.floor;
@@ -6,12 +6,7 @@ import static java.lang.Math.floor;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 // TODO: Adapt the system into our robot
@@ -28,16 +23,13 @@ public class Turret extends SubsystemBase {
 
     public static double kp = -0.2;
     public static double highkp = -1;
+    public static double txBar = 5;
 
-    public static double maxkp = -1.5;
-    // maximum tx = +- 20
-    public static double txbar = 5;
+    public static int targetPos = 0;
 
-    public static int targetpos = 0;
+    public int currentPos = 0;
 
-    public int currentpos = 0;
-
-    public double tx =0;
+    public double tx = 0;
 
     // Constructor for intake motors
 
@@ -62,26 +54,26 @@ public class Turret extends SubsystemBase {
     }
 
     public void focusMode(){
-        if(abs(tx) < txbar){
+        if(abs(tx) < txBar){
             turretMotor.setPower(0.3);
             int dpos = (int) floor(kp*tx);
-            targetpos += dpos;
-            turretMotor.setTargetPosition(targetpos);
+            targetPos += dpos;
+            turretMotor.setTargetPosition(targetPos);
             turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         else{
             turretMotor.setPower(1);
             int dpos = (int) floor(highkp*tx);
-            targetpos += dpos;
-            turretMotor.setTargetPosition(targetpos);
+            targetPos += dpos;
+            turretMotor.setTargetPosition(targetPos);
             turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
     }
 
     public void centering(){
         turretMotor.setPower(0.4);
-        targetpos = 0;
-        turretMotor.setTargetPosition(targetpos);
+        targetPos = 0;
+        turretMotor.setTargetPosition(targetPos);
         turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
@@ -93,7 +85,7 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() { // FTC 0.001s cycle
-        currentpos = turretMotor.getCurrentPosition();
+        currentPos = turretMotor.getCurrentPosition();
         if(shooterAuto || autoForce) {
             // at shooterAuto or autoForce, the power of the DC motors are set separately
             // thus you will need to make sure that the robot is not in these two states

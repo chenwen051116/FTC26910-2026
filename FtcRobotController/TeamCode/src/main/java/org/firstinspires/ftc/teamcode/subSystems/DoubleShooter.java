@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subSystems;
 
 import static java.lang.Math.abs;
 
@@ -13,11 +13,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 @Config
-public class Shooter extends SubsystemBase {
+public class DoubleShooter extends SubsystemBase {
 
     // shooterLeft and shooterRight to be removed
     public static int baseRPM = 3900;
-    private final DcMotorEx shooter;
+    private final DcMotorEx leftShooter;
+    private final DcMotorEx rightShooter;
     private final Servo hood;
     private final PIDController pidController;
 
@@ -28,35 +29,27 @@ public class Shooter extends SubsystemBase {
     public static double Kd = 0;    // Derivative gain
     public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
-
     public static double hoodAngle = 0.5;
-
     public static double aimRPM = 4000;
-
+    public static double hoodUpperBar = 1;
+    public static double hoodLowerBar = 0.4;
     public static int RPMshift = 3400;
 
-    // Records the default value of the hood. Used in resetHoodAngle()
 
     // Target RPM for the flywheel
     private double targetRPM = 0.0;
-    public static double publicRPM = 0.0;
 
     public double distance = 0;
 
-    public boolean idelOn = false;
-
     public boolean focused = false;
-
-    public boolean automode = false;
-
+    public boolean autoMode = false;
     public boolean autoLonger = true;
 
-    public double PIDoutput;
 
-
-
-
-
+    // The shooter has 3 status: Stop, Idling, and Shooting
+    // Stop: The flywheel stops
+    // Idling: The flywheel will run at a lower speed, particularly at aimRPM
+    // Shooting: The shooter will shoot at a speed that is determined by the limelight
     public enum ShooterStatus {
         Stop,Idling,Shooting
     }
@@ -67,68 +60,43 @@ public class Shooter extends SubsystemBase {
 
 
 
-    public Shooter(HardwareMap hardwareMap) {
-        // shooterLeft and shooterRight to be removed
-//        shooterLeft = hardwareMap.get(DcMotorEx.class, "shooterLeft");
-//        shooterRight = hardwareMap.get(DcMotorEx.class, "shooterRight");
-
-
-        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+    public DoubleShooter(HardwareMap hardwareMap) {
+        leftShooter = hardwareMap.get(DcMotorEx.class, "leftShooter");
+        rightShooter = hardwareMap.get(DcMotorEx.class, "rightShooter");
         hood = hardwareMap.get(Servo.class, "Hood");
         hood.setPosition(hoodAngle);
+
         // Initialize PID controller
         pidController = new PIDController(Kp, Ki, Kd);
 
-        // Configure motors
-        // shooterLeft and shooterRight to be removed
-//        shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        // Configure shooter
+        leftShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        leftShooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
-
-
- //       shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-//        shooterLeft.setDirection(DcMotor.Direction.FORWARD);
-//        shooterRight.setDirection(DcMotor.Direction.REVERSE);
-
-        // Configure motor modes - only shooterLeft has encoder
-//        shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);  // Has encoder
-      shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // No encoder
+        rightShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightShooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Set PID tolerance (adjustable via static parameter)
         pidController.setTolerance(tolerance);
     }
 
-    /**
-     * Get current flywheel velocity in rad/s
-     * Uses shooterLeft (the motor with encoder) for velocity feedback
-     */
     public void updateFocused(boolean focus){
         focused = focus;
     }
     public void setShooterStatus(ShooterStatus status){
         shooterStatus = status;
     }
-    public double getFlyWheelVelocity() {
-        return shooter.getVelocity() * (2.0 * Math.PI) / 60.0; // Convert RPM to rad/s
-
-    }
 
     public void updateDis(double dis){
         distance = dis;
     }
-    /**
-     * Get current flywheel RPM
-     * Uses shooterLeft (the motor with encoder) for velocity feedback
-     * shooterRight runs in open-loop mode (no encoder)
-     */
+
+    // Get the RPM of the shooter flywheel
     public double getFlyWheelRPM() {
-        // shooterLeft has encoder, so we use its velocity as representative
-        // of the entire flywheel speed (both motors should spin at same speed)
-        // getVelocity() returns encoder ticks per second, convert to RPM
-        return shooter.getVelocity() * 60.0 / 28.0; // 28 ticks per revolution
+
+        return (rightShooter.getVelocity() + leftShooter.getVelocity()) / 2 * 60.0 / 28.0; // 28 ticks per revolution
     }
     public void setTargetRPM(double targetRPM) {
         this.targetRPM = targetRPM;
@@ -163,14 +131,16 @@ public class Shooter extends SubsystemBase {
         shooterStatus = ShooterStatus.Idling;
     }
     public void updateFlywheelPID() {
-        shooter.setVelocity(targetRPM*28/60);
+        leftShooter.setVelocity(targetRPM*28/60);
+        rightShooter.setVelocity(targetRPM*28/60);
     }
 
     /**
      * Set flywheel power directly (bypasses PID)
      */
     public void setFlywheelPower(double power) {
-        shooter.setPower(power);
+        leftShooter.setPower(power);
+        rightShooter.setPower(power);
         // Reset target when using manual power
         targetRPM = 0;
     }
@@ -186,10 +156,12 @@ public class Shooter extends SubsystemBase {
 
     }
 
+    // Hood
     public void updateHoodAngle(){
         hood.setPosition(hoodAngle);
     }
 
+    // Set the angle of the hood
     public void setHoodAngle(double angle){
         if(angle<0.4){
             angle = 0.4;
@@ -214,18 +186,6 @@ public class Shooter extends SubsystemBase {
 //            setTargetRPM(3850);
 //        }
 
-        // kp = 10
-        // data
-        // GROUP | DIST | AIMRPM | HOOD
-        // 1 | 0.60 | 4500 | 0.4
-        // 2 | 0.70 | 4500 | 0.45
-        // 3 | 0.80 | 4500 | 0.45
-        // 4 | 0.90 | 4500 | 0.5
-        // 5 | 1.00 | 4750 | 0.5
-        // 6 | 1.10 | 5000 | 0.5
-
-        //
-
         // target code
 
         if (distance < 1.1&&distance>0.58){
@@ -246,7 +206,7 @@ public class Shooter extends SubsystemBase {
 //            setTargetRPM(3500);
 //        }
 //
- //        if(automode&&autoLonger){
+        //        if(automode&&autoLonger){
 //            setTargetRPM(3500);
 //        }
 //        else if(automode&&!autoLonger){

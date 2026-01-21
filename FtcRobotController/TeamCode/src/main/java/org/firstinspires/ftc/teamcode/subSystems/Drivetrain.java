@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subSystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
@@ -7,34 +7,39 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 @Config
 public class Drivetrain extends SubsystemBase {
-    //declare motors.. 声明，赋值...
+    // Declare motors
     private final DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
+    // Set PID variables
     public static double kpll = -0.040;
-    //servos
 
-    public Drivetrain(HardwareMap hardwareMap) {      //Constructor,新建对象时需要
+    // Constructor for the chassis of the
+    public Drivetrain(HardwareMap hardwareMap) {
+        // Get motor hardware reference from hardware map
         frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRightMotor = hardwareMap.get(DcMotor.class, "frontRight");
         backLeftMotor = hardwareMap.get(DcMotor.class, "backLeft");
         backRightMotor = hardwareMap.get(DcMotor.class, "backRight");
 
+        // Configure motor mode
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        // Configure zero power behavior
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        // Configure the direction of each motor
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
-    public void teleDrive (double frontBackVelocity, double strafeVelocity, double turnVelocity){
+    public void move(double frontBackVelocity, double strafeVelocity, double turnVelocity){
         double y = frontBackVelocity;
         double x = strafeVelocity;
         double rx = turnVelocity;
@@ -53,7 +58,8 @@ public class Drivetrain extends SubsystemBase {
         backLeftMotor.setPower(backLeftPower);
         backRightMotor.setPower(backRightPower);
     }
-    // 在 Drivetrain getter
+
+    // Get the power of the four motors
     public double getFrontLeftPower() {
         return frontLeftMotor.getPower();
     }

@@ -5,7 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class ChassisTestingTeleOp extends LinearOpMode {
@@ -30,7 +30,7 @@ public class ChassisTestingTeleOp extends LinearOpMode {
             double x = -gamepad1.left_stick_x * speedMultiplier;
             double y = gamepad1.left_stick_y * speedMultiplier;
             double rx = -gamepad1.right_stick_x * speedMultiplier;
-            drivetrain.teleDrive(y, x, rx);
+            drivetrain.move(y, x, rx);
             if(gamepad1.left_trigger > 0.3){
                 slowMode = true;
             }

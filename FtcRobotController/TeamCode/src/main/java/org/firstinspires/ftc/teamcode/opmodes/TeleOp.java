@@ -5,11 +5,11 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Limelight;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subSystems.Intake;
+import org.firstinspires.ftc.teamcode.subSystems.Limelight;
+import org.firstinspires.ftc.teamcode.subSystems.Shooter;
+import org.firstinspires.ftc.teamcode.subSystems.Turret;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends LinearOpMode {
@@ -149,7 +149,7 @@ public class TeleOp extends LinearOpMode {
             double x = gamepad1.left_stick_x * speedMultiplier;
             double y = gamepad1.left_stick_y * speedMultiplier;
             double rx = -gamepad1.right_stick_x * speedMultiplier;
-            drivetrain.teleDrive(y, x, rx);
+            drivetrain.move(y, x, rx);
             if(gamepad1.left_bumper){
                 //drivetrain.teleDrive(y, x,Drivetrain.kpll*limeLight.getTx());
                 turret.tx = limelight.getTx();
@@ -215,7 +215,7 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Apriltag(PoI) Tx", limelight.getTx());
             telemetry.addData("Apriltag ID", limelight.getAprilTagID());
             telemetry.addData("Pitch", limelight.getPitch());
-            telemetry.addData("Turret pos", turret.currentpos);
+            telemetry.addData("Turret pos", turret.currentPos);
             telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());
             telemetry.addData("Shooter Current RPM", shooter.getFlyWheelRPM());
             telemetry.addData("PIDoutput", shooter.getCurrentPIDOutput());
