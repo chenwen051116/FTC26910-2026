@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 
 @Config
@@ -19,7 +18,7 @@ public class DoubleShooter extends SubsystemBase {
     public static int baseRPM = 3900;
     private final DcMotorEx leftShooter;
     private final DcMotorEx rightShooter;
-    private final Servo hood;
+    //private final Servo hood;
     private final PIDController pidController;
 
 
@@ -65,20 +64,20 @@ public class DoubleShooter extends SubsystemBase {
     public DoubleShooter(HardwareMap hardwareMap) {
         leftShooter = hardwareMap.get(DcMotorEx.class, "leftShooter");
         rightShooter = hardwareMap.get(DcMotorEx.class, "rightShooter");
-        hood = hardwareMap.get(Servo.class, "Hood");
-        hood.setPosition(hoodAngle);
+//        hood = hardwareMap.get(Servo.class, "Hood");
+//        hood.setPosition(hoodAngle);
 
         // Initialize PID controller
         pidController = new PIDController(Kp, Ki, Kd);
 
         // Configure shooter
         leftShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        leftShooter.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftShooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rightShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightShooter.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightShooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Set PID tolerance (adjustable via static parameter)
         pidController.setTolerance(tolerance);
@@ -98,7 +97,15 @@ public class DoubleShooter extends SubsystemBase {
     // Get the RPM of the shooter flywheel
     public double getFlyWheelRPM() {
 
-        return (rightShooter.getVelocity() + leftShooter.getVelocity()) / 2 * 60.0 / 28.0; // 28 ticks per revolution
+        return (getLeftWheelRPM() + getRightWheelRPM())/2; // 28 ticks per revolution
+    }
+
+    public double getLeftWheelRPM() {
+        return leftShooter.getVelocity()  * 60.0 / 28.0;
+    }
+
+    public double getRightWheelRPM() {
+        return rightShooter.getVelocity() * 60.0 / 28.0;
     }
     public void setTargetRPM(double targetRPM) {
         this.targetRPM = targetRPM;
@@ -132,7 +139,7 @@ public class DoubleShooter extends SubsystemBase {
     public void setToIdle(){
         shooterStatus = ShooterStatus.Idling;
     }
-    public void updateFlywheelPID() {
+    public void setVelocity() {
         leftShooter.setVelocity(targetRPM*28/60);
         rightShooter.setVelocity(targetRPM*28/60);
     }
@@ -159,24 +166,24 @@ public class DoubleShooter extends SubsystemBase {
     }
 
     // Hood
-    public void updateHoodAngle(){
-        hood.setPosition(hoodAngle);
-    }
-
-    // Set the angle of the hood
-    public void setHoodAngle(double angle){
-        if(angle<hoodLowerBar){
-            angle = hoodLowerBar;
-        }
-        if(angle > hoodUpperBar){
-            angle = hoodUpperBar;
-        }
-        hoodAngle = angle;
-    }
-
-    public double getHoodAngle(){
-        return hoodAngle;
-    }
+//    public void updateHoodAngle(){
+//        hood.setPosition(hoodAngle);
+//    }
+//
+//    // Set the angle of the hood
+//    public void setHoodAngle(double angle){
+//        if(angle<hoodLowerBar){
+//            angle = hoodLowerBar;
+//        }
+//        if(angle > hoodUpperBar){
+//            angle = hoodUpperBar;
+//        }
+//        hoodAngle = angle;
+//    }
+//
+//    public double getHoodAngle(){
+//        return hoodAngle;
+//    }
 
 
 
@@ -192,10 +199,10 @@ public class DoubleShooter extends SubsystemBase {
 
         if (distance < 1.1&&distance>0.58){
             setTargetRPM(1000*distance+baseRPM);
-            setHoodAngle(0.2*distance+0.28);
+            //setHoodAngle(0.2*distance+0.28);
         }
         else{
-            setHoodAngle(hoodLowerBar);
+            //setHoodAngle(hoodLowerBar);
             setTargetRPM(maxRPM);
         }
 
@@ -237,8 +244,8 @@ public class DoubleShooter extends SubsystemBase {
     @Override
     public void periodic(){
 
-        updateHoodAngle();
-        updateFlywheelPID();
+        //updateHoodAngle();
+        setVelocity();
         if(shooterStatus == ShooterStatus.Shooting){
             updateAim();
             //passRPM();

@@ -115,6 +115,10 @@ public class TeleOp extends LinearOpMode {
                     dPadDownHolding = true;
                 }
             }
+            else{
+                dPadDownHolding = false;
+                dPadDownJustPressed = false;
+            }
 
             // set shooter status
             // press y to stop the shooter when it is in idle state

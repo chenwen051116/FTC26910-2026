@@ -4,10 +4,15 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake extends SubsystemBase {
 
-    private final DcMotor intake, transfer;
+    private final DcMotor intake;
+
+    private final Servo transferServo;
+    private final Servo lowerFeederServo;
+    private final Servo upperFeederServo;
 
     public IntakeStates intakeCurrentState = IntakeStates.Stop;
 
@@ -19,28 +24,35 @@ public class Intake extends SubsystemBase {
 
     // Constructor for intake motors
     public Intake(HardwareMap hardwareMap) {
+        // Initialize hardware
         intake = hardwareMap.get(DcMotor.class, "intake");
-        transfer = hardwareMap.get(DcMotor.class, "transfer");
+        transferServo = hardwareMap.get(Servo.class, "transfer");
+        lowerFeederServo = hardwareMap.get(Servo.class, "lowerFeeder");
+        upperFeederServo = hardwareMap.get(Servo.class, "upperFeeder");
 
-
-        // The intake does not need to necessarily move at steady
+        // Configure Zero power behavior for motor
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        // The transfer has to be steady for the case where there are already balls in the
-        // transfer stage
-        transfer.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // Configure direction
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        transfer.setDirection(DcMotorSimple.Direction.REVERSE);
+        transferServo.setDirection(Servo.Direction.FORWARD);
+        lowerFeederServo.setDirection(Servo.Direction.REVERSE);
+        upperFeederServo.setDirection(Servo.Direction.REVERSE);
     }
 
 
+    // Set the power of the intake servo system.
+    // Range of input: -1 to 1 (0 as steady);
     public void setIntakePower(double power) {
-
         intake.setPower(power);
-
     }
 
+    // Set the power of the transfer servo system.
+    // Range of input: 0 to 1 (0.5 as steady)
     public void setTransferPower(double power) {
-        transfer.setPower(power);
+        transferServo.setPosition((power + 1)/2);
+        lowerFeederServo.setPosition((power + 1)/2);
+        upperFeederServo.setPosition((power + 1)/2);
     }
 
     // Enum which stores all the power needed for each state of the intake motors
@@ -63,16 +75,16 @@ public class Intake extends SubsystemBase {
     public void setIntakeState(IntakeStates intakeState) {
         intakeCurrentState = intakeState;
         if(!shooterAuto || autoForce) {
-            intake.setPower(intakeCurrentState.frontPower);
-            transfer.setPower(intakeCurrentState.backPower);
+            setIntakePower(intakeCurrentState.frontPower);
+            setTransferPower(intakeCurrentState.backPower);
         } else{
             if(autoTrans){
                 intakeCurrentState = IntakeStates.Send_Ball;
             } else{
                 intakeCurrentState = IntakeStates.Stop;
             }
-            intake.setPower(intakeCurrentState.frontPower);
-            transfer.setPower(intakeCurrentState.backPower);
+            setIntakePower(intakeCurrentState.frontPower);
+            setTransferPower(intakeCurrentState.backPower);
         }
 
     }
@@ -88,25 +100,6 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() { // FTC 0.001s cycle
-        if(!shooterAuto || autoForce) {
-            // at shooterAuto or autoForce, the power of the DC motors are set separately
-            // thus you will need to make sure that the robot is not in these two states
-            intake.setPower(intakeCurrentState.frontPower);
-            transfer.setPower(intakeCurrentState.backPower);
-        }
-        else{
-            if(autoTrans){
-                // autoTrans is the state of sending the ball from intake position to shooting
-                // position
-                intakeCurrentState = IntakeStates.Send_Ball;
-            }
-            else{
-                // if not, then the intake doesn't need to do anything
-                intakeCurrentState = IntakeStates.Stop;
-            }
-            // update the power to the motors
-            intake.setPower(intakeCurrentState.frontPower);
-            transfer.setPower(intakeCurrentState.backPower);
-        }
+        setIntakeState(intakeCurrentState);
     }
 }
