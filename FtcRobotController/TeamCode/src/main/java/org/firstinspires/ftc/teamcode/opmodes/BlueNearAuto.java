@@ -43,7 +43,7 @@ public class BlueNearAuto extends OpMode {
 
 
     private boolean firstshooting = false;
-    private PathChain Shootpath1, Shootpath2, Shootpath3,Shootpath4, lastOutPath;
+    private PathChain shootPath1, shootPath2, shootPath3, shootPath4, lastOutPath;
     private PathChain prepGatherPath1, prepGatherPath2, prepGatherPath3;
 
     public Intake intake;
@@ -55,7 +55,7 @@ public class BlueNearAuto extends OpMode {
     public void buildPaths() {
 
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        Shootpath1 = follower.pathBuilder()
+        shootPath1 = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, ShootPose1))
                 .setLinearHeadingInterpolation(startPose.getHeading(), ShootPose1.getHeading())
 
@@ -72,7 +72,7 @@ public class BlueNearAuto extends OpMode {
 
 
 
-        Shootpath2 = follower.pathBuilder()
+        shootPath2 = follower.pathBuilder()
                 .addPath(new BezierLine(GatePose, GatePassby))
                 .setLinearHeadingInterpolation(GatePose.getHeading(), GatePassby.getHeading())
 
@@ -88,7 +88,7 @@ public class BlueNearAuto extends OpMode {
                 .setLinearHeadingInterpolation(PrepGather2.getHeading(), FinishGather2.getHeading())
                 .build();
 
-        Shootpath3 = follower.pathBuilder()
+        shootPath3 = follower.pathBuilder()
 
                 .addPath(new BezierLine(FinishGather2, ShootPose1))
                 .setLinearHeadingInterpolation(PrepGather2.getHeading(), ShootPose1.getHeading())
@@ -102,7 +102,7 @@ public class BlueNearAuto extends OpMode {
                 .setBrakingStrength(1.5)
                 .build();
 
-        Shootpath4 = follower.pathBuilder()
+        shootPath4 = follower.pathBuilder()
 
                 .addPath(new BezierLine(FinishGather3, ShootPose1))
                 .setLinearHeadingInterpolation(PrepGather3.getHeading(), ShootPose1.getHeading())
@@ -126,7 +126,7 @@ public class BlueNearAuto extends OpMode {
             case 0:
                 shooter.autoLonger = false;
                 shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
-                follower.followPath(Shootpath1,true);
+                follower.followPath(shootPath1,true);
                 setPathState(1);
                 break;
             case 1:
@@ -180,8 +180,7 @@ public class BlueNearAuto extends OpMode {
                 }
                 break;
             case 4:
-
-                follower.followPath(Shootpath2,true);
+                follower.followPath(shootPath2,true);
                 firstshooting = false;
                 setPathState(5);
 
@@ -234,7 +233,7 @@ public class BlueNearAuto extends OpMode {
                 break;
             case 8:
                 shooter.autoLonger = false;
-                follower.followPath(Shootpath3,true);
+                follower.followPath(shootPath3,true);
                 firstshooting = false;
                 setPathState(9);
 
@@ -289,7 +288,7 @@ public class BlueNearAuto extends OpMode {
                 break;
             case 12:
 
-                follower.followPath(Shootpath4,true);
+                follower.followPath(shootPath4,true);
                 firstshooting = false;
                 setPathState(13);
 

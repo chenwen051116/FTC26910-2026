@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-
 @Config
 public class Shooter extends SubsystemBase {
 
@@ -19,36 +18,44 @@ public class Shooter extends SubsystemBase {
     private final DcMotorEx leftShooter;
     private final DcMotorEx rightShooter;
     private final Servo hood;
-    private final PIDController pidController;
-
+    private final PIDController PIDController;
 
     // Tunable PID parameters - can be adjusted via FTC Dashboard
-    public static double Kp = 10;  // Proportional gain
+    public static double Kp = 0.0020;  // Proportional gain
     public static double Ki = 0; // Integral gain
-    public static double Kd = 0;    // Derivative gain
-    public static double pidThreshold = 1000.0; // RPM threshold for PID vs full power control
+    public static double Kd = 0.00025;    // Derivative gain
+    public static double Kf = 0;
+    public static double Kv = 0.0001955;
+    public static double PIDThreshold = 300; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
     public static double hoodAngle = 0.5;
     public static double hoodUpperBar = 1;
-    public static double hoodLowerBar = 0.4;
-    public static double hoodAngleCoefficient = 0;
-    public static double hoodAngleBase = 0;
-    public static int maxRPM = 4500;
-    public static int idleRPM = 3000;
+    public static double hoodLowerBar = 0;
+    public static double hoodAngleCoefficient = 1.52    ;
+    public static double hoodAngleBase = -0.61;
+    public static double configHoodAngle = 0.5;
+    public static int maxRPM = 3800;
+    public static int idleRPM = 2500;
     public static int RPMThreshold = 150;
-    public static int shooterRPMCoefficient = 1000;
-    public static int shooterRPMBase = 3900;
+    public static int shooterRPMCoefficient = 476;
+    public static int shooterRPMBase = 3322;
+    public static int configRPM = 3500;
+
+
 
 
     // Target RPM for the flywheel
     private double targetRPM = 0.0;
 
     public double distance = 0;
+    public double PIDOutput;
+    public double differenceToLastRPM = 0;
+    public double lastRPM = 0;
+
 
     public boolean focused = false;
     public boolean autoMode = false;
     public boolean autoLonger = true;
-
 
     // The shooter has 3 status: Stop, Idling, and Shooting
     // Stop: The flywheel stops
@@ -58,11 +65,7 @@ public class Shooter extends SubsystemBase {
         Stop,Idling,Shooting
     }
 
-
-
     public ShooterStatus shooterStatus = ShooterStatus.Stop;
-
-
 
     public Shooter(HardwareMap hardwareMap) {
         // Initialize hardware
@@ -72,9 +75,9 @@ public class Shooter extends SubsystemBase {
         hood.setPosition(hoodAngle);
 
         // Initialize PID controller
-        pidController = new PIDController(Kp, Ki, Kd);
+        PIDController = new PIDController(Kp, Ki, Kd);
 
-        // Configrue both motor
+        // Configure both motor
         leftShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftShooter.setDirection(DcMotorSimple.Direction.FORWARD);
         leftShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -84,7 +87,7 @@ public class Shooter extends SubsystemBase {
         rightShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Set PID tolerance (adjustable via static parameter)
-        pidController.setTolerance(tolerance);
+        PIDController.setTolerance(tolerance);
     }
 
     public void updateFocused(boolean focus){
@@ -100,7 +103,6 @@ public class Shooter extends SubsystemBase {
 
     // Get the RPM of the shooter flywheel
     public double getFlyWheelRPM() {
-
         return (getLeftWheelRPM() + getRightWheelRPM())/2; // 28 ticks per revolution
     }
 
@@ -113,10 +115,9 @@ public class Shooter extends SubsystemBase {
     }
     public void setTargetRPM(double targetRPM) {
         this.targetRPM = targetRPM;
-        pidController.setSetPoint(0);
-
-
+        PIDController.setSetPoint(0);
     }
+
     public double getTargetRPM() {
         return targetRPM;
     }
@@ -128,10 +129,52 @@ public class Shooter extends SubsystemBase {
     private double currentMotorPower = 0.0;
     private double currentPIDOutput = 0.0;
 
+    // dist | RPM || hood
+    // 0.5  | 3600| 0
+    // 0.6  | 3600| 0.5
+    // 0.75 | 3650| 0.5
+    // 0.925| 3700| 0.75
+    // 1    | 3800| 1
+    // 1.1  | 3900| 1
+
+
+
+
     // Update PID controller and set motor powers
-    public void setVelocity() {
-        leftShooter.setVelocity(targetRPM*28/60);
-        rightShooter.setVelocity(targetRPM*28/60);
+    public void updateFlywheelPID() {
+        differenceToLastRPM = lastRPM - getFlyWheelRPM();
+        lastRPM = getFlyWheelRPM();
+        if (targetRPM > 0){
+            double PIDCalculationOutput = 0;
+            double currentRPM = getFlyWheelRPM();
+            double RPMDifference = targetRPM - currentRPM;
+            double PIDCalculationInput = RPMDifference / 100;
+            double targetMotorPower;
+            PIDController.setPID(Kp, Ki, Kd);
+            PIDController.setTolerance(tolerance);
+
+            if (abs(RPMDifference) <= PIDThreshold){
+                PIDCalculationOutput = PIDController.calculate(PIDCalculationInput) + Kv * targetRPM;
+                targetMotorPower = Math.max(-1.0, Math.min(1.0, PIDCalculationOutput));
+            } else if (RPMDifference > PIDThreshold){
+                targetMotorPower = 1.0;
+                PIDCalculationOutput = 1.0;
+            } else {
+                targetMotorPower = 0.0;
+                PIDCalculationOutput = 0.0;
+            }
+            PIDOutput = targetMotorPower;
+            currentMotorPower = targetMotorPower;
+            currentPIDOutput = PIDCalculationOutput;
+
+            leftShooter.setPower(targetMotorPower);
+            rightShooter.setPower(targetMotorPower);
+        } else{
+            currentMotorPower = 0.0;
+            currentPIDOutput = 0.0;
+            leftShooter.setPower(0);
+            rightShooter.setPower(0);
+        }
     }
 
     // Set Flywheel power directly bypassing PID controller
@@ -145,9 +188,8 @@ public class Shooter extends SubsystemBase {
     // Stop the shooters
     public void completeStop() {
         setFlywheelPower(0);
-        pidController.reset();
+        PIDController.reset();
     }
-
 
     // Hood
     public void updateHoodAngle(){
@@ -169,17 +211,15 @@ public class Shooter extends SubsystemBase {
         return hoodAngle;
     }
 
-
-
     // TODO: Rewrite the updateAim method
     public void updateAim() {
         distance = abs(distance);
-        if (distance < 1.1&&distance>0.58){
+        if (distance < 1.1&&distance>0.5){
             setTargetRPM(shooterRPMCoefficient*distance+shooterRPMBase);
             setHoodAngle(hoodAngleBase*distance+hoodAngleCoefficient);
         }
         else{
-            setHoodAngle(hoodLowerBar);
+            setHoodAngle(hoodUpperBar);
             setTargetRPM(maxRPM);
         }
     }
@@ -198,11 +238,16 @@ public class Shooter extends SubsystemBase {
     public double getCurrentPIDOutput() {
         return currentPIDOutput;
     }
+
+    public double getCurrentHoodPosition(){
+        return hood.getPosition();
+    }
+
     @Override
     public void periodic(){
 
         updateHoodAngle();
-        setVelocity();
+        updateFlywheelPID();
         if(shooterStatus == ShooterStatus.Shooting){
             updateAim();
         }
@@ -212,9 +257,5 @@ public class Shooter extends SubsystemBase {
         else if(shooterStatus == ShooterStatus.Idling){
             setTargetRPM(idleRPM);
         }
-
-
-
-
     }
 }

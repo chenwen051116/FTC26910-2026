@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subSystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,9 +11,9 @@ public class Intake extends SubsystemBase {
 
     private final DcMotor intake;
 
-    private final Servo transferServo;
-    private final Servo lowerFeederServo;
-    private final Servo upperFeederServo;
+    private final CRServo transferServo;
+    private final CRServo lowerFeederServo;
+    private final CRServo upperFeederServo;
 
     public IntakeStates intakeCurrentState = IntakeStates.Stop;
 
@@ -26,18 +27,18 @@ public class Intake extends SubsystemBase {
     public Intake(HardwareMap hardwareMap) {
         // Initialize hardware
         intake = hardwareMap.get(DcMotor.class, "intake");
-        transferServo = hardwareMap.get(Servo.class, "transfer");
-        lowerFeederServo = hardwareMap.get(Servo.class, "lowerFeeder");
-        upperFeederServo = hardwareMap.get(Servo.class, "upperFeeder");
+        transferServo = hardwareMap.get(CRServo.class, "transfer");
+        lowerFeederServo = hardwareMap.get(CRServo.class, "lowerFeeder");
+        upperFeederServo = hardwareMap.get(CRServo.class, "upperFeeder");
 
         // Configure Zero power behavior for motor
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Configure direction
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        transferServo.setDirection(Servo.Direction.FORWARD);
-        lowerFeederServo.setDirection(Servo.Direction.REVERSE);
-        upperFeederServo.setDirection(Servo.Direction.REVERSE);
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        transferServo.setDirection(CRServo.Direction.FORWARD);
+        lowerFeederServo.setDirection(CRServo.Direction.REVERSE);
+        upperFeederServo.setDirection(CRServo.Direction.REVERSE);
     }
 
 
@@ -50,9 +51,9 @@ public class Intake extends SubsystemBase {
     // Set the power of the transfer servo system.
     // Range of input: 0 to 1 (0.5 as steady)
     public void setTransferPower(double power) {
-        transferServo.setPosition((power + 1)/2);
-        lowerFeederServo.setPosition((power + 1)/2);
-        upperFeederServo.setPosition((power + 1)/2);
+        transferServo.setPower(power);
+        lowerFeederServo.setPower(power);
+        upperFeederServo.setPower(power);
     }
 
     // Enum which stores all the power needed for each state of the intake motors
@@ -100,6 +101,17 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() { // FTC 0.001s cycle
-        setIntakeState(intakeCurrentState);
+        if(!shooterAuto || autoForce) {
+            setIntakePower(intakeCurrentState.frontPower);
+            setTransferPower(intakeCurrentState.backPower);
+        } else{
+            if(autoTrans){
+                intakeCurrentState = IntakeStates.Send_Ball;
+            } else{
+                intakeCurrentState = IntakeStates.Stop;
+            }
+            setIntakePower(intakeCurrentState.frontPower);
+            setTransferPower(intakeCurrentState.backPower);
+        }
     }
 }

@@ -19,8 +19,8 @@ public class Transfer extends SubsystemBase {
         lowerFeederServo = hardwareMap.get(Servo.class, "lowerFeeder");
 
         transferServo.setDirection(Servo.Direction.FORWARD);
-        upperFeederServo.setDirection(Servo.Direction.FORWARD);
-        lowerFeederServo.setDirection(Servo.Direction.FORWARD);
+        upperFeederServo.setDirection(Servo.Direction.REVERSE);
+        lowerFeederServo.setDirection(Servo.Direction.REVERSE);
 
         setPosition(0);
     }

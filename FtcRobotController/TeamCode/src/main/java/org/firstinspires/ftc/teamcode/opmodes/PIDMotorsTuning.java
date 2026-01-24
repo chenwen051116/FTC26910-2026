@@ -46,7 +46,7 @@ public class PIDMotorsTuning extends OpMode {
         Shooter.Kp = Kp;
         Shooter.Ki = Ki;
         Shooter.Kd = Kd;
-        Shooter.pidThreshold = pidThreshold;
+        Shooter.PIDThreshold = pidThreshold;
         Shooter.tolerance = tolerance;
         
         dashboardTelemetry.addData("Status", "Clean PID Tuning Ready - Use Dashboard to adjust parameters");
@@ -59,7 +59,7 @@ public class PIDMotorsTuning extends OpMode {
         Shooter.Kp = Kp;
         Shooter.Ki = Ki;
         Shooter.Kd = Kd;
-        Shooter.pidThreshold = pidThreshold;
+        Shooter.PIDThreshold = pidThreshold;
         Shooter.tolerance = tolerance;
         
         // Set target and update PID

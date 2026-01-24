@@ -27,7 +27,7 @@ public class ChassisTestingTeleOp extends LinearOpMode {
             // drivetrain
             // set drivetrain status
 
-            double x = -gamepad1.left_stick_x * speedMultiplier;
+            double x = gamepad1.left_stick_x * speedMultiplier;
             double y = gamepad1.left_stick_y * speedMultiplier;
             double rx = -gamepad1.right_stick_x * speedMultiplier;
             drivetrain.move(y, x, rx);

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.subSystems.DoubleShooter;
+import org.firstinspires.ftc.teamcode.subSystems.Intake;
 import org.firstinspires.ftc.teamcode.subSystems.Transfer;
 
 
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subSystems.Transfer;
 public class ShooterMaxPowerTest extends LinearOpMode{
     private DcMotorEx leftShooter;
     private DcMotorEx rightShooter;
-    private Transfer transfer;
+    private Intake intake;
     //private Intake intake = new Intake(hardwareMap);
     //private Limelight limelight = new Limelight(hardwareMap);
     private boolean xJustPressed = false;
@@ -40,7 +41,7 @@ public class ShooterMaxPowerTest extends LinearOpMode{
         rightShooter.setDirection(DcMotorSimple.Direction.REVERSE);
         rightShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        transfer = new Transfer(hardwareMap);
+        intake = new Intake(hardwareMap);
         telemetry.setMsTransmissionInterval(200);
         waitForStart();
         while (opModeIsActive()){
@@ -101,20 +102,18 @@ public class ShooterMaxPowerTest extends LinearOpMode{
             }
 
 
-            if (dPadDownJustPressed){
-                dPadDownJustPressed = false;
-                transfer.setPosition(0);
+            if (dPadDownHolding){
+                intake.setIntakeState(Intake.IntakeStates.Ball_In);
             }
 
-            if (dPadUpJustPressed){
-                dPadUpJustPressed = false;
-                transfer.setPosition(1);
+            if (dPadUpHolding){
+                intake.setIntakeState(Intake.IntakeStates.Send_Ball);
             }
 
             telemetry.addData("Left Shooter RPM", leftShooter.getVelocity() * 60.0 / 28.0);
             telemetry.addData("Right Shooter RPM", rightShooter.getVelocity() * 60.0 / 28.0);
 
-            transfer.periodic();
+            intake.periodic();
             telemetry.update();
         }
     }

@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subSystems.Hook;
 import org.firstinspires.ftc.teamcode.subSystems.Intake;
 import org.firstinspires.ftc.teamcode.subSystems.Limelight;
 import org.firstinspires.ftc.teamcode.subSystems.Shooter;
@@ -22,10 +23,15 @@ public class TeleOp extends LinearOpMode {
     //    private Shooter shooter;
     private Limelight limelight;
     private Turret turret;
+    private Hook hook;
     private boolean xJustPressed = false;
     private boolean xHolding = false;
     private boolean yJustPressed = false;
     private boolean yHolding = false;
+    private boolean aJustPressed = false;
+    private boolean aHolding = false;
+    private boolean bJustPressed = false;
+    private boolean bHolding = false;
     private boolean slowMode = false;
     private boolean dPadUpHolding = false;
     private boolean dPadUpJustPressed = false;
@@ -45,6 +51,7 @@ public class TeleOp extends LinearOpMode {
         limelight = new Limelight(hardwareMap);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
+        hook = new Hook(hardwareMap);
 
         // default red
         limelight.initRedPipeline();
@@ -58,6 +65,7 @@ public class TeleOp extends LinearOpMode {
             turret.periodic();
             limelight.periodic();
             intake.periodic();
+            hook.periodic();
 
             if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
                 intake.updateAutoShoot(true);
@@ -94,6 +102,30 @@ public class TeleOp extends LinearOpMode {
             else{
                 yHolding = false;
                 yJustPressed = false;
+            }
+
+            // check if a is being hold
+            if(gamepad1.a){
+                if(!aHolding){
+                    aJustPressed = true;
+                    aHolding = true;
+                }
+            }
+            else{
+                aHolding = false;
+                aJustPressed = false;
+            }
+
+            // check if b is being hold
+            if(gamepad1.b){
+                if(!bHolding){
+                    bJustPressed = true;
+                    bHolding = true;
+                }
+            }
+            else{
+                bHolding = false;
+                bJustPressed = false;
             }
 
             // check if up is being hold
@@ -146,6 +178,27 @@ public class TeleOp extends LinearOpMode {
 
             }
 
+            // hook settings
+            // press a to set it into push state, b to pull, press again to standby
+            if(aJustPressed){
+                if(hook.currentHookState == Hook.HookStates.push){
+                    hook.setHookState(Hook.HookStates.standBy);
+                }
+                else{
+                    hook.setHookState(Hook.HookStates.push);
+                }
+                aJustPressed = false;
+            }
+
+            if(bJustPressed){
+                if(hook.currentHookState == Hook.HookStates.pull){
+                    hook.setHookState(Hook.HookStates.standBy);
+                }
+                else{
+                    hook.setHookState(Hook.HookStates.pull);
+                }
+                bJustPressed = false;
+            }
 
             // drivetrain
             // set drivetrain status
@@ -225,6 +278,10 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("PIDoutput", shooter.getCurrentPIDOutput());
             telemetry.addData("Shooter At Target", shooter.isAtTargetRPM() ? "YES" : "NO");
             telemetry.addData("Hood Angle", shooter.getHoodAngle());
+            telemetry.addData("PID", shooter.getCurrentPIDOutput());
+            telemetry.addData("MOTOR", shooter.getCurrentMotorPower());
+            telemetry.addData("Hook Angle", hook.getHookAngle());
+            telemetry.addData("Hood position", shooter.getCurrentHoodPosition());
 
             telemetry.update();
         }
