@@ -19,12 +19,12 @@ import org.firstinspires.ftc.teamcode.subSystems.Turret;
 public class BlueNearAuto extends OpMode {
 
     private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer, timer;
+    private Timer pathTimer, actionTimer, opmodeTimer, timer; 
     //private final ElapsedTime timer  = new ElapsedTime();
 
     private int pathState = 0;
     private final Pose startPose = new Pose(0, -2, 0); // Start Pose of our robot.
-    private final Pose ShootPose1 = new Pose(-30.53817, 19.4827, -0.83604);
+    private final Pose ShootPose1 = new Pose(-14.53817, 5.4827, -0.83604);
     private final Pose GatePose = new Pose(0.6099,34.4572, -1.600);
     private final Pose PrepGather1 = new Pose(-32.0954, 27.4628, 0);
 

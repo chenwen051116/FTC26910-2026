@@ -10,10 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Intake extends SubsystemBase {
 
     private final DcMotor intake;
-
-    private final CRServo transferServo;
-    private final CRServo lowerFeederServo;
-    private final CRServo upperFeederServo;
+    private final DcMotor transfer;
 
     public IntakeStates intakeCurrentState = IntakeStates.Stop;
 
@@ -27,18 +24,14 @@ public class Intake extends SubsystemBase {
     public Intake(HardwareMap hardwareMap) {
         // Initialize hardware
         intake = hardwareMap.get(DcMotor.class, "intake");
-        transferServo = hardwareMap.get(CRServo.class, "transfer");
-        lowerFeederServo = hardwareMap.get(CRServo.class, "lowerFeeder");
-        upperFeederServo = hardwareMap.get(CRServo.class, "upperFeeder");
+        transfer = hardwareMap.get(DcMotor.class, "transfer");
 
         // Configure Zero power behavior for motor
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Configure direction
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
-        transferServo.setDirection(CRServo.Direction.FORWARD);
-        lowerFeederServo.setDirection(CRServo.Direction.REVERSE);
-        upperFeederServo.setDirection(CRServo.Direction.REVERSE);
+        transfer.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
 
@@ -51,9 +44,7 @@ public class Intake extends SubsystemBase {
     // Set the power of the transfer servo system.
     // Range of input: 0 to 1 (0.5 as steady)
     public void setTransferPower(double power) {
-        transferServo.setPower(power);
-        lowerFeederServo.setPower(power);
-        upperFeederServo.setPower(power);
+        transfer.setPower(power);
     }
 
     // Enum which stores all the power needed for each state of the intake motors

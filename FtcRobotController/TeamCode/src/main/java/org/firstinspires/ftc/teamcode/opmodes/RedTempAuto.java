@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.subSystems.Shooter;
 import org.firstinspires.ftc.teamcode.subSystems.Scheduler;
 import org.firstinspires.ftc.teamcode.subSystems.Turret;
 
-@Autonomous(name = "RED_Near_12ball_gate")
-public class RedNearAuto extends OpMode {
+@Autonomous(name = "REDTempAuto")
+public class RedTempAuto extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer, timer;
@@ -29,21 +29,15 @@ public class RedNearAuto extends OpMode {
     private final Pose PrepGather1 = new Pose(-32.0954, -27.4628, 0);
 
     private final Pose FinishGather1 = new Pose(-2.4513, -27.4628, 0);
-
-    private final Pose PrepGather2 = new Pose(-32.0954, -49.0732, 0);
-
-    private final Pose FinishGather2 = new Pose(-2.4513, -53.0732, 0);
-
-    private final Pose PrepGather3 = new Pose(-32.0954, -70.1802, 0);//accounted for overshoot
-
-    private final Pose FinishGather3 = new Pose(-2.4513, -75.1802, 0);
-
     private final Pose GatePassby = new Pose(-23.0954, -27.4628, 1.5647);
+    private final Pose PrepGather2 = new Pose(-32.0954, -57.0732, 0);
+    private final Pose FinishGather2 = new Pose(-2.4513, -57.0732, 0);
+
 
     private final Pose Park = new Pose(-26.0954, -49.0732, 0.83604);
     private boolean firstshooting = false;
-    private PathChain Shootpath1, Shootpath2, Shootpath3,Shootpath4, lastOutPath;
-    private PathChain prepGatherPath1, prepGatherPath2, prepGatherPath3;
+    private PathChain Shootpath1, Shootpath2, prepGatherPath2, lastOutPath;
+    private PathChain prepGatherPath1;
 
     public Intake intake;
     public Shooter shooter;
@@ -69,8 +63,6 @@ public class RedNearAuto extends OpMode {
                 .setLinearHeadingInterpolation(FinishGather1.getHeading(), GatePose.getHeading())
                 .build();
 
-
-
         Shootpath2 = follower.pathBuilder()
                 .addPath(new BezierLine(GatePose, GatePassby))
                 .setLinearHeadingInterpolation(GatePose.getHeading(), GatePassby.getHeading())
@@ -83,26 +75,6 @@ public class RedNearAuto extends OpMode {
                 .setLinearHeadingInterpolation(ShootPose1.getHeading(), PrepGather2.getHeading())
                 .addPath(new BezierLine(PrepGather2, FinishGather2))
                 .setLinearHeadingInterpolation(PrepGather2.getHeading(), FinishGather2.getHeading())
-                .build();
-
-        Shootpath3 = follower.pathBuilder()
-
-                .addPath(new BezierLine(FinishGather2, ShootPose1))
-                .setLinearHeadingInterpolation(PrepGather2.getHeading(), ShootPose1.getHeading())
-                .build();
-
-        prepGatherPath3 = follower.pathBuilder()
-                .addPath(new BezierLine(ShootPose1, PrepGather3))
-                .setLinearHeadingInterpolation(ShootPose1.getHeading(), PrepGather3.getHeading())
-                .addPath(new BezierLine(PrepGather3, FinishGather3))
-                .setLinearHeadingInterpolation(PrepGather3.getHeading(), FinishGather3.getHeading())
-                .setBrakingStrength(1.5)
-                .build();
-
-        Shootpath4 = follower.pathBuilder()
-
-                .addPath(new BezierLine(FinishGather3, ShootPose1))
-                .setLinearHeadingInterpolation(PrepGather3.getHeading(), ShootPose1.getHeading())
                 .build();
         lastOutPath = follower.pathBuilder()
 
@@ -135,7 +107,7 @@ public class RedNearAuto extends OpMode {
                         firstshooting = true;
                     }
                     else{
-                        if(timer.getElapsedTimeSeconds()> 3.5){
+                        if(timer.getElapsedTimeSeconds()> 8){
                             shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
                             intake.setIntakeState(Intake.IntakeStates.Ball_In);
                             setPathState(2);
@@ -192,7 +164,7 @@ public class RedNearAuto extends OpMode {
                         firstshooting = true;
                     }
                     else{
-                        if(timer.getElapsedTimeSeconds()> 3.5){
+                        if(timer.getElapsedTimeSeconds()> 8){
                             shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
                             intake.setIntakeState(Intake.IntakeStates.Ball_In);
                             setPathState(6);
@@ -207,119 +179,10 @@ public class RedNearAuto extends OpMode {
                     shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
                     intake.setIntakeState(Intake.IntakeStates.Ball_In);
                     shooter.periodic();
-                    follower.followPath(prepGatherPath2);
+                    follower.followPath(lastOutPath);
                     setPathState(7);
                 }
                 break;
-            case 7:
-                if(follower.getPose().getX()>-6){
-                    intake.setIntakeState(Intake.IntakeStates.Ball_In);
-                    intake.periodic();
-                }
-                else if (follower.getPose().getX() > -9){
-                    intake.setIntakeState(Intake.IntakeStates.Send_Ball);
-                    intake.periodic();
-                }
-
-                if(!follower.isBusy()) {
-                    setPathState(8);
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
-                    intake.setIntakeState(Intake.IntakeStates.Ball_In);
-                    shooter.periodic();
-                }
-                break;
-            case 8:
-                shooter.autoLonger = false;
-                follower.followPath(Shootpath3,true);
-                firstshooting = false;
-                setPathState(9);
-
-                break;
-            case 9:
-                if(!follower.isBusy()) {
-                    if (!firstshooting) {
-                        shooter.updateFocused(true);
-                        shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
-                        timer.resetTimer();
-
-                        firstshooting = true;
-                    }
-                    else{
-                        if(timer.getElapsedTimeSeconds()> 3.5){
-                            shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
-                            intake.setIntakeState(Intake.IntakeStates.Ball_In);
-                            setPathState(10);
-                        }
-                        if(timer.getElapsedTimeSeconds()>2 && timer.getElapsedTimeSeconds()<3.5){
-                        }
-
-                    }
-                    break;
-                }
-            case 10:
-                if(!follower.isBusy()) {
-
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
-                    intake.setIntakeState(Intake.IntakeStates.Ball_In);
-                    shooter.periodic();
-                    follower.followPath(prepGatherPath3);
-                    setPathState(11);
-                }
-                break;
-            case 11:
-                if(follower.getPose().getX()>-9){
-                    intake.setIntakeState(Intake.IntakeStates.Ball_In);
-                    intake.periodic();
-                }
-                else if (follower.getPose().getX() > -12){
-                    intake.setIntakeState(Intake.IntakeStates.Send_Ball);
-                    intake.periodic();
-                }
-
-                if(!follower.isBusy()) {
-                    setPathState(12);
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
-                    intake.setIntakeState(Intake.IntakeStates.Ball_In);
-                    shooter.periodic();
-                }
-                break;
-            case 12:
-
-                follower.followPath(Shootpath4,true);
-                firstshooting = false;
-                setPathState(13);
-
-                break;
-            case 13:
-                if(!follower.isBusy()) {
-                    if (!firstshooting) {
-                        shooter.updateFocused(true);
-                        shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
-                        timer.resetTimer();
-
-                        firstshooting = true;
-                    }
-                    else{
-                        if(timer.getElapsedTimeSeconds()> 3.5){
-                            shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
-                            intake.setIntakeState(Intake.IntakeStates.Ball_In);
-                            setPathState(14);
-                        }
-
-                    }
-                    break;
-                }
-            case 14:
-                if(!follower.isBusy()) {
-                    follower.followPath(lastOutPath);
-                    setPathState(15);
-                }
-//                break;
-//            case 15:
-//                if(!follower.isBusy()) {
-//                    setPathState(16);
-//                }
-
         }
     }
     private void sleep(long ms){
