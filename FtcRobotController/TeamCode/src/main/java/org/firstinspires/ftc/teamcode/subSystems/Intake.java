@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
 
         // Configure direction
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
-        transfer.setDirection(DcMotorSimple.Direction.FORWARD);
+        transfer.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
 

@@ -103,9 +103,15 @@ public class ShooterMaxPowerTest extends LinearOpMode{
             if (dPadDownHolding){
                 intake.setIntakeState(Intake.IntakeStates.Ball_In);
             }
+            else{
+                intake.setIntakeState(Intake.IntakeStates.Stop);
+            }
 
             if (dPadUpHolding){
                 intake.setIntakeState(Intake.IntakeStates.Send_Ball);
+            }
+            else{
+                intake.setIntakeState(Intake.IntakeStates.Stop);
             }
 
             telemetry.addData("Left Shooter RPM", leftShooter.getVelocity() * 60.0 / 28.0);
