@@ -6,11 +6,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subSystems.Hook;
 import org.firstinspires.ftc.teamcode.subSystems.Intake;
 import org.firstinspires.ftc.teamcode.subSystems.Limelight;
 import org.firstinspires.ftc.teamcode.subSystems.Shooter;
-import org.firstinspires.ftc.teamcode.subSystems.Turret;
+import org.firstinspires.ftc.teamcode.subSystems.Shooter.ShooterStates;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends LinearOpMode {
@@ -23,7 +22,6 @@ public class TeleOp extends LinearOpMode {
     //    private Shooter shooter;
     private Limelight limelight;
 //    private Turret turret;
-    private Hook hook;
     private boolean xJustPressed = false;
     private boolean xHolding = false;
     private boolean yJustPressed = false;
@@ -41,6 +39,7 @@ public class TeleOp extends LinearOpMode {
     private double speedMultiplier = 1;
     private int limelightState = 0;
 
+    private boolean currentIntakeFirstballStatus = true;
 
     @Override
     public void runOpMode() {
@@ -51,13 +50,12 @@ public class TeleOp extends LinearOpMode {
         limelight = new Limelight(hardwareMap);
         shooter = new Shooter(hardwareMap);
 //        turret = new Turret(hardwareMap);
-        hook = new Hook(hardwareMap);
 
         // default red
         limelight.initRedPipeline();
         limelight.startDetect();
 //        turret.initEncoder();
-        shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
+        shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
         telemetry.setMsTransmissionInterval(200);
         waitForStart();
         while (opModeIsActive()){
@@ -65,18 +63,20 @@ public class TeleOp extends LinearOpMode {
 //            turret.periodic();
             limelight.periodic();
             intake.periodic();
-            hook.periodic();
 
-            if(shooter.shooterStatus == Shooter.ShooterStatus.Shooting){
-                intake.updateAutoShoot(true);
-                intake.updateAutoTrans(shooter.isAtTargetRPM());
-                shooter.updateDis(limelight.getDis());
+            if(shooter.isAtShooterState(ShooterStates.Shooting)){
+                intake.updateShootingStatus(true);
+                intake.updateShooterIsAtTargetRPMStatus(shooter.isAtTargetRPM());
+                shooter.updateTargetDistance(limelight.getDis());
                 shooter.updateFocused(limelight.isFocused());
 //                turret.tx = limelight.getTx();
 //                turret.updateAutoShoot(true);
+            } else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
+                intake.updateShootingStatus(true);
+                intake.updateShooterIsAtTargetRPMStatus(shooter.burstShooting);
             }
             else{
-                intake.updateAutoShoot(false);
+                intake.updateShootingStatus(false);
                 //turret.updateAutoShoot(false);
             }
             // check keys
@@ -154,12 +154,12 @@ public class TeleOp extends LinearOpMode {
 
             // set shooter status
             // press y to stop the shooter when it is in idle state
-            if(yJustPressed &&shooter.shooterStatus != Shooter.ShooterStatus.Shooting){
-                if(shooter.shooterStatus == Shooter.ShooterStatus.Idling) {
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Stop);
+            if(yJustPressed && !shooter.isAtShooterState(ShooterStates.Shooting) && !shooter.isAtShooterState(ShooterStates.BurstShooting)){
+                if(shooter.isAtShooterState(ShooterStates.Idling)) {
+                    shooter.setShooterStatusTo(ShooterStates.Stop);
                 }
                 else{
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
+                    shooter.setShooterStatusTo(ShooterStates.Idling);
                 }
                 yJustPressed = false;
             }
@@ -167,37 +167,26 @@ public class TeleOp extends LinearOpMode {
             // press x to shoot when the shooter is in idle state
             // set the shooter to idle state if the shooter is in shooting state or stop state
             if(xJustPressed){
-                if(shooter.shooterStatus == Shooter.ShooterStatus.Idling){
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Shooting);
+                if(shooter.isAtShooterState(ShooterStates.Idling)){
+                    shooter.setShooterStatusTo(ShooterStates.Shooting);
 //                    turret.updateAutoShoot(true);
                 }
-                else{
-                    shooter.setShooterStatus(Shooter.ShooterStatus.Idling);
+                else if (shooter.isAtShooterState(ShooterStates.Shooting)) {
+                    shooter.setShooterStatusTo(ShooterStates.Idling);
                 }
                 xJustPressed = false;
-
             }
 
-            // hook settings
-            // press a to set it into push state, b to pull, press again to standby
+            // press a to set to manual shooting mode when the shooter is in idle state
+            // set the shooter to idle state if the shooter is in manual shooting state or stop state
             if(aJustPressed){
-                if(hook.currentHookState == Hook.HookStates.push){
-                    hook.setHookState(Hook.HookStates.standBy);
+                if (shooter.isAtShooterState(ShooterStates.Idling)){
+                    shooter.setShooterStatusTo(ShooterStates.BurstShooting);
                 }
-                else{
-                    hook.setHookState(Hook.HookStates.push);
+                else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
+                    shooter.setShooterStatusTo(ShooterStates.Idling);
                 }
                 aJustPressed = false;
-            }
-
-            if(bJustPressed){
-                if(hook.currentHookState == Hook.HookStates.pull){
-                    hook.setHookState(Hook.HookStates.standBy);
-                }
-                else{
-                    hook.setHookState(Hook.HookStates.pull);
-                }
-                bJustPressed = false;
             }
 
             // drivetrain
@@ -213,7 +202,7 @@ public class TeleOp extends LinearOpMode {
 //                turret.updateAutoShoot(true);
             }
             else{
-                if(shooter.shooterStatus != Shooter.ShooterStatus.Shooting){
+                if(shooter.shooterStatus != Shooter.ShooterStates.Shooting){
 //                    turret.updateAutoShoot(false);
                 }
             }
@@ -235,13 +224,19 @@ public class TeleOp extends LinearOpMode {
             // intake
             // set intake status
             if (gamepad1.right_trigger > 0.3){
-                intake.setIntakeState(Intake.IntakeStates.Ball_In);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Ball_In);
             } else if (gamepad1.dpad_up){
-                intake.setIntakeState(Intake.IntakeStates.Ball_Out);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Ball_Out);
             } else if (gamepad1.right_bumper) {
-                intake.setIntakeState(Intake.IntakeStates.Send_Ball);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Send_Ball);
             } else {
-                intake.setIntakeState(Intake.IntakeStates.Stop);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+            }
+
+            if (dPadUpJustPressed){
+                dPadUpJustPressed = false;
+                currentIntakeFirstballStatus = !currentIntakeFirstballStatus;
+                intake.updateFirstBallStatus(currentIntakeFirstballStatus);
             }
 
 
@@ -259,6 +254,7 @@ public class TeleOp extends LinearOpMode {
                 limelight.startDetect();
             }
 
+
             // telemetry
             if (limelightState == 1){
                 telemetry.addData("Detecting for color", "BLUE");
@@ -275,14 +271,15 @@ public class TeleOp extends LinearOpMode {
 //            telemetry.addData("Turret pos", turret.currentPos);
             telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());
             telemetry.addData("Shooter Current RPM", shooter.getFlyWheelRPM());
-            telemetry.addData("PIDoutput", shooter.getCurrentPIDOutput());
+            telemetry.addData("PIDoutput", shooter.getCurrentMotorPIDOutput());
             telemetry.addData("Shooter At Target", shooter.isAtTargetRPM() ? "YES" : "NO");
-            telemetry.addData("Hood Angle", shooter.getHoodAngle());
-            telemetry.addData("PID", shooter.getCurrentPIDOutput());
+            telemetry.addData("Hood Angle", shooter.getCurrentHoodAngle());
+            telemetry.addData("PID", shooter.getCurrentMotorPIDOutput());
             telemetry.addData("MOTOR", shooter.getCurrentMotorPower());
-            telemetry.addData("Hook Angle", hook.getHookAngle());
-            telemetry.addData("Hood position", shooter.getCurrentHoodPosition());
-
+            telemetry.addData("Hood position", shooter.getCurrentHoodAngle());
+            telemetry.addData("Hood is at position", shooter.hoodIsAtTargetPosition());
+            telemetry.addData("Burst Shooting", shooter.burstShooting);
+            telemetry.addData("Burst Shooting begin", shooter.beginBurstShooting);
             telemetry.update();
         }
 

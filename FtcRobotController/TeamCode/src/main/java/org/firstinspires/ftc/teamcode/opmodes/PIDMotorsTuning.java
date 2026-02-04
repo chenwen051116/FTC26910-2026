@@ -63,8 +63,8 @@ public class PIDMotorsTuning extends OpMode {
         Shooter.tolerance = tolerance;
         
         // Set target and update PID
-        shooter.setTargetRPM(targetRPM);
-        shooter.updateFlywheelPID();
+        shooter.setTargetRPMTo(targetRPM);
+        shooter.updateShooterPID();
         
         // Create telemetry packet for graphing
         TelemetryPacket packet = new TelemetryPacket();
@@ -74,7 +74,7 @@ public class PIDMotorsTuning extends OpMode {
         packet.put("Current RPM", shooter.getFlyWheelRPM());
         packet.put("RPM Error", targetRPM - shooter.getFlyWheelRPM());
         packet.put("Motor Power", shooter.getCurrentMotorPower());
-        packet.put("PID Output", shooter.getCurrentPIDOutput());
+        packet.put("PID Output", shooter.getCurrentMotorPIDOutput());
         
         // Add PID parameters
         packet.put("Kp", Kp);
@@ -92,7 +92,7 @@ public class PIDMotorsTuning extends OpMode {
         dashboardTelemetry.addData("Current RPM", "%.1f", shooter.getFlyWheelRPM());
         dashboardTelemetry.addData("RPM Error", "%.1f", targetRPM - shooter.getFlyWheelRPM());
         dashboardTelemetry.addData("Motor Power", "%.3f", shooter.getCurrentMotorPower());
-        dashboardTelemetry.addData("PID Output", "%.3f", shooter.getCurrentPIDOutput());
+        dashboardTelemetry.addData("PID Output", "%.3f", shooter.getCurrentMotorPIDOutput());
         dashboardTelemetry.addData("At Target", shooter.isAtTargetRPM() ? "YES" : "NO");
         dashboardTelemetry.addData("", "");
         dashboardTelemetry.addData("Kp", "%.6f", Kp);
@@ -105,7 +105,7 @@ public class PIDMotorsTuning extends OpMode {
     
     @Override
     public void stop() {
-        shooter.completeStop();
+        shooter.setCompleteStop();
         dashboardTelemetry.addData("Status", "Stopped");
         dashboardTelemetry.update();
     }

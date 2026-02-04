@@ -1,24 +1,21 @@
 package org.firstinspires.ftc.teamcode.subSystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake extends SubsystemBase {
 
     private final DcMotor intake;
     private final DcMotor transfer;
 
-    public IntakeStates intakeCurrentState = IntakeStates.Stop;
+    public IntakeStates intakeStatus = IntakeStates.Stop;
 
     // set the 3 status as false in default
-    public boolean shooterAuto = false;
-    public boolean autoTrans = false;
-
-    public boolean autoForce = false;
+    public boolean shooting = false;
+    public boolean shooterAtTargetRPM = false;
+    public boolean firstBall = false;
 
     // Constructor for intake motors
     public Intake(HardwareMap hardwareMap) {
@@ -28,6 +25,7 @@ public class Intake extends SubsystemBase {
 
         // Configure Zero power behavior for motor
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        transfer.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Configure direction
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -35,20 +33,31 @@ public class Intake extends SubsystemBase {
     }
 
 
-    // Set the power of the intake servo system.
-    // Range of input: -1 to 1 (0 as steady);
-    public void setIntakePower(double power) {
+    // Set the shooting state according by input
+    public void updateShootingStatus(boolean targetStatus) {
+        shooting = targetStatus;
+    }
+
+    public void updateShooterIsAtTargetRPMStatus(boolean targetStatus){
+        shooterAtTargetRPM = targetStatus;
+    }
+
+    public void updateFirstBallStatus(boolean status){
+        firstBall = status;
+    }
+
+    // Set the power of the intake motor
+    public void setIntakePowerTo(double power) {
         intake.setPower(power);
     }
 
-    // Set the power of the transfer servo system.
-    // Range of input: 0 to 1 (0.5 as steady)
-    public void setTransferPower(double power) {
+    // Set the power of the transfer motor
+    public void setTransferPowerTo(double power) {
         transfer.setPower(power);
     }
 
     // Enum which stores all the power needed for each state of the intake motors
-    public enum IntakeStates {
+    public enum IntakeStates{
         Ball_In(1,0),
         Ball_Out(-0.7, -1),
         Send_Ball(1,1),
@@ -64,45 +73,26 @@ public class Intake extends SubsystemBase {
 
     // This function is not necessary
     // used to update the state of the intake motors when called
-    public void setIntakeState(IntakeStates intakeState) {
-        intakeCurrentState = intakeState;
-        if(!shooterAuto || autoForce) {
-            setIntakePower(intakeCurrentState.frontPower);
-            setTransferPower(intakeCurrentState.backPower);
-        } else{
-            if(autoTrans){
-                intakeCurrentState = IntakeStates.Send_Ball;
+    public void setIntakeStatusTo(IntakeStates targetIntakeStatus) {
+        if (shooting){
+            if(shooterAtTargetRPM){
+                targetIntakeStatus = IntakeStates.Send_Ball;
             } else{
-                intakeCurrentState = IntakeStates.Stop;
+                targetIntakeStatus = IntakeStates.Stop;
             }
-            setIntakePower(intakeCurrentState.frontPower);
-            setTransferPower(intakeCurrentState.backPower);
+        } else{
+            if (firstBall){
+                if (targetIntakeStatus == IntakeStates.Ball_In){
+                    targetIntakeStatus = IntakeStates.Send_Ball;
+                }
+            }
         }
-
-    }
-
-    // Standardization of the two functions
-    public void updateAutoShoot(boolean state){
-        shooterAuto = state;
-    }
-
-    public void updateAutoTrans(boolean state){
-        autoTrans = state;
+        intakeStatus = targetIntakeStatus;
     }
 
     @Override
     public void periodic() { // FTC 0.001s cycle
-        if(!shooterAuto || autoForce) {
-            setIntakePower(intakeCurrentState.frontPower);
-            setTransferPower(intakeCurrentState.backPower);
-        } else{
-            if(autoTrans){
-                intakeCurrentState = IntakeStates.Send_Ball;
-            } else{
-                intakeCurrentState = IntakeStates.Stop;
-            }
-            setIntakePower(intakeCurrentState.frontPower);
-            setTransferPower(intakeCurrentState.backPower);
-        }
+        setIntakePowerTo(intakeStatus.frontPower);
+        setTransferPowerTo(intakeStatus.backPower);
     }
 }

@@ -17,18 +17,18 @@ public class IntakeCommand extends CommandBase {
 
     public void execute() {
         if (gamepad1.right_trigger > 0.3 ){
-        intake.setIntakeState(Intake.IntakeStates.Ball_In);
+        intake.setIntakeStatusTo(Intake.IntakeStates.Ball_In);
     }else if (gamepad1.left_trigger > 0.3){
-            intake.setIntakeState(Intake.IntakeStates.Ball_Out);
+            intake.setIntakeStatusTo(Intake.IntakeStates.Ball_Out);
     }else if (gamepad1.right_bumper) {
-            intake.setIntakeState(Intake.IntakeStates.Send_Ball);
+            intake.setIntakeStatusTo(Intake.IntakeStates.Send_Ball);
     }else {
-            intake.setIntakeState(Intake.IntakeStates.Stop);
+            intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
     }
     }
 
     @Override
     public void end(boolean interrupted) {
-        intake.setIntakePower(0);
+        intake.setIntakePowerTo(0);
     }
 }

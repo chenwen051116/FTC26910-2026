@@ -26,20 +26,24 @@ public class Shooter extends SubsystemBase {
     public static double Kd = 0.00025;    // Derivative gain
     public static double Kf = 0;
     public static double Kv = 0.0001955;
-    public static double PIDThreshold = 300; // RPM threshold for PID vs full power control
+    public static double PIDThreshold = 500; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
     public static double hoodAngle = 0.5;
-    public static double hoodUpperBar = 1;
-    public static double hoodLowerBar = 0;
+    public static double hoodMaximumAngle = 1;
+    public static double hoodMinimumAngle = 0;
     public static double hoodAngleCoefficient = 1.52    ;
     public static double hoodAngleBase = -0.61;
+    public static double hoodAngleThreshold = 0.01;
     public static double configHoodAngle = 0.5;
+    public static double burstShootingBeginHoodAngle = 1;
+    public static double burstShootingEndHoodAngle = 0;
     public static int maxRPM = 3800;
     public static int idleRPM = 2500;
-    public static int RPMThreshold = 150;
+    public static int RPMThreshold = 100;
     public static int shooterRPMCoefficient = 476;
     public static int shooterRPMBase = 3322;
     public static int configRPM = 3500;
+    public static int burstShootingRPM = 4600;
 
 
 
@@ -54,18 +58,30 @@ public class Shooter extends SubsystemBase {
 
 
     public boolean focused = false;
-    public boolean autoMode = false;
-    public boolean autoLonger = true;
+    public boolean burstShooting = false;
+    public boolean beginBurstShooting = false;
 
     // The shooter has 3 status: Stop, Idling, and Shooting
     // Stop: The flywheel stops
     // Idling: The flywheel will run at a lower speed (idleRPM)
     // Shooting: The shooter will shoot at a speed that is determined by the limelight
-    public enum ShooterStatus {
-        Stop,Idling,Shooting
+    public enum ShooterStates {
+        Stop, Idling, Shooting, BurstShooting
     }
 
-    public ShooterStatus shooterStatus = ShooterStatus.Stop;
+    public ShooterStates shooterStatus = ShooterStates.Stop;
+
+    // set shooter status
+    public void setShooterStatusTo(ShooterStates targetShooterStatus){
+        shooterStatus = targetShooterStatus;
+    }
+    public ShooterStates getShooterStatus(){
+        return shooterStatus;
+    }
+
+    public boolean isAtShooterState(ShooterStates shooterState){
+        return shooterStatus == shooterState;
+    }
 
     public Shooter(HardwareMap hardwareMap) {
         // Initialize hardware
@@ -90,30 +106,30 @@ public class Shooter extends SubsystemBase {
         PIDController.setTolerance(tolerance);
     }
 
+    // Update focus status
     public void updateFocused(boolean focus){
         focused = focus;
     }
-    public void setShooterStatus(ShooterStatus status){
-        shooterStatus = status;
-    }
 
-    public void updateDis(double dis){
+    public void updateTargetDistance(double dis){
         distance = dis;
     }
 
+
     // Get the RPM of the shooter flywheel
     public double getFlyWheelRPM() {
-        return (getLeftWheelRPM() + getRightWheelRPM())/2; // 28 ticks per revolution
+        return (getLeftShooterRPM() + getRightShooterRPM())/2; // 28 ticks per revolution
     }
 
-    public double getLeftWheelRPM() {
+    public double getLeftShooterRPM() {
         return leftShooter.getVelocity()  * 60.0 / 28.0;
     }
 
-    public double getRightWheelRPM() {
+    public double getRightShooterRPM() {
         return rightShooter.getVelocity() * 60.0 / 28.0;
     }
-    public void setTargetRPM(double targetRPM) {
+
+    public void setTargetRPMTo(double targetRPM) {
         this.targetRPM = targetRPM;
         PIDController.setSetPoint(0);
     }
@@ -127,21 +143,10 @@ public class Shooter extends SubsystemBase {
 
     // Store current motor power for telemetry/graphing
     private double currentMotorPower = 0.0;
-    private double currentPIDOutput = 0.0;
-
-    // dist | RPM || hood
-    // 0.5  | 3600| 0
-    // 0.6  | 3600| 0.5
-    // 0.75 | 3650| 0.5
-    // 0.925| 3700| 0.75
-    // 1    | 3800| 1
-    // 1.1  | 3900| 1
-
-
-
+    private double currentMotorPIDOutput = 0.0;
 
     // Update PID controller and set motor powers
-    public void updateFlywheelPID() {
+    public void updateShooterPID() {
         differenceToLastRPM = lastRPM - getFlyWheelRPM();
         lastRPM = getFlyWheelRPM();
         if (targetRPM > 0){
@@ -165,97 +170,128 @@ public class Shooter extends SubsystemBase {
             }
             PIDOutput = targetMotorPower;
             currentMotorPower = targetMotorPower;
-            currentPIDOutput = PIDCalculationOutput;
+            currentMotorPIDOutput = PIDCalculationOutput;
 
-            leftShooter.setPower(targetMotorPower);
-            rightShooter.setPower(targetMotorPower);
+            setShooterPowerTo(targetMotorPower);
         } else{
             currentMotorPower = 0.0;
-            currentPIDOutput = 0.0;
-            leftShooter.setPower(0);
-            rightShooter.setPower(0);
+            currentMotorPIDOutput = 0.0;
+            setShooterPowerTo(0.0);
         }
     }
 
-    // Set Flywheel power directly bypassing PID controller
-    public void setFlywheelPower(double power) {
-        leftShooter.setPower(power);
-        rightShooter.setPower(power);
-        // Reset target when using manual power
-        targetRPM = 0;
+    // Run burst shooting program
+    public void runBurstShooting(){
+
+        if (isAtTargetRPM() && hoodIsAtTargetPosition() && !burstShooting){
+            burstShooting = true;
+        }
+
+        if (burstShooting){
+            leftShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            setHoodAngleTo(burstShootingEndHoodAngle);
+            setShooterPowerTo(1);
+        }
     }
 
-    // Stop the shooters
-    public void completeStop() {
-        setFlywheelPower(0);
+    public boolean getBurstShootingStatus(){
+        return burstShooting;
+    }
+
+    // Set shooter power directly bypassing PID controller
+    public void setShooterPowerTo(double power) {
+        leftShooter.setPower(power);
+        rightShooter.setPower(power);
+    }
+
+    // Stop the shooters and set the targetRPM to 0 to stop the PID controller
+    public void setCompleteStop() {
+        setShooterPowerTo(0);
+        targetRPM = 0;
         PIDController.reset();
     }
 
-    // Hood
+    // Code part for Hood
     public void updateHoodAngle(){
         hood.setPosition(hoodAngle);
     }
 
     // Set the angle of the hood
-    public void setHoodAngle(double angle){
-        if(angle < hoodLowerBar){
-            angle = hoodLowerBar;
+    public void setHoodAngleTo(double angle){
+        if(angle < hoodMinimumAngle){
+            angle = hoodMinimumAngle;
         }
-        if(angle > hoodUpperBar){
-            angle = hoodUpperBar;
+        if(angle > hoodMaximumAngle){
+            angle = hoodMaximumAngle;
         }
         hoodAngle = angle;
     }
 
-    public double getHoodAngle(){
-        return hoodAngle;
-    }
-
-    // TODO: Rewrite the updateAim method
-    public void updateAim() {
+    // Update the targetRPM using the value from limelight
+    public void updateTargetRPMByDistance() {
         distance = abs(distance);
         if (distance < 1.1&&distance>0.5){
-            setTargetRPM(shooterRPMCoefficient*distance+shooterRPMBase);
-            setHoodAngle(hoodAngleBase*distance+hoodAngleCoefficient);
+            setTargetRPMTo(shooterRPMCoefficient*distance+shooterRPMBase);
+            setHoodAngleTo(hoodAngleBase*distance+hoodAngleCoefficient);
         }
         else{
-            setHoodAngle(hoodUpperBar);
-            setTargetRPM(maxRPM);
+            setHoodAngleTo(hoodMaximumAngle);
+            setTargetRPMTo(maxRPM);
         }
     }
 
+    // Debuggers and getters
 
-    /**
-     * Get current motor power (for graphing/telemetry)
-     */
+    // Return the current motor power
     public double getCurrentMotorPower() {
         return currentMotorPower;
     }
 
-    /**
-     * Get current PID output (for graphing/telemetry)
-     */
-    public double getCurrentPIDOutput() {
-        return currentPIDOutput;
+    // Return the current motor PID output
+    public double getCurrentMotorPIDOutput() {
+        return currentMotorPIDOutput;
     }
 
-    public double getCurrentHoodPosition(){
+    // Return the current hood angle
+    public double getCurrentHoodAngle(){
         return hood.getPosition();
     }
 
+    public double getTargetHoodAngle(){
+        return hoodAngle;
+    }
+
+    public boolean hoodIsAtTargetPosition(){
+        return hoodAngle - hoodAngleThreshold <= getCurrentHoodAngle() && getCurrentHoodAngle() <= hoodAngle + hoodAngleThreshold;
+    }
     @Override
     public void periodic(){
 
         updateHoodAngle();
-        updateFlywheelPID();
-        if(shooterStatus == ShooterStatus.Shooting){
-            updateAim();
+        updateShooterPID();
+
+
+        if (shooterStatus != ShooterStates.BurstShooting){
+            beginBurstShooting = false;
+            leftShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
-        else if(shooterStatus == ShooterStatus.Stop){
-            completeStop();
-        }
-        else if(shooterStatus == ShooterStatus.Idling){
-            setTargetRPM(idleRPM);
+        // Update the flywheel mode accordingly from shooter status
+        if (shooterStatus == ShooterStates.Shooting) {
+            updateTargetRPMByDistance();
+        } else if (shooterStatus == ShooterStates.Stop) {
+            setCompleteStop();
+        } else if (shooterStatus == ShooterStates.Idling) {
+            setTargetRPMTo(idleRPM);
+        } else if (shooterStatus == ShooterStates.BurstShooting) {
+            if (!beginBurstShooting){
+                burstShooting = false;
+                beginBurstShooting = true;
+                setTargetRPMTo(burstShootingRPM);
+                setHoodAngleTo(burstShootingBeginHoodAngle);
+            }
+            runBurstShooting();
         }
     }
 }
