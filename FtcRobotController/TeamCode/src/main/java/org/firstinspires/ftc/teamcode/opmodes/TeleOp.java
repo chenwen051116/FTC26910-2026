@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.subSystems.DistSensor;
 import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subSystems.Intake;
 import org.firstinspires.ftc.teamcode.subSystems.Limelight;
@@ -21,6 +22,7 @@ public class TeleOp extends LinearOpMode {
     private Shooter shooter;
     //    private Shooter shooter;
     private Limelight limelight;
+    private DistSensor distSensor;
 //    private Turret turret;
     private boolean xJustPressed = false;
     private boolean xHolding = false;
@@ -37,9 +39,8 @@ public class TeleOp extends LinearOpMode {
     private boolean dPadDownJustPressed = false;
     private double x, y, rx;
     private double speedMultiplier = 1;
+    private double prevLimelightDistance = 0;
     private int limelightState = 0;
-
-    private boolean currentIntakeFirstballStatus = true;
 
     @Override
     public void runOpMode() {
@@ -49,6 +50,7 @@ public class TeleOp extends LinearOpMode {
         intake = new Intake(hardwareMap);
         limelight = new Limelight(hardwareMap);
         shooter = new Shooter(hardwareMap);
+        distSensor = new DistSensor(hardwareMap);
 //        turret = new Turret(hardwareMap);
 
         // default red
@@ -63,11 +65,17 @@ public class TeleOp extends LinearOpMode {
 //            turret.periodic();
             limelight.periodic();
             intake.periodic();
+            distSensor.periodic();
 
+            intake.updateFirstBallStatus(!distSensor.containsFirstBall());
+
+            if(limelight.getDis() != 0){
+                prevLimelightDistance = limelight.getDis();
+            }
             if(shooter.isAtShooterState(ShooterStates.Shooting)){
                 intake.updateShootingStatus(true);
                 intake.updateShooterIsAtTargetRPMStatus(shooter.isAtTargetRPM());
-                shooter.updateTargetDistance(limelight.getDis());
+                shooter.updateTargetDistance(prevLimelightDistance);
                 shooter.updateFocused(limelight.isFocused());
 //                turret.tx = limelight.getTx();
 //                turret.updateAutoShoot(true);
@@ -233,12 +241,6 @@ public class TeleOp extends LinearOpMode {
                 intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
             }
 
-            if (dPadUpJustPressed){
-                dPadUpJustPressed = false;
-                currentIntakeFirstballStatus = !currentIntakeFirstballStatus;
-                intake.updateFirstBallStatus(currentIntakeFirstballStatus);
-            }
-
 
             // limelight
             // press left to initiate as red, right to initiate as blue
@@ -280,6 +282,7 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Hood is at position", shooter.hoodIsAtTargetPosition());
             telemetry.addData("Burst Shooting", shooter.burstShooting);
             telemetry.addData("Burst Shooting begin", shooter.beginBurstShooting);
+            telemetry.addData("First Dist Sensor in CM", distSensor.getFirstSensorDistanceCM());
             telemetry.update();
         }
 

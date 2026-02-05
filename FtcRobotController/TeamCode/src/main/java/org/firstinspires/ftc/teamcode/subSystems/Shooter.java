@@ -31,8 +31,8 @@ public class Shooter extends SubsystemBase {
     public static double hoodAngle = 0.5;
     public static double hoodMaximumAngle = 1;
     public static double hoodMinimumAngle = 0;
-    public static double hoodAngleCoefficient = 1.52    ;
-    public static double hoodAngleBase = -0.61;
+    public static double hoodAngleCoefficient = 0.645    ;
+    public static double hoodAngleBase = -0.293;
     public static double hoodAngleThreshold = 0.01;
     public static double configHoodAngle = 0.5;
     public static double burstShootingBeginHoodAngle = 1;
@@ -40,8 +40,8 @@ public class Shooter extends SubsystemBase {
     public static int maxRPM = 3800;
     public static int idleRPM = 2500;
     public static int RPMThreshold = 100;
-    public static int shooterRPMCoefficient = 476;
-    public static int shooterRPMBase = 3322;
+    public static int shooterRPMCoefficient = 1021;
+    public static int shooterRPMBase = 2973;
     public static int configRPM = 3500;
     public static int burstShootingRPM = 4600;
 
@@ -231,7 +231,7 @@ public class Shooter extends SubsystemBase {
     // Update the targetRPM using the value from limelight
     public void updateTargetRPMByDistance() {
         distance = abs(distance);
-        if (distance < 1.1&&distance>0.5){
+        if (distance < 1.6&&distance>0.5){
             setTargetRPMTo(shooterRPMCoefficient*distance+shooterRPMBase);
             setHoodAngleTo(hoodAngleBase*distance+hoodAngleCoefficient);
         }
@@ -239,6 +239,9 @@ public class Shooter extends SubsystemBase {
             setHoodAngleTo(hoodMaximumAngle);
             setTargetRPMTo(maxRPM);
         }
+
+//        setHoodAngleTo(configHoodAngle);
+//        setTargetRPMTo(configRPM);
     }
 
     // Debuggers and getters
