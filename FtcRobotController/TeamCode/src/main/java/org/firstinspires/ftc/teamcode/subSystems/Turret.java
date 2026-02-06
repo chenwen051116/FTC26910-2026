@@ -50,26 +50,18 @@ public class Turret extends SubsystemBase {
     public double power = 0;
     public double limelightFocusPower = 0;
 
-    // Constructor for intake motors
+    // Constructor for turret motors
 
     public Turret(HardwareMap hardwareMap) {
         turretServo = hardwareMap.get(CRServo.class, "turret");
         encoder = hardwareMap.get(DcMotor.class, "transfer");
         turretServo.setDirection(CRServo.Direction.FORWARD);
-        encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        encoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         limelightPIDController = new PIDController(limelightKp, limelightKi, limelightKd);
         turretPIDController = new PIDFController(turretKp, turretKi, turretKd, turretKf);
         turretPIDController.setSetPoint(0);
     }
-
-    public void initEncoder(){
-        encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        encoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    // Enum which stores all the power needed for each state of the intake motors
 
     public void aimByLimelight(){
         limelightPIDController.setPIDF(limelightKp, limelightKi, limelightKd, limelightKf);
@@ -94,7 +86,7 @@ public class Turret extends SubsystemBase {
     public void setServoPower(double power){
         if (power > 1){
             power = 1;
-        } else if (power < 0){
+        } else if (power < -1){
             power = -1;
         }
         turretServo.setPower((power + 1) / 2);

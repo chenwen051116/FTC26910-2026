@@ -59,7 +59,7 @@ public class TeleOp extends LinearOpMode {
         // default red
         limelight.initRedPipeline();
         limelight.startDetect();
-        turret.initEncoder();
+        intake.initEncoder();
         shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
         telemetry.setMsTransmissionInterval(200);
         waitForStart();

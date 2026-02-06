@@ -33,6 +33,11 @@ public class Intake extends SubsystemBase {
     }
 
 
+    public void initEncoder(){
+        transfer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        transfer.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     // Set the shooting state according by input
     public void updateShootingStatus(boolean targetStatus) {
         shooting = targetStatus;
