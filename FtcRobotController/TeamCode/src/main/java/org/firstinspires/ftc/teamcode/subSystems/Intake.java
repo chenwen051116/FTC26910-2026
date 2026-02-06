@@ -61,7 +61,7 @@ public class Intake extends SubsystemBase {
         Ball_In(1,0),
         Ball_Out(-0.7, -1),
         Send_Ball(1,1),
-        First_Ball_In(1, 0.5),
+        First_Ball_In(1, 0.3),
         Stop(0,0);
         private final double frontPower;
         private final double backPower;

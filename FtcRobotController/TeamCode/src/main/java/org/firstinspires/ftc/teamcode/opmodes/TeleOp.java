@@ -8,9 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.subSystems.DistSensor;
 import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subSystems.Intake;
+import org.firstinspires.ftc.teamcode.subSystems.LEDIndicator;
 import org.firstinspires.ftc.teamcode.subSystems.Limelight;
 import org.firstinspires.ftc.teamcode.subSystems.Shooter;
 import org.firstinspires.ftc.teamcode.subSystems.Shooter.ShooterStates;
+import org.firstinspires.ftc.teamcode.subSystems.Turret;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends LinearOpMode {
@@ -20,10 +22,10 @@ public class TeleOp extends LinearOpMode {
     private Drivetrain drivetrain;
     private Intake intake;
     private Shooter shooter;
-    //    private Shooter shooter;
     private Limelight limelight;
     private DistSensor distSensor;
-//    private Turret turret;
+    private LEDIndicator ledIndicator;
+    private Turret turret;
     private boolean xJustPressed = false;
     private boolean xHolding = false;
     private boolean yJustPressed = false;
@@ -40,53 +42,65 @@ public class TeleOp extends LinearOpMode {
     private double x, y, rx;
     private double speedMultiplier = 1;
     private double prevLimelightDistance = 0;
-    private int limelightState = 0;
+    private int limelightState = -1;
 
     @Override
     public void runOpMode() {
+        // Initialize instances
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drivetrain = new Drivetrain(hardwareMap);
-
+        ledIndicator = new LEDIndicator(hardwareMap);
         intake = new Intake(hardwareMap);
         limelight = new Limelight(hardwareMap);
         shooter = new Shooter(hardwareMap);
         distSensor = new DistSensor(hardwareMap);
-//        turret = new Turret(hardwareMap);
+        turret = new Turret(hardwareMap);
 
         // default red
         limelight.initRedPipeline();
         limelight.startDetect();
-//        turret.initEncoder();
+        turret.initEncoder();
         shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
         telemetry.setMsTransmissionInterval(200);
         waitForStart();
         while (opModeIsActive()){
+            // Load periodic functions
             shooter.periodic();
-//            turret.periodic();
+            turret.periodic();
             limelight.periodic();
             intake.periodic();
             distSensor.periodic();
+            ledIndicator.periodic();
 
+            // update intake status if it has first ball
             intake.updateFirstBallStatus(!distSensor.containsFirstBall());
 
+            // store limelight distance if not detected
             if(limelight.getDis() != 0){
                 prevLimelightDistance = limelight.getDis();
             }
+
+            // Update shooter status
             if(shooter.isAtShooterState(ShooterStates.Shooting)){
                 intake.updateShootingStatus(true);
                 intake.updateShooterIsAtTargetRPMStatus(shooter.isAtTargetRPM());
                 shooter.updateTargetDistance(prevLimelightDistance);
                 shooter.updateFocused(limelight.isFocused());
-//                turret.tx = limelight.getTx();
-//                turret.updateAutoShoot(true);
+                turret.tx = limelight.getTx();
+                turret.updateAutoShoot(true);
             } else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
                 intake.updateShootingStatus(true);
                 intake.updateShooterIsAtTargetRPMStatus(shooter.burstShooting);
             }
             else{
                 intake.updateShootingStatus(false);
-                //turret.updateAutoShoot(false);
+                turret.updateAutoShoot(false);
             }
+
+            // Update LED color based on ball count
+            ledIndicator.setColorByBallCount(distSensor.getCurrentBallCount());
+
+
             // check keys
             // check if x is being hold
             if(gamepad1.x){
@@ -177,7 +191,7 @@ public class TeleOp extends LinearOpMode {
             if(xJustPressed){
                 if(shooter.isAtShooterState(ShooterStates.Idling)){
                     shooter.setShooterStatusTo(ShooterStates.Shooting);
-//                    turret.updateAutoShoot(true);
+                    turret.updateAutoShoot(true);
                 }
                 else if (shooter.isAtShooterState(ShooterStates.Shooting)) {
                     shooter.setShooterStatusTo(ShooterStates.Idling);
@@ -200,18 +214,18 @@ public class TeleOp extends LinearOpMode {
             // drivetrain
             // set drivetrain status
 
-            double x = gamepad1.left_stick_x * speedMultiplier;
-            double y = gamepad1.left_stick_y * speedMultiplier;
-            double rx = -gamepad1.right_stick_x * speedMultiplier;
+            x = gamepad1.left_stick_x * speedMultiplier;
+            y = gamepad1.left_stick_y * speedMultiplier;
+            rx = -gamepad1.right_stick_x * speedMultiplier;
             drivetrain.move(y, x, rx);
             if(gamepad1.left_bumper){
-                //drivetrain.teleDrive(y, x,Drivetrain.kpll*limeLight.getTx());
-//                turret.tx = limelight.getTx();
-//                turret.updateAutoShoot(true);
+                drivetrain.move(y, x, Drivetrain.kpll*limelight.getTx());
+                turret.tx = limelight.getTx();
+                turret.updateAutoShoot(true);
             }
             else{
                 if(shooter.shooterStatus != Shooter.ShooterStates.Shooting){
-//                    turret.updateAutoShoot(false);
+                    turret.updateAutoShoot(false);
                 }
             }
 
@@ -270,7 +284,7 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Apriltag(PoI) Tx", limelight.getTx());
             telemetry.addData("Apriltag ID", limelight.getAprilTagID());
             telemetry.addData("Pitch", limelight.getPitch());
-//            telemetry.addData("Turret pos", turret.currentPos);
+            telemetry.addData("Turret pos", turret.currentPos);
             telemetry.addData("Shooter Target RPM", shooter.getTargetRPM());
             telemetry.addData("Shooter Current RPM", shooter.getFlyWheelRPM());
             telemetry.addData("PIDoutput", shooter.getCurrentMotorPIDOutput());
