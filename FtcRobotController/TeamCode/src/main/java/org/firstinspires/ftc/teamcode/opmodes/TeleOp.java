@@ -59,7 +59,6 @@ public class TeleOp extends LinearOpMode {
         // default red
         limelight.initRedPipeline();
         limelight.startDetect();
-        intake.initEncoder();
         shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
         telemetry.setMsTransmissionInterval(200);
         waitForStart();
@@ -71,6 +70,9 @@ public class TeleOp extends LinearOpMode {
             intake.periodic();
             distSensor.periodic();
             ledIndicator.periodic();
+
+            // update turret current position using encoder
+            turret.updateCurrentPos(intake.getEncoderValue());
 
             // update intake status if it has first ball
             intake.updateFirstBallStatus(!distSensor.containsFirstBall());

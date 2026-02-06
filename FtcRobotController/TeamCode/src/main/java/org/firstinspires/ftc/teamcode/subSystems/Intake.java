@@ -30,6 +30,9 @@ public class Intake extends SubsystemBase {
         // Configure direction
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
         transfer.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        transfer.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        transfer.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
 
@@ -59,6 +62,10 @@ public class Intake extends SubsystemBase {
     // Set the power of the transfer motor
     public void setTransferPowerTo(double power) {
         transfer.setPower(power);
+    }
+
+    public int getEncoderValue(){
+        return transfer.getCurrentPosition();
     }
 
     // Enum which stores all the power needed for each state of the intake motors
@@ -95,6 +102,7 @@ public class Intake extends SubsystemBase {
         }
         intakeStatus = targetIntakeStatus;
     }
+
 
     @Override
     public void periodic() { // FTC 0.001s cycle

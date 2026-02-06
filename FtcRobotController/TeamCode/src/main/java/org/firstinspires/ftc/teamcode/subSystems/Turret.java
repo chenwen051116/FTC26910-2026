@@ -98,20 +98,19 @@ public class Turret extends SubsystemBase {
         shooterAuto = auto;
     }
 
-    public void updateCurrentPos(){
-        currentPos = encoder.getCurrentPosition();
+    public void updateCurrentPos(int inputValue){
+        currentPos = (inputValue);
     }
 
 
     @Override
     public void periodic() { // FTC 0.001s cycle
-        updateCurrentPos();
         gotoTargetPosition();
         if(shooterAuto || autoForce) {
             aimByLimelight();
         }
         else{
-            centering();
+            //centering();
         }
     }
 }
