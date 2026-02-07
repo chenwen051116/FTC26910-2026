@@ -93,6 +93,8 @@ public class TeleOp extends LinearOpMode {
             } else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
                 intake.updateShootingStatus(true);
                 intake.updateShooterIsAtTargetRPMStatus(shooter.burstShooting);
+                turret.tx = limelight.getTx();
+                turret.updateAutoShoot(true);
             }
             else{
                 intake.updateShootingStatus(false);
@@ -221,7 +223,6 @@ public class TeleOp extends LinearOpMode {
             rx = -gamepad1.right_stick_x * speedMultiplier;
             drivetrain.move(y, x, rx);
             if(gamepad1.left_bumper){
-                drivetrain.move(y, x, Drivetrain.kpll*limelight.getTx());
                 turret.tx = limelight.getTx();
                 turret.updateAutoShoot(true);
             }
@@ -299,6 +300,8 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Burst Shooting", shooter.burstShooting);
             telemetry.addData("Burst Shooting begin", shooter.beginBurstShooting);
             telemetry.addData("First Dist Sensor in CM", distSensor.getFirstSensorDistanceCM());
+            telemetry.addData("Servo power display", turret.currentPower);
+            telemetry.addData("Limelight focus power", turret.limelightFocusPower);
             telemetry.update();
         }
 

@@ -27,27 +27,25 @@ public class Turret extends SubsystemBase {
 
     public boolean autoForce = false;
 
-    public static double turretKp = 1;
-    public static double turretKi = 0;
-    public static double turretKd = 0;
+    public static double turretKp = 0.0001;
+    public static double turretKi = 0.000001;
+    public static double turretKd = 0.000005;
     public static double turretKf = 0;
 
-    public static double limelightKp = 1;
+    public static double limelightKp = 0.01;
     public static double limelightKi = 0;
     public static double limelightKd = 0;
     public static double limelightKf = 0;
 
     public static double txThreshold = 0.2;
     public static double PIDTolerance = 0.2;
-    public static int posDifferenceThreshold = 10;
-
     public static int currentTargetPos = 0;
-    public int posDifference = 0;
 
     public int currentPos = 0;
 
     public double tx = 0;
     public double power = 0;
+    public double currentPower = 0;
     public double limelightFocusPower = 0;
 
     // Constructor for turret motors
@@ -89,9 +87,12 @@ public class Turret extends SubsystemBase {
         } else if (power < -1){
             power = -1;
         }
-        turretServo.setPower((power + 1) / 2);
+        currentPower = -power;
     }
 
+    public void updateServoPower(){
+        turretServo.setPower(currentPower);
+    }
 
     // Standardization of the two functions
     public void updateAutoShoot(boolean auto){
@@ -105,12 +106,14 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() { // FTC 0.001s cycle
-        gotoTargetPosition();
+
+        updateServoPower();
         if(shooterAuto || autoForce) {
             aimByLimelight();
         }
         else{
-            //centering();
+            centering();
+            gotoTargetPosition();
         }
     }
 }
