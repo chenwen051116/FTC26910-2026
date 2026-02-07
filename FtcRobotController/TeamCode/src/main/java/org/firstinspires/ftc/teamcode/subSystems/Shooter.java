@@ -28,11 +28,11 @@ public class Shooter extends SubsystemBase {
     public static double Kv = 0.0001955;
     public static double PIDThreshold = 500; // RPM threshold for PID vs full power control
     public static double tolerance = 0.3; // RPM tolerance for "at target" determination
-    public static double hoodAngle = 0.5;
+    public static double hoodAngle = 0;
     public static double hoodMaximumAngle = 1;
     public static double hoodMinimumAngle = 0;
-    public static double hoodAngleCoefficient = 0.645    ;
-    public static double hoodAngleBase = -0.293;
+    public static double hoodAngleCoefficient = 0.5667;
+    public static double hoodAngleBase = -0.2767;
     public static double hoodAngleThreshold = 0.01;
     public static double configHoodAngle = 0.5;
     public static double burstShootingBeginHoodAngle = 1;
@@ -233,7 +233,7 @@ public class Shooter extends SubsystemBase {
         distance = abs(distance);
         if (distance < 1.6&&distance>0.5){
             setTargetRPMTo(shooterRPMCoefficient*distance+shooterRPMBase);
-            setHoodAngleTo(hoodAngleBase*distance+hoodAngleCoefficient);
+            setHoodAngleTo(hoodAngleCoefficient*distance+hoodAngleBase);
         }
         else{
             setHoodAngleTo(hoodMaximumAngle);

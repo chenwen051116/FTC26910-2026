@@ -11,6 +11,10 @@ public class LEDIndicator extends SubsystemBase {
     private final Servo secondLED;
     private final Servo thirdLED;
 
+
+    public boolean shootingState = false;
+    public boolean onTarget = false;
+
     public int currentBallCount = 0;
     public Color currentColor = Color.Off;
 
@@ -24,7 +28,7 @@ public class LEDIndicator extends SubsystemBase {
 
     public enum Color{
         Off(0),
-        Red(0.277),
+        Red(0.288),
         Orange(0.333),
         Yellow(0.388),
         Sage(0.444),
@@ -50,8 +54,12 @@ public class LEDIndicator extends SubsystemBase {
         thirdLED.setPosition(currentColor.colorPWM);
     }
 
-    public void setColorByBallCount(int ballCount){
-        switch (ballCount){
+    public void updateBallCount(int ballCount){
+        currentBallCount = ballCount;
+    }
+
+    public void setColorByBallCount(){
+        switch (currentBallCount){
             case 0:
                 currentColor = Color.Red;
                 break;
@@ -64,13 +72,35 @@ public class LEDIndicator extends SubsystemBase {
                 break;
 
             case 3:
-                currentColor = Color.Green;
+                currentColor = Color.Sage;
                 break;
+        }
+    }
+
+    public void setShootingState(boolean targetShootingState){
+        shootingState = targetShootingState;
+    }
+
+
+    public void setOnTarget(boolean targetOnTargetState){
+        onTarget = !targetOnTargetState;
+    }
+
+    public void setColorByOnTargetState(){
+        if (onTarget){
+            currentColor = Color.Green;
+        } else{
+            currentColor = Color.Red;
         }
     }
 
     @Override
     public void periodic(){
+        if (shootingState){
+            setColorByOnTargetState();
+        } else{
+            setColorByBallCount();
+        }
         updateLEDColor();
     }
 }

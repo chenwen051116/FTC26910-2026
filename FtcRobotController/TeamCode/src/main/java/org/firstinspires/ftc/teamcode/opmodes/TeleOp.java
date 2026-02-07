@@ -87,22 +87,27 @@ public class TeleOp extends LinearOpMode {
                 intake.updateShootingStatus(true);
                 intake.updateShooterIsAtTargetRPMStatus(shooter.isAtTargetRPM());
                 shooter.updateTargetDistance(prevLimelightDistance);
-                shooter.updateFocused(limelight.isFocused());
+                shooter.updateFocused(limelight.onTarget());
                 turret.tx = limelight.getTx();
                 turret.updateAutoShoot(true);
+                ledIndicator.setShootingState(true);
+                ledIndicator.setOnTarget(limelight.onTarget());
             } else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
                 intake.updateShootingStatus(true);
                 intake.updateShooterIsAtTargetRPMStatus(shooter.burstShooting);
                 turret.tx = limelight.getTx();
                 turret.updateAutoShoot(true);
+                ledIndicator.setShootingState(true);
+                ledIndicator.setOnTarget(limelight.onTarget());
             }
             else{
                 intake.updateShootingStatus(false);
                 turret.updateAutoShoot(false);
+                ledIndicator.setShootingState(false);
             }
 
             // Update LED color based on ball count
-            ledIndicator.setColorByBallCount(distSensor.getCurrentBallCount());
+            ledIndicator.updateBallCount(distSensor.getCurrentBallCount());
 
 
             // check keys
@@ -225,10 +230,13 @@ public class TeleOp extends LinearOpMode {
             if(gamepad1.left_bumper){
                 turret.tx = limelight.getTx();
                 turret.updateAutoShoot(true);
+                ledIndicator.setShootingState(true);
+                ledIndicator.setOnTarget(limelight.onTarget());
             }
             else{
                 if(shooter.shooterStatus != Shooter.ShooterStates.Shooting){
                     turret.updateAutoShoot(false);
+                    ledIndicator.setShootingState(false);
                 }
             }
 
@@ -302,6 +310,8 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("First Dist Sensor in CM", distSensor.getFirstSensorDistanceCM());
             telemetry.addData("Servo power display", turret.currentPower);
             telemetry.addData("Limelight focus power", turret.limelightFocusPower);
+            telemetry.addData("Limelight On target", limelight.onTarget());
+            telemetry.addData("LED shooting state", ledIndicator.shootingState);
             telemetry.update();
         }
 
