@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
@@ -16,14 +17,21 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+@Configurable
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
+            .useSecondaryHeadingPIDF(true)
+            .useSecondaryDrivePIDF(true)
+            .useSecondaryTranslationalPIDF(true)
             .mass(11)
             .lateralZeroPowerAcceleration(-73)
             .forwardZeroPowerAcceleration(-43)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.0625, 0, 0, 0))
-            .headingPIDFCoefficients(new PIDFCoefficients(0.815, 0, 0, 0.01))
+            .headingPIDFCoefficients(new PIDFCoefficients(0.8, 0, 0.015, 0.04))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025, 0, 0.00001, 0.6, 0.01))
+            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.01, 0, 0.01, 0.6, 0.000005))
+            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1.55, 0, 0.015, 0.04))
+            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.0115, 0, 0.002, 0.01))
             .centripetalScaling(0.000225)
             ;
 
@@ -45,8 +53,8 @@ public class Constants {
     //5: -68.06
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-5)
-            .strafePodX(0.5)
+            .forwardPodY(0.125)
+            .strafePodX(-0.05)
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
@@ -68,7 +76,7 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             ;
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.25, 1);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)

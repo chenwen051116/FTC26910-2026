@@ -56,6 +56,7 @@ public class DistSensor extends SubsystemBase {
         containsSecondBall = getSecondSensorDistanceCM() <= containsBallDistance;
         containsThirdBall = getThirdSensorDistanceCM() <= containsBallDistance;
     }
+
     public void updateCurrentBallNumber(){
         if (containsFirstBall && containsSecondBall && containsThirdBall){
             currentBallCount = 3;

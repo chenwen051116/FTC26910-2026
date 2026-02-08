@@ -101,14 +101,15 @@ public class ShooterMaxPowerTest extends LinearOpMode{
 
 
             if (dPadDownHolding){
-                intake.setIntakeStatusTo(Intake.IntakeStates.Ball_In);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
             }
             else{
                 intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+
             }
 
             if (dPadUpHolding){
-                intake.setIntakeStatusTo(Intake.IntakeStates.Send_Ball);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Feeding);
             }
             else{
                 intake.setIntakeStatusTo(Intake.IntakeStates.Stop);

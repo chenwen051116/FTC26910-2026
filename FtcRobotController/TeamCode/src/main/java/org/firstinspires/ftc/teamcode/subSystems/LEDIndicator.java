@@ -7,23 +7,24 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 public class LEDIndicator extends SubsystemBase {
-    private final Servo firstLED;
-    private final Servo secondLED;
-    private final Servo thirdLED;
+    private final Servo shooterStatusIndicatingLED;
+    private final Servo ballIndicatingLED1;
+    private final Servo ballIndicatingLED2;
 
 
-    public boolean shootingState = false;
+    public boolean shootingStatus = false;
     public boolean onTarget = false;
 
     public int currentBallCount = 0;
-    public Color currentColor = Color.Off;
-
+    public Color currentBallIndicatingColor = Color.Off;
+    public Color currentShooterStatusIndicatingColor = Color.Off;
+    public LEDShooterStatus currentShooterStatus = LEDShooterStatus.Off;
 
 
     public LEDIndicator(HardwareMap hardwareMap){
-        firstLED = hardwareMap.get(Servo.class, "led1");
-        secondLED = hardwareMap.get(Servo.class, "led2");
-        thirdLED = hardwareMap.get(Servo.class, "led3");
+        shooterStatusIndicatingLED = hardwareMap.get(Servo.class, "led1");
+        ballIndicatingLED1 = hardwareMap.get(Servo.class, "led2");
+        ballIndicatingLED2 = hardwareMap.get(Servo.class, "led3");
     }
 
     public enum Color{
@@ -45,40 +46,63 @@ public class LEDIndicator extends SubsystemBase {
     }
 
     public void setLEDColor(Color targetColor){
-        currentColor = targetColor;
+        currentBallIndicatingColor = targetColor;
     }
 
-    public void updateLEDColor(){
-        firstLED.setPosition(currentColor.colorPWM);
-        secondLED.setPosition(currentColor.colorPWM);
-        thirdLED.setPosition(currentColor.colorPWM);
+    public void updateBallIndicatingLEDColor(){
+        ballIndicatingLED1.setPosition(currentBallIndicatingColor.colorPWM);
+        ballIndicatingLED2.setPosition(currentBallIndicatingColor.colorPWM);
+    }
+
+    public void updateShooterStatusIndicatingLEDColor(){
+        shooterStatusIndicatingLED.setPosition(currentShooterStatusIndicatingColor.colorPWM);
     }
 
     public void updateBallCount(int ballCount){
         currentBallCount = ballCount;
     }
 
+    public enum LEDShooterStatus{
+        Idle(Color.Blue),
+        Off(Color.White),
+        Shooting(Color.Violet);
+        private final Color color;
+        LEDShooterStatus(Color color){
+            this.color = color;
+        }
+    }
+
     public void setColorByBallCount(){
         switch (currentBallCount){
             case 0:
-                currentColor = Color.Red;
+                currentBallIndicatingColor = Color.Red;
                 break;
             case 1:
-                currentColor = Color.Orange;
+                currentBallIndicatingColor = Color.Orange;
                 break;
 
             case 2:
-                currentColor = Color.Yellow;
+                currentBallIndicatingColor = Color.Yellow;
                 break;
 
             case 3:
-                currentColor = Color.Sage;
+                currentBallIndicatingColor = Color.Sage;
                 break;
         }
     }
 
-    public void setShootingState(boolean targetShootingState){
-        shootingState = targetShootingState;
+
+
+    public void updateColorByShooterStatus(){
+        currentShooterStatusIndicatingColor = currentShooterStatus.color;
+    }
+
+    public void setShooterStatusTo(LEDShooterStatus targetShooterStatus){
+        currentShooterStatus = targetShooterStatus;
+
+    }
+    public void setShooterStatusTo(boolean targetShootingState){
+        shootingStatus = targetShootingState;
     }
 
 
@@ -88,19 +112,21 @@ public class LEDIndicator extends SubsystemBase {
 
     public void setColorByOnTargetState(){
         if (onTarget){
-            currentColor = Color.Green;
+            currentBallIndicatingColor = Color.Green;
         } else{
-            currentColor = Color.Red;
+            currentBallIndicatingColor = Color.Red;
         }
     }
 
     @Override
     public void periodic(){
-        if (shootingState){
+        if (shootingStatus){
             setColorByOnTargetState();
         } else{
             setColorByBallCount();
         }
-        updateLEDColor();
+        updateBallIndicatingLEDColor();
+        updateColorByShooterStatus();
+        updateShooterStatusIndicatingLEDColor();
     }
 }

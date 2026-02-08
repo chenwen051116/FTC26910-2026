@@ -21,7 +21,7 @@ public class Shooter extends SubsystemBase {
     private final PIDController PIDController;
 
     // Tunable PID parameters - can be adjusted via FTC Dashboard
-    public static double Kp = 0.0020;  // Proportional gain
+    public static double Kp = 0.002;  // Proportional gain
     public static double Ki = 0; // Integral gain
     public static double Kd = 0.00025;    // Derivative gain
     public static double Kf = 0;
@@ -31,19 +31,25 @@ public class Shooter extends SubsystemBase {
     public static double hoodAngle = 0;
     public static double hoodMaximumAngle = 1;
     public static double hoodMinimumAngle = 0;
-    public static double hoodAngleCoefficient = 0.5667;
-    public static double hoodAngleBase = -0.2767;
+    public static double hoodAngleCoefficient = 0.64545;
+    public static double hoodAngleBase = -0.29273;
     public static double hoodAngleThreshold = 0.01;
     public static double configHoodAngle = 0.5;
-    public static double burstShootingBeginHoodAngle = 1;
-    public static double burstShootingEndHoodAngle = 0;
-    public static int maxRPM = 3800;
-    public static int idleRPM = 2500;
+    public static double burstShootingBeginHoodAngleBase = 1;
+    public static double burstShootingBeginHoodAngleCoefficient = 0.15;
+    public static double burstShootingEndHoodAngleBase = 1;
+    public static double burstShootingEndHoodAngleCoefficient = 0.65;
+    public static int maxRPM = 4800;
+    public static int idleRPM = 3000;
     public static int RPMThreshold = 100;
     public static int shooterRPMCoefficient = 1021;
     public static int shooterRPMBase = 2973;
+    public static int burstShootingRPMCoefficient = 2000;
+    public static int burstShootingRPMBase = 2600;
     public static int configRPM = 3500;
     public static int burstShootingRPM = 4600;
+    public static int manualShootingRPM = 3800;
+    public static double manualShootingHoodAngle = 0.25;
 
 
 
@@ -57,7 +63,6 @@ public class Shooter extends SubsystemBase {
     public double lastRPM = 0;
 
 
-    public boolean focused = false;
     public boolean burstShooting = false;
     public boolean beginBurstShooting = false;
 
@@ -107,9 +112,6 @@ public class Shooter extends SubsystemBase {
     }
 
     // Update focus status
-    public void updateFocused(boolean focus){
-        focused = focus;
-    }
 
     public void updateTargetDistance(double dis){
         distance = dis;
@@ -182,7 +184,7 @@ public class Shooter extends SubsystemBase {
 
     // Run burst shooting program
     public void runBurstShooting(){
-
+        distance = abs(distance);
         if (isAtTargetRPM() && hoodIsAtTargetPosition() && !burstShooting){
             burstShooting = true;
         }
@@ -190,7 +192,7 @@ public class Shooter extends SubsystemBase {
         if (burstShooting){
             leftShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rightShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            setHoodAngleTo(burstShootingEndHoodAngle);
+            setHoodAngleTo(burstShootingEndHoodAngleCoefficient * distance + burstShootingEndHoodAngleBase);
             setShooterPowerTo(1);
         }
     }
@@ -236,12 +238,12 @@ public class Shooter extends SubsystemBase {
             setHoodAngleTo(hoodAngleCoefficient*distance+hoodAngleBase);
         }
         else{
-            setHoodAngleTo(hoodMaximumAngle);
-            setTargetRPMTo(maxRPM);
+            setHoodAngleTo(manualShootingHoodAngle);
+            setTargetRPMTo(manualShootingRPM);
         }
-
-//        setHoodAngleTo(configHoodAngle);
+//
 //        setTargetRPMTo(configRPM);
+//        setHoodAngleTo(configHoodAngle);
     }
 
     // Debuggers and getters
@@ -283,16 +285,20 @@ public class Shooter extends SubsystemBase {
         // Update the flywheel mode accordingly from shooter status
         if (shooterStatus == ShooterStates.Shooting) {
             updateTargetRPMByDistance();
-        } else if (shooterStatus == ShooterStates.Stop) {
+        }
+        else if (shooterStatus == ShooterStates.Stop) {
             setCompleteStop();
-        } else if (shooterStatus == ShooterStates.Idling) {
+        }
+        else if (shooterStatus == ShooterStates.Idling) {
             setTargetRPMTo(idleRPM);
-        } else if (shooterStatus == ShooterStates.BurstShooting) {
+        }
+        else if (shooterStatus == ShooterStates.BurstShooting) {
             if (!beginBurstShooting){
+                distance = abs(distance);
                 burstShooting = false;
                 beginBurstShooting = true;
-                setTargetRPMTo(burstShootingRPM);
-                setHoodAngleTo(burstShootingBeginHoodAngle);
+                setTargetRPMTo(burstShootingRPMCoefficient * distance + burstShootingRPMBase);
+                setHoodAngleTo(burstShootingBeginHoodAngleCoefficient * distance + burstShootingBeginHoodAngleBase);
             }
             runBurstShooting();
         }

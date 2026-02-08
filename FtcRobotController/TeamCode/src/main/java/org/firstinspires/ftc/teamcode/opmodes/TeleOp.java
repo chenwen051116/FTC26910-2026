@@ -8,11 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.subSystems.DistSensor;
 import org.firstinspires.ftc.teamcode.subSystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subSystems.Intake;
+import org.firstinspires.ftc.teamcode.subSystems.Intake.IntakeShooterStates;
 import org.firstinspires.ftc.teamcode.subSystems.LEDIndicator;
+import org.firstinspires.ftc.teamcode.subSystems.LEDIndicator.LEDShooterStatus;
 import org.firstinspires.ftc.teamcode.subSystems.Limelight;
 import org.firstinspires.ftc.teamcode.subSystems.Shooter;
 import org.firstinspires.ftc.teamcode.subSystems.Shooter.ShooterStates;
 import org.firstinspires.ftc.teamcode.subSystems.Turret;
+import org.firstinspires.ftc.teamcode.subSystems.Turret.TurretShooterStates;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends LinearOpMode {
@@ -72,10 +75,10 @@ public class TeleOp extends LinearOpMode {
             ledIndicator.periodic();
 
             // update turret current position using encoder
-            turret.updateCurrentPos(intake.getEncoderValue());
+            turret.setCurrentPosTo(intake.getEncoderValue());
 
             // update intake status if it has first ball
-            intake.updateFirstBallStatus(!distSensor.containsFirstBall());
+            intake.setFirstBallStatusTo(!distSensor.containsFirstBall());
 
             // store limelight distance if not detected
             if(limelight.getDis() != 0){
@@ -84,31 +87,38 @@ public class TeleOp extends LinearOpMode {
 
             // Update shooter status
             if(shooter.isAtShooterState(ShooterStates.Shooting)){
-                intake.updateShootingStatus(true);
-                intake.updateShooterIsAtTargetRPMStatus(shooter.isAtTargetRPM());
+                intake.setShooterStatusTo(IntakeShooterStates.Shooting);
+                intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
                 shooter.updateTargetDistance(prevLimelightDistance);
-                shooter.updateFocused(limelight.onTarget());
                 turret.tx = limelight.getTx();
-                turret.updateAutoShoot(true);
-                ledIndicator.setShootingState(true);
+                turret.setShooterStatusTo(TurretShooterStates.Shooting);
+                ledIndicator.setShooterStatusTo(true);
                 ledIndicator.setOnTarget(limelight.onTarget());
             } else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
-                intake.updateShootingStatus(true);
-                intake.updateShooterIsAtTargetRPMStatus(shooter.burstShooting);
+                intake.setShooterStatusTo(IntakeShooterStates.Burst_Shooting);
+                intake.setShooterIsAtTargetRPMStatusTo(shooter.burstShooting);
                 turret.tx = limelight.getTx();
-                turret.updateAutoShoot(true);
-                ledIndicator.setShootingState(true);
+                turret.setShooterStatusTo(TurretShooterStates.Shooting);
+                ledIndicator.setShooterStatusTo(true);
                 ledIndicator.setOnTarget(limelight.onTarget());
             }
             else{
-                intake.updateShootingStatus(false);
-                turret.updateAutoShoot(false);
-                ledIndicator.setShootingState(false);
+                intake.setShooterStatusTo(IntakeShooterStates.Off);
+                turret.setShooterStatusTo(TurretShooterStates.Off);
+                ledIndicator.setShooterStatusTo(false);
             }
 
             // Update LED color based on ball count
             ledIndicator.updateBallCount(distSensor.getCurrentBallCount());
 
+            // Update rear LED indicator based on shooter status
+            if(shooter.isAtShooterState(ShooterStates.Shooting) || shooter.isAtShooterState(ShooterStates.BurstShooting)){
+                ledIndicator.setShooterStatusTo(LEDShooterStatus.Shooting);
+            } else if (shooter.isAtShooterState(ShooterStates.Idling)){
+                ledIndicator.setShooterStatusTo(LEDShooterStatus.Idle);
+            } else{
+                ledIndicator.setShooterStatusTo(LEDShooterStatus.Off);
+            }
 
             // check keys
             // check if x is being hold
@@ -199,8 +209,8 @@ public class TeleOp extends LinearOpMode {
             // set the shooter to idle state if the shooter is in shooting state or stop state
             if(xJustPressed){
                 if(shooter.isAtShooterState(ShooterStates.Idling)){
+                    prevLimelightDistance = 0;
                     shooter.setShooterStatusTo(ShooterStates.Shooting);
-                    turret.updateAutoShoot(true);
                 }
                 else if (shooter.isAtShooterState(ShooterStates.Shooting)) {
                     shooter.setShooterStatusTo(ShooterStates.Idling);
@@ -212,6 +222,7 @@ public class TeleOp extends LinearOpMode {
             // set the shooter to idle state if the shooter is in manual shooting state or stop state
             if(aJustPressed){
                 if (shooter.isAtShooterState(ShooterStates.Idling)){
+                    prevLimelightDistance = 0;
                     shooter.setShooterStatusTo(ShooterStates.BurstShooting);
                 }
                 else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
@@ -229,14 +240,14 @@ public class TeleOp extends LinearOpMode {
             drivetrain.move(y, x, rx);
             if(gamepad1.left_bumper){
                 turret.tx = limelight.getTx();
-                turret.updateAutoShoot(true);
-                ledIndicator.setShootingState(true);
+                turret.setShooterStatusTo(TurretShooterStates.Shooting);
+                ledIndicator.setShooterStatusTo(true);
                 ledIndicator.setOnTarget(limelight.onTarget());
             }
             else{
                 if(shooter.shooterStatus != Shooter.ShooterStates.Shooting){
-                    turret.updateAutoShoot(false);
-                    ledIndicator.setShootingState(false);
+                    turret.setShooterStatusTo(TurretShooterStates.Off);
+                    ledIndicator.setShooterStatusTo(false);
                 }
             }
 
@@ -257,11 +268,11 @@ public class TeleOp extends LinearOpMode {
             // intake
             // set intake status
             if (gamepad1.right_trigger > 0.3){
-                intake.setIntakeStatusTo(Intake.IntakeStates.Ball_In);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
             } else if (gamepad1.dpad_up){
-                intake.setIntakeStatusTo(Intake.IntakeStates.Ball_Out);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Outtake);
             } else if (gamepad1.right_bumper) {
-                intake.setIntakeStatusTo(Intake.IntakeStates.Send_Ball);
+                intake.setIntakeStatusTo(Intake.IntakeStates.Feeding);
             } else {
                 intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
             }
@@ -311,7 +322,7 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("Servo power display", turret.currentPower);
             telemetry.addData("Limelight focus power", turret.limelightFocusPower);
             telemetry.addData("Limelight On target", limelight.onTarget());
-            telemetry.addData("LED shooting state", ledIndicator.shootingState);
+            telemetry.addData("LED shooting state", ledIndicator.shootingStatus);
             telemetry.update();
         }
 

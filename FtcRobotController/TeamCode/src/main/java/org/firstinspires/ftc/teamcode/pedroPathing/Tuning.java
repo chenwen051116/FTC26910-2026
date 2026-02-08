@@ -12,6 +12,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.field.FieldManager;
 import com.bylazar.field.PanelsField;
+import com.bylazar.panels.Panels;
 import com.bylazar.field.Style;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -790,6 +791,7 @@ class TranslationalTuner extends OpMode {
         }
 
         telemetryM.debug("Push the robot laterally to test the Translational PIDF(s).");
+        telemetryM.debug(follower.getTranslationalError());
         telemetryM.update(telemetry);
     }
 }
@@ -806,7 +808,7 @@ class TranslationalTuner extends OpMode {
  * @version 1.0, 3/12/2024
  */
 class HeadingTuner extends OpMode {
-    public static double DISTANCE = 40;
+        public static double DISTANCE = 40;
     private boolean forward = true;
 
     private Path forwards;
@@ -862,6 +864,7 @@ class HeadingTuner extends OpMode {
         }
 
         telemetryM.debug("Turn the robot manually to test the Heading PIDF(s).");
+        telemetryM.debug(follower.getHeadingError());
         telemetryM.update(telemetry);
     }
 }

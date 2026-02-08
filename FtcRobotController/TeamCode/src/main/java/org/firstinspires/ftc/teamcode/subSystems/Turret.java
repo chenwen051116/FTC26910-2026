@@ -9,23 +9,17 @@ import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
-
-// TODO: Adapt the system into our robot
 @Config
 public class Turret extends SubsystemBase {
     // battery is not yet installed and configured
     // shooter is not yet installed and configured
 
     private final CRServo turretServo;
-    private final DcMotor encoder;
     private final PIDFController turretPIDController;
     private final PIDController limelightPIDController;
 
-    public boolean shooterAuto = false;
-
-    public boolean autoForce = false;
+    public boolean aiming = false;
 
     public static double turretKp = 0.0001;
     public static double turretKi = 0.000001;
@@ -41,6 +35,7 @@ public class Turret extends SubsystemBase {
     public static double PIDTolerance = 0.2;
     public static int currentTargetPos = 0;
 
+    public TurretShooterStates turretShooterStatus = TurretShooterStates.Off;
     public int currentPos = 0;
 
     public double tx = 0;
@@ -52,7 +47,6 @@ public class Turret extends SubsystemBase {
 
     public Turret(HardwareMap hardwareMap) {
         turretServo = hardwareMap.get(CRServo.class, "turret");
-        encoder = hardwareMap.get(DcMotor.class, "transfer");
         turretServo.setDirection(CRServo.Direction.FORWARD);
 
 
@@ -67,7 +61,7 @@ public class Turret extends SubsystemBase {
         limelightPIDController.setSetPoint(0);
 
         limelightFocusPower = limelightPIDController.calculate(tx);
-        setServoPower(limelightFocusPower);
+        setServoPowerTo(limelightFocusPower);
     }
 
     public void centering(){
@@ -78,10 +72,10 @@ public class Turret extends SubsystemBase {
         turretPIDController.setSetPoint(currentTargetPos);
         turretPIDController.setPIDF(turretKp, turretKi, turretKd, turretKf);
         power = turretPIDController.calculate(currentPos);
-        setServoPower(power);
+        setServoPowerTo(power);
     }
 
-    public void setServoPower(double power){
+    public void setServoPowerTo(double power){
         if (power > 1){
             power = 1;
         } else if (power < -1){
@@ -95,23 +89,30 @@ public class Turret extends SubsystemBase {
     }
 
     // Standardization of the two functions
-    public void updateAutoShoot(boolean auto){
-        shooterAuto = auto;
-    }
-
-    public void updateCurrentPos(int inputValue){
+    public void setCurrentPosTo(int inputValue){
         currentPos = (inputValue);
     }
 
+    public enum TurretShooterStates {
+        Shooting(true),
+        Off(false);
+        private final boolean aiming;
+        TurretShooterStates(boolean aiming){
+            this.aiming = aiming;
+        }
+    }
+
+    public void setShooterStatusTo(TurretShooterStates targetTurretShooterStatus){
+        turretShooterStatus = targetTurretShooterStatus;
+        aiming = turretShooterStatus.aiming;
+    }
 
     @Override
     public void periodic() { // FTC 0.001s cycle
-
         updateServoPower();
-        if(shooterAuto || autoForce) {
+        if (aiming){
             aimByLimelight();
-        }
-        else{
+        } else{
             centering();
             gotoTargetPosition();
         }
