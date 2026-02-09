@@ -41,7 +41,7 @@ public class Shooter extends SubsystemBase {
     public static double burstShootingEndHoodAngleCoefficient = 0.65;
     public static int maxRPM = 4800;
     public static int idleRPM = 3000;
-    public static int RPMThreshold = 100;
+    public static int RPMThreshold = 150;
     public static int shooterRPMCoefficient = 1021;
     public static int shooterRPMBase = 2973;
     public static int burstShootingRPMCoefficient = 2000;
