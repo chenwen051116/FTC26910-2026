@@ -101,18 +101,18 @@ public class ShooterMaxPowerTest extends LinearOpMode{
 
 
             if (dPadDownHolding){
-                intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
             }
             else{
-                intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+                intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
 
             }
 
             if (dPadUpHolding){
-                intake.setIntakeStatusTo(Intake.IntakeStates.Feeding);
+                intake.setIntakeStatusTo(Intake.IntakeStates.FEEDING);
             }
             else{
-                intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+                intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
             }
 
             telemetry.addData("Left Shooter RPM", leftShooter.getVelocity() * 60.0 / 28.0);

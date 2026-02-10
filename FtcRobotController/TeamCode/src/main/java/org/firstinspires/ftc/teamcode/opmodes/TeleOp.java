@@ -62,7 +62,7 @@ public class TeleOp extends LinearOpMode {
         // default red
         limelight.initRedPipeline();
         limelight.startDetect();
-        shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
+        shooter.setShooterStatus(Shooter.ShooterStates.STOP);
         telemetry.setMsTransmissionInterval(200);
         waitForStart();
         while (opModeIsActive()){
@@ -86,25 +86,25 @@ public class TeleOp extends LinearOpMode {
             }
 
             // Update shooter status
-            if(shooter.isAtShooterState(ShooterStates.Shooting)){
-                intake.setShooterStatusTo(IntakeShooterStates.Shooting);
+            if(shooter.isAtShooterState(ShooterStates.SHOOTING)){
+                intake.setShooterStatusTo(IntakeShooterStates.SHOOTING);
                 intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
                 shooter.updateTargetDistance(prevLimelightDistance);
                 turret.tx = limelight.getTx();
-                turret.setShooterStatusTo(TurretShooterStates.Shooting);
+                turret.setShooterStatusTo(TurretShooterStates.SHOOTING);
                 ledIndicator.setShooterStatusTo(true);
                 ledIndicator.setOnTarget(limelight.onTarget());
-            } else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
-                intake.setShooterStatusTo(IntakeShooterStates.Burst_Shooting);
+            } else if (shooter.isAtShooterState(ShooterStates.BURST_SHOOTING)){
+                intake.setShooterStatusTo(IntakeShooterStates.BURST_SHOOTING);
                 intake.setShooterIsAtTargetRPMStatusTo(shooter.burstShooting);
                 turret.tx = limelight.getTx();
-                turret.setShooterStatusTo(TurretShooterStates.Shooting);
+                turret.setShooterStatusTo(TurretShooterStates.SHOOTING);
                 ledIndicator.setShooterStatusTo(true);
                 ledIndicator.setOnTarget(limelight.onTarget());
             }
             else{
-                intake.setShooterStatusTo(IntakeShooterStates.Off);
-                turret.setShooterStatusTo(TurretShooterStates.Off);
+                intake.setShooterStatusTo(IntakeShooterStates.OFF);
+                turret.setShooterStatusTo(TurretShooterStates.OFF);
                 ledIndicator.setShooterStatusTo(false);
             }
 
@@ -112,12 +112,12 @@ public class TeleOp extends LinearOpMode {
             ledIndicator.updateBallCount(distSensor.getCurrentBallCount());
 
             // Update rear LED indicator based on shooter status
-            if(shooter.isAtShooterState(ShooterStates.Shooting) || shooter.isAtShooterState(ShooterStates.BurstShooting)){
-                ledIndicator.setShooterStatusTo(LEDShooterStatus.Shooting);
-            } else if (shooter.isAtShooterState(ShooterStates.Idling)){
-                ledIndicator.setShooterStatusTo(LEDShooterStatus.Idle);
+            if(shooter.isAtShooterState(ShooterStates.SHOOTING) || shooter.isAtShooterState(ShooterStates.BURST_SHOOTING)){
+                ledIndicator.setShooterStatusTo(LEDShooterStatus.SHOOTING);
+            } else if (shooter.isAtShooterState(ShooterStates.IDLING)){
+                ledIndicator.setShooterStatusTo(LEDShooterStatus.IDLE);
             } else{
-                ledIndicator.setShooterStatusTo(LEDShooterStatus.Off);
+                ledIndicator.setShooterStatusTo(LEDShooterStatus.OFF);
             }
 
             // check keys
@@ -195,12 +195,12 @@ public class TeleOp extends LinearOpMode {
 
             // set shooter status
             // press y to stop the shooter when it is in idle state
-            if(yJustPressed && !shooter.isAtShooterState(ShooterStates.Shooting) && !shooter.isAtShooterState(ShooterStates.BurstShooting)){
-                if(shooter.isAtShooterState(ShooterStates.Idling)) {
-                    shooter.setShooterStatusTo(ShooterStates.Stop);
+            if(yJustPressed && !shooter.isAtShooterState(ShooterStates.SHOOTING) && !shooter.isAtShooterState(ShooterStates.BURST_SHOOTING)){
+                if(shooter.isAtShooterState(ShooterStates.IDLING)) {
+                    shooter.setShooterStatus(ShooterStates.STOP);
                 }
                 else{
-                    shooter.setShooterStatusTo(ShooterStates.Idling);
+                    shooter.setShooterStatus(ShooterStates.IDLING);
                 }
                 yJustPressed = false;
             }
@@ -208,12 +208,12 @@ public class TeleOp extends LinearOpMode {
             // press x to shoot when the shooter is in idle state
             // set the shooter to idle state if the shooter is in shooting state or stop state
             if(xJustPressed){
-                if(shooter.isAtShooterState(ShooterStates.Idling)){
+                if(shooter.isAtShooterState(ShooterStates.IDLING)){
                     prevLimelightDistance = 0;
-                    shooter.setShooterStatusTo(ShooterStates.Shooting);
+                    shooter.setShooterStatus(ShooterStates.SHOOTING);
                 }
-                else if (shooter.isAtShooterState(ShooterStates.Shooting)) {
-                    shooter.setShooterStatusTo(ShooterStates.Idling);
+                else if (shooter.isAtShooterState(ShooterStates.SHOOTING)) {
+                    shooter.setShooterStatus(ShooterStates.IDLING);
                 }
                 xJustPressed = false;
             }
@@ -221,12 +221,12 @@ public class TeleOp extends LinearOpMode {
             // press a to set to manual shooting mode when the shooter is in idle state
             // set the shooter to idle state if the shooter is in manual shooting state or stop state
             if(aJustPressed){
-                if (shooter.isAtShooterState(ShooterStates.Idling)){
+                if (shooter.isAtShooterState(ShooterStates.IDLING)){
                     prevLimelightDistance = 0;
-                    shooter.setShooterStatusTo(ShooterStates.BurstShooting);
+                    shooter.setShooterStatus(ShooterStates.BURST_SHOOTING);
                 }
-                else if (shooter.isAtShooterState(ShooterStates.BurstShooting)){
-                    shooter.setShooterStatusTo(ShooterStates.Idling);
+                else if (shooter.isAtShooterState(ShooterStates.BURST_SHOOTING)){
+                    shooter.setShooterStatus(ShooterStates.IDLING);
                 }
                 aJustPressed = false;
             }
@@ -240,13 +240,13 @@ public class TeleOp extends LinearOpMode {
             drivetrain.move(y, x, rx);
             if(gamepad1.left_bumper){
                 turret.tx = limelight.getTx();
-                turret.setShooterStatusTo(TurretShooterStates.Shooting);
+                turret.setShooterStatusTo(TurretShooterStates.SHOOTING);
                 ledIndicator.setShooterStatusTo(true);
                 ledIndicator.setOnTarget(limelight.onTarget());
             }
             else{
-                if(shooter.shooterStatus != Shooter.ShooterStates.Shooting){
-                    turret.setShooterStatusTo(TurretShooterStates.Off);
+                if(shooter.shooterStatus != Shooter.ShooterStates.SHOOTING){
+                    turret.setShooterStatusTo(TurretShooterStates.OFF);
                     ledIndicator.setShooterStatusTo(false);
                 }
             }
@@ -268,13 +268,13 @@ public class TeleOp extends LinearOpMode {
             // intake
             // set intake status
             if (gamepad1.right_trigger > 0.3){
-                intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
             } else if (gamepad1.dpad_up){
-                intake.setIntakeStatusTo(Intake.IntakeStates.Outtake);
+                intake.setIntakeStatusTo(Intake.IntakeStates.OUTTAKE);
             } else if (gamepad1.right_bumper) {
-                intake.setIntakeStatusTo(Intake.IntakeStates.Feeding);
+                intake.setIntakeStatusTo(Intake.IntakeStates.FEEDING);
             } else {
-                intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+                intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
             }
 
 

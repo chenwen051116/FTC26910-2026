@@ -16,9 +16,9 @@ public class LEDIndicator extends SubsystemBase {
     public boolean onTarget = false;
 
     public int currentBallCount = 0;
-    public Color currentBallIndicatingColor = Color.Off;
-    public Color currentShooterStatusIndicatingColor = Color.Off;
-    public LEDShooterStatus currentShooterStatus = LEDShooterStatus.Off;
+    public Color currentBallIndicatingColor = Color.OFF;
+    public Color currentShooterStatusIndicatingColor = Color.OFF;
+    public LEDShooterStatus currentShooterStatus = LEDShooterStatus.OFF;
 
 
     public LEDIndicator(HardwareMap hardwareMap){
@@ -28,17 +28,17 @@ public class LEDIndicator extends SubsystemBase {
     }
 
     public enum Color{
-        Off(0),
-        Red(0.288),
-        Orange(0.333),
-        Yellow(0.388),
-        Sage(0.444),
-        Green(0.500),
-        Azure(0.555),
-        Blue(0.611),
-        Indigo(0.666),
-        Violet(0.722),
-        White(1.0);
+        OFF(0),
+        RED(0.288),
+        ORANGE(0.333),
+        YELLOW(0.388),
+        SAGE(0.444),
+        GREEN(0.500),
+        AZURE(0.555),
+        BLUE(0.611),
+        INDIGO(0.666),
+        VIOLET(0.722),
+        WHITE(1.0);
         private final double colorPWM;
         Color(double colorPWM){
             this.colorPWM = colorPWM;
@@ -63,9 +63,9 @@ public class LEDIndicator extends SubsystemBase {
     }
 
     public enum LEDShooterStatus{
-        Idle(Color.Blue),
-        Off(Color.White),
-        Shooting(Color.Violet);
+        IDLE(Color.BLUE),
+        OFF(Color.WHITE),
+        SHOOTING(Color.VIOLET);
         private final Color color;
         LEDShooterStatus(Color color){
             this.color = color;
@@ -75,18 +75,18 @@ public class LEDIndicator extends SubsystemBase {
     public void setColorByBallCount(){
         switch (currentBallCount){
             case 0:
-                currentBallIndicatingColor = Color.Red;
+                currentBallIndicatingColor = Color.RED;
                 break;
             case 1:
-                currentBallIndicatingColor = Color.Orange;
+                currentBallIndicatingColor = Color.ORANGE;
                 break;
 
             case 2:
-                currentBallIndicatingColor = Color.Yellow;
+                currentBallIndicatingColor = Color.YELLOW;
                 break;
 
             case 3:
-                currentBallIndicatingColor = Color.Sage;
+                currentBallIndicatingColor = Color.SAGE;
                 break;
         }
     }
@@ -112,9 +112,9 @@ public class LEDIndicator extends SubsystemBase {
 
     public void setColorByOnTargetState(){
         if (onTarget){
-            currentBallIndicatingColor = Color.Green;
+            currentBallIndicatingColor = Color.GREEN;
         } else{
-            currentBallIndicatingColor = Color.Red;
+            currentBallIndicatingColor = Color.RED;
         }
     }
 

@@ -71,13 +71,13 @@ public class Shooter extends SubsystemBase {
     // Idling: The flywheel will run at a lower speed (idleRPM)
     // Shooting: The shooter will shoot at a speed that is determined by the limelight
     public enum ShooterStates {
-        Stop, Idling, Shooting, BurstShooting
+        STOP, IDLING, SHOOTING, BURST_SHOOTING
     }
 
-    public ShooterStates shooterStatus = ShooterStates.Stop;
+    public ShooterStates shooterStatus = ShooterStates.STOP;
 
     // set shooter status
-    public void setShooterStatusTo(ShooterStates targetShooterStatus){
+    public void setShooterStatus(ShooterStates targetShooterStatus){
         shooterStatus = targetShooterStatus;
     }
     public ShooterStates getShooterStatus(){
@@ -277,22 +277,22 @@ public class Shooter extends SubsystemBase {
         updateShooterPID();
 
 
-        if (shooterStatus != ShooterStates.BurstShooting){
+        if (shooterStatus != ShooterStates.BURST_SHOOTING){
             beginBurstShooting = false;
             leftShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
         // Update the flywheel mode accordingly from shooter status
-        if (shooterStatus == ShooterStates.Shooting) {
+        if (shooterStatus == ShooterStates.SHOOTING) {
             updateTargetRPMByDistance();
         }
-        else if (shooterStatus == ShooterStates.Stop) {
+        else if (shooterStatus == ShooterStates.STOP) {
             setCompleteStop();
         }
-        else if (shooterStatus == ShooterStates.Idling) {
+        else if (shooterStatus == ShooterStates.IDLING) {
             setTargetRPMTo(idleRPM);
         }
-        else if (shooterStatus == ShooterStates.BurstShooting) {
+        else if (shooterStatus == ShooterStates.BURST_SHOOTING) {
             if (!beginBurstShooting){
                 distance = abs(distance);
                 burstShooting = false;

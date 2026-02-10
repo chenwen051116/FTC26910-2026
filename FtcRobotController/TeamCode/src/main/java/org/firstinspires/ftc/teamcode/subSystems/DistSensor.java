@@ -47,7 +47,7 @@ public class DistSensor extends SubsystemBase {
         return containsSecondBall;
     }
 
-    public boolean ContainsThirdBall(){
+    public boolean containsThirdBall(){
         return containsThirdBall;
     }
 

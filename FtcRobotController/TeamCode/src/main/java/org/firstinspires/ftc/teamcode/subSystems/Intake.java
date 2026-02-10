@@ -10,10 +10,10 @@ public class Intake extends SubsystemBase {
     private final DcMotor intake;
     private final DcMotor transfer;
 
-    public IntakeStates intakeStatus = IntakeStates.Stop;
+    public IntakeStates intakeStatus = IntakeStates.STOP;
 
     // set the 3 status as false in default
-    public IntakeShooterStates shooterStatus = IntakeShooterStates.Off;
+    public IntakeShooterStates shooterStatus = IntakeShooterStates.OFF;
     public boolean shooterAtTargetRPM = false;
     public boolean firstBall = false;
     public boolean onTarget = false;
@@ -70,12 +70,12 @@ public class Intake extends SubsystemBase {
 
     // Enum which stores all the power needed for each state of the intake motors
     public enum IntakeStates{
-        Intake(1,0),
-        Outtake(-0.7, -1),
-        Feeding(1,.8),
-        Slow_Feeding(1, 0.3),
-        Burst_Feeding(1, 0.6),
-        Stop(0,0);
+        INTAKE(1,0),
+        OUTTAKE(-0.7, -1),
+        FEEDING(1,.8),
+        SLOW_FEEDING(1, 0.3),
+        BURST_FEEDING(1, 0.6),
+        STOP(0,0);
         private final double frontPower;
         private final double backPower;
         // Set update the transfer state
@@ -86,36 +86,36 @@ public class Intake extends SubsystemBase {
     }
 
     public enum IntakeShooterStates {
-        Shooting,
-        Burst_Shooting,
-        Off;
+        SHOOTING,
+        BURST_SHOOTING,
+        OFF;
     }
 
     // This function is not necessary
     // used to update the state of the intake motors when called
     public void setIntakeStatusTo(IntakeStates targetIntakeStatus) {
         switch(shooterStatus){
-            case Shooting:
+            case SHOOTING:
                 if(shooterAtTargetRPM){
-                    targetIntakeStatus = IntakeStates.Feeding;
+                    targetIntakeStatus = IntakeStates.FEEDING;
                 }
                 else{
-                    targetIntakeStatus = IntakeStates.Stop;
+                    targetIntakeStatus = IntakeStates.STOP;
                 }
                 break;
 
-            case Burst_Shooting:
+            case BURST_SHOOTING:
                 if(shooterAtTargetRPM){
-                    targetIntakeStatus = IntakeStates.Burst_Feeding;
+                    targetIntakeStatus = IntakeStates.BURST_FEEDING;
                 }
                 else{
-                    targetIntakeStatus = IntakeStates.Stop;
+                    targetIntakeStatus = IntakeStates.STOP;
                 }
                 break;
 
-            case Off:
-                if (firstBall && targetIntakeStatus == IntakeStates.Intake){
-                    targetIntakeStatus = IntakeStates.Slow_Feeding;
+            case OFF:
+                if (firstBall && targetIntakeStatus == IntakeStates.INTAKE){
+                    targetIntakeStatus = IntakeStates.SLOW_FEEDING;
                 }
                 break;
         }

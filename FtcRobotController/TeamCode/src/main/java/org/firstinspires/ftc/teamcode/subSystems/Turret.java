@@ -7,7 +7,6 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
@@ -35,7 +34,7 @@ public class Turret extends SubsystemBase {
     public static double PIDTolerance = 0.2;
     public static int currentTargetPos = 0;
 
-    public TurretShooterStates turretShooterStatus = TurretShooterStates.Off;
+    public TurretShooterStates turretShooterStatus = TurretShooterStates.OFF;
     public int currentPos = 0;
 
     public double tx = 0;
@@ -94,8 +93,8 @@ public class Turret extends SubsystemBase {
     }
 
     public enum TurretShooterStates {
-        Shooting(true),
-        Off(false);
+        SHOOTING(true),
+        OFF(false);
         private final boolean aiming;
         TurretShooterStates(boolean aiming){
             this.aiming = aiming;

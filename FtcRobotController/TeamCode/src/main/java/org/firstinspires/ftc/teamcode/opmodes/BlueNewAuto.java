@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -129,7 +128,7 @@ public class BlueNewAuto extends OpMode {
         double prevDis;
         switch (pathState){
             case 0: // Path: From initial position to shooting position
-                shooter.setShooterStatusTo(ShooterStates.Idling);
+                shooter.setShooterStatus(ShooterStates.IDLING);
                 follower.followPath(Shootpath1, true);
                 turret.setCurrentPosTo(intake.getEncoderValue());
                 setPathState(1);
@@ -140,39 +139,39 @@ public class BlueNewAuto extends OpMode {
                 if (!follower.isBusy()){
                     if (!shooting){
                         shooting = true;
-                        shooter.setShooterStatusTo(ShooterStates.Shooting);
+                        shooter.setShooterStatus(ShooterStates.SHOOTING);
                         turret.tx = limelight.getTx();
                         turret.setCurrentPosTo(intake.getEncoderValue());
-                        turret.setShooterStatusTo(TurretShooterStates.Shooting);
-                        intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
-                        intake.setShooterStatusTo(Intake.IntakeShooterStates.Shooting);
+                        turret.setShooterStatusTo(TurretShooterStates.SHOOTING);
+                        intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
+                        intake.setShooterStatusTo(Intake.IntakeShooterStates.SHOOTING);
 
                         timer.resetTimer();
                     }
                     else {
                         if (timer.getElapsedTimeSeconds() > 3.5){
-                            shooter.setShooterStatusTo(ShooterStates.Stop);
-                            turret.setShooterStatusTo(TurretShooterStates.Off);
+                            shooter.setShooterStatus(ShooterStates.STOP);
+                            turret.setShooterStatusTo(TurretShooterStates.OFF);
                             turret.setCurrentPosTo(intake.getEncoderValue());
-                            intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                            intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                             setPathState(2);
                         }
                         else{
                             turret.tx = limelight.getTx();
                             turret.setCurrentPosTo(intake.getEncoderValue());
                             intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
-                            intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+                            intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
                         }
                     }
                     break;
                 }
 
             case 2: // Path: From shooting position to prep gather position 1
-                turret.setShooterStatusTo(TurretShooterStates.Off);
+                turret.setShooterStatusTo(TurretShooterStates.OFF);
                 turret.setCurrentPosTo(intake.getEncoderValue());
                 if(!follower.isBusy()) {
-                    shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
-                    intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                    shooter.setShooterStatus(Shooter.ShooterStates.STOP);
+                    intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                     shooter.periodic();
                     follower.followPath(prepGatherPath1);
                     setPathState(3);
@@ -180,13 +179,13 @@ public class BlueNewAuto extends OpMode {
                 break;
 
             case 3: // Path: Gather ball 1
-                turret.setShooterStatusTo(TurretShooterStates.Off);
+                turret.setShooterStatusTo(TurretShooterStates.OFF);
                 turret.setCurrentPosTo(intake.getEncoderValue());
                 intake.setFirstBallStatusTo(!distSensor.containsFirstBall());
                 if(!follower.isBusy()) {
                     setPathState(4);
-                    shooter.setShooterStatusTo(Shooter.ShooterStates.Idling);
-                    intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                    shooter.setShooterStatus(Shooter.ShooterStates.IDLING);
+                    intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                     shooter.periodic();
                 }
                 break;
@@ -201,39 +200,39 @@ public class BlueNewAuto extends OpMode {
                 if (!follower.isBusy()){
                     if (!shooting){
                         shooting = true;
-                        shooter.setShooterStatusTo(ShooterStates.Shooting);
+                        shooter.setShooterStatus(ShooterStates.SHOOTING);
                         turret.tx = limelight.getTx();
                         turret.setCurrentPosTo(intake.getEncoderValue());
-                        turret.setShooterStatusTo(TurretShooterStates.Shooting);
-                        intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
-                        intake.setShooterStatusTo(Intake.IntakeShooterStates.Shooting);
+                        turret.setShooterStatusTo(TurretShooterStates.SHOOTING);
+                        intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
+                        intake.setShooterStatusTo(Intake.IntakeShooterStates.SHOOTING);
                         intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
                         timer.resetTimer();
                     }
                     else {
                         if (timer.getElapsedTimeSeconds() > 3.5){
-                            shooter.setShooterStatusTo(ShooterStates.Stop);
-                            turret.setShooterStatusTo(TurretShooterStates.Off);
+                            shooter.setShooterStatus(ShooterStates.STOP);
+                            turret.setShooterStatusTo(TurretShooterStates.OFF);
                             turret.setCurrentPosTo(intake.getEncoderValue());
-                            intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                            intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                             setPathState(6);
                         }
                         else{
                             turret.tx = limelight.getTx();
                             turret.setCurrentPosTo(intake.getEncoderValue());
                             intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
-                            intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+                            intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
                         }
                     }
                     break;
                 }
 
             case 6: // Path: From Shooting position to prep gather position 2
-                turret.setShooterStatusTo(TurretShooterStates.Off);
+                turret.setShooterStatusTo(TurretShooterStates.OFF);
                 turret.setCurrentPosTo(intake.getEncoderValue());
                 if(!follower.isBusy()) {
-                    shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
-                    intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                    shooter.setShooterStatus(Shooter.ShooterStates.STOP);
+                    intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                     shooter.periodic();
                     follower.followPath(prepGatherPath2);
                     setPathState(7);
@@ -241,13 +240,13 @@ public class BlueNewAuto extends OpMode {
                 break;
 
             case 7: // Path: Gather ball 2
-                turret.setShooterStatusTo(TurretShooterStates.Off);
+                turret.setShooterStatusTo(TurretShooterStates.OFF);
                 turret.setCurrentPosTo(intake.getEncoderValue());
                 intake.setFirstBallStatusTo(!distSensor.containsFirstBall());
                 if(!follower.isBusy()) {
                     setPathState(8);
-                    shooter.setShooterStatusTo(Shooter.ShooterStates.Idling);
-                    intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                    shooter.setShooterStatus(Shooter.ShooterStates.IDLING);
+                    intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                     shooter.periodic();
                 }
                 break;
@@ -262,39 +261,39 @@ public class BlueNewAuto extends OpMode {
                 if (!follower.isBusy()){
                     if (!shooting){
                         shooting = true;
-                        shooter.setShooterStatusTo(ShooterStates.Shooting);
+                        shooter.setShooterStatus(ShooterStates.SHOOTING);
                         turret.tx = limelight.getTx();
                         turret.setCurrentPosTo(intake.getEncoderValue());
-                        turret.setShooterStatusTo(TurretShooterStates.Shooting);
-                        intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
-                        intake.setShooterStatusTo(Intake.IntakeShooterStates.Shooting);
+                        turret.setShooterStatusTo(TurretShooterStates.SHOOTING);
+                        intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
+                        intake.setShooterStatusTo(Intake.IntakeShooterStates.SHOOTING);
                         intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
                         timer.resetTimer();
                     }
                     else {
                         if (timer.getElapsedTimeSeconds() > 3.5){
-                            shooter.setShooterStatusTo(ShooterStates.Stop);
-                            turret.setShooterStatusTo(TurretShooterStates.Off);
+                            shooter.setShooterStatus(ShooterStates.STOP);
+                            turret.setShooterStatusTo(TurretShooterStates.OFF);
                             turret.setCurrentPosTo(intake.getEncoderValue());
-                            intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                            intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                             setPathState(10);
                         }
                         else{
                             turret.tx = limelight.getTx();
                             turret.setCurrentPosTo(intake.getEncoderValue());
                             intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
-                            intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+                            intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
                         }
                     }
                     break;
                 }
 
             case 10: // Path: From Shooting position to prep gather position 3
-                turret.setShooterStatusTo(TurretShooterStates.Off);
+                turret.setShooterStatusTo(TurretShooterStates.OFF);
                 turret.setCurrentPosTo(intake.getEncoderValue());
                 if(!follower.isBusy()) {
-                    shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
-                    intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                    shooter.setShooterStatus(Shooter.ShooterStates.STOP);
+                    intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                     shooter.periodic();
                     follower.followPath(prepGatherPath3);
                     setPathState(11);
@@ -302,13 +301,13 @@ public class BlueNewAuto extends OpMode {
                 break;
 
             case 11: // Path: Gather ball 3
-                turret.setShooterStatusTo(TurretShooterStates.Off);
+                turret.setShooterStatusTo(TurretShooterStates.OFF);
                 turret.setCurrentPosTo(intake.getEncoderValue());
                 intake.setFirstBallStatusTo(!distSensor.containsFirstBall());
                 if(!follower.isBusy()) {
                     setPathState(12);
-                    shooter.setShooterStatusTo(Shooter.ShooterStates.Idling);
-                    intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                    shooter.setShooterStatus(Shooter.ShooterStates.IDLING);
+                    intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                     shooter.periodic();
                 }
                 break;
@@ -323,28 +322,28 @@ public class BlueNewAuto extends OpMode {
                 if (!follower.isBusy()){
                     if (!shooting){
                         shooting = true;
-                        shooter.setShooterStatusTo(ShooterStates.Shooting);
+                        shooter.setShooterStatus(ShooterStates.SHOOTING);
                         turret.tx = limelight.getTx();
                         turret.setCurrentPosTo(intake.getEncoderValue());
-                        turret.setShooterStatusTo(TurretShooterStates.Shooting);
-                        intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
-                        intake.setShooterStatusTo(Intake.IntakeShooterStates.Shooting);
+                        turret.setShooterStatusTo(TurretShooterStates.SHOOTING);
+                        intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
+                        intake.setShooterStatusTo(Intake.IntakeShooterStates.SHOOTING);
                         intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
                         timer.resetTimer();
                     }
                     else {
                         if (timer.getElapsedTimeSeconds() > 3.5){
-                            shooter.setShooterStatusTo(ShooterStates.Stop);
-                            turret.setShooterStatusTo(TurretShooterStates.Off);
+                            shooter.setShooterStatus(ShooterStates.STOP);
+                            turret.setShooterStatusTo(TurretShooterStates.OFF);
                             turret.setCurrentPosTo(intake.getEncoderValue());
-                            intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+                            intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
                             setPathState(14);
                         }
                         else{
                             turret.tx = limelight.getTx();
                             turret.setCurrentPosTo(intake.getEncoderValue());
                             intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
-                            intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+                            intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
                         }
                     }
                     break;
@@ -368,16 +367,16 @@ public class BlueNewAuto extends OpMode {
         turret.periodic();
         limelight.periodic();
         distSensor.periodic();
-        if(shooter.isAtShooterState(ShooterStates.Shooting)) {
-            intake.setShooterStatusTo(Intake.IntakeShooterStates.Shooting);
+        if(shooter.isAtShooterState(ShooterStates.SHOOTING)) {
+            intake.setShooterStatusTo(Intake.IntakeShooterStates.SHOOTING);
             intake.setShooterIsAtTargetRPMStatusTo(shooter.isAtTargetRPM());
             shooter.updateTargetDistance(0.75);
             turret.tx = limelight.getTx();
-            turret.setShooterStatusTo(TurretShooterStates.Shooting);
+            turret.setShooterStatusTo(TurretShooterStates.SHOOTING);
         }
         else{
-            intake.setShooterStatusTo(Intake.IntakeShooterStates.Off);
-            turret.setShooterStatusTo(TurretShooterStates.Off);
+            intake.setShooterStatusTo(Intake.IntakeShooterStates.OFF);
+            turret.setShooterStatusTo(TurretShooterStates.OFF);
 
         }
         autonomousPathUpdate();
@@ -413,8 +412,8 @@ public class BlueNewAuto extends OpMode {
         turret = new Turret(hardwareMap);
         distSensor = new DistSensor(hardwareMap);
         intake.initEncoder();
-        intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
-        shooter.setShooterStatusTo(Shooter.ShooterStates.Stop);
+        intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
+        shooter.setShooterStatus(Shooter.ShooterStates.STOP);
         buildPaths();
         follower.setStartingPose(startPose);
 

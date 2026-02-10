@@ -17,13 +17,13 @@ public class IntakeCommand extends CommandBase {
 
     public void execute() {
         if (gamepad1.right_trigger > 0.3 ){
-        intake.setIntakeStatusTo(Intake.IntakeStates.Intake);
+        intake.setIntakeStatusTo(Intake.IntakeStates.INTAKE);
     }else if (gamepad1.left_trigger > 0.3){
-            intake.setIntakeStatusTo(Intake.IntakeStates.Outtake);
+            intake.setIntakeStatusTo(Intake.IntakeStates.OUTTAKE);
     }else if (gamepad1.right_bumper) {
-            intake.setIntakeStatusTo(Intake.IntakeStates.Feeding);
+            intake.setIntakeStatusTo(Intake.IntakeStates.FEEDING);
     }else {
-            intake.setIntakeStatusTo(Intake.IntakeStates.Stop);
+            intake.setIntakeStatusTo(Intake.IntakeStates.STOP);
     }
     }
 
