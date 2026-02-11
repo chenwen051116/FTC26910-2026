@@ -7,8 +7,9 @@ import com.arcrobotics.ftclib.controller.PIDController;
 
 @Config
 public class SpeedController {
-    // Initialize PID Controller for flywheel
+    // Initialize PID Controllers
     private final PIDController flywheelPidController;
+    private final PIDController turretPidController;
 
     // PID Constants for flywheel
     public static double flywheelKp = 0.002;
@@ -19,11 +20,23 @@ public class SpeedController {
     public static double flywheelPidThreshold = 500;
     public static double flywheelPidTolerance = 0.3;
 
+    // PID Constants for turret
+    public static double turretKp = 0.0001;
+    public static double turretKi = 0.000001;
+    public static double turretKd = 0.000005;
+    public static double turretKf = 0;
+    public static double turretPidTolerance = 0.2;
+
     // Constructor to initialize all the PID controllers. Must call before using the methods
     // otherwise the PIDControllers will not be initialized.
     public SpeedController(){
         flywheelPidController = new PIDController(flywheelKp, flywheelKi, flywheelKd);
         flywheelPidController.setTolerance(flywheelPidTolerance);
+
+        turretPidController = new PIDController(turretKp, turretKi, turretKd);
+        turretPidController.setTolerance(turretPidTolerance);
+        turretPidController.setSetPoint(0);
+
     }
 
     public double calculateFlywheelPower (double currentRPM, double targetRPM ){
@@ -51,5 +64,11 @@ public class SpeedController {
             return targetMotorPower;
         }
         return 0;
+    }
+
+    public double calculateTurretPower (double currentPosition, double targetPosition ){
+        turretPidController.setSetPoint(targetPosition);
+        turretPidController.setPIDF(turretKp, turretKi, turretKd, turretKf);
+        return Math.max(-1.0, Math.min(1.0, turretPidController.calculate(currentPosition)));
     }
 }
