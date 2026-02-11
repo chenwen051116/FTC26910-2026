@@ -10,6 +10,7 @@ public class Flywheel {
         IDLE,
     }
 
+    public static final double TO_RPM_CONVERSION_FACTOR = 60.0 / 28.0;
     private final DcMotorEx flywheelMotor1;
     private final DcMotorEx flywheelMotor2;
 
@@ -25,7 +26,7 @@ public class Flywheel {
     }
 
     public double getRpm() {
-        return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) * 60.0 / 28.0;
+        return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) * TO_RPM_CONVERSION_FACTOR;
     }
 
     public void setRPM(){

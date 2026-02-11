@@ -23,8 +23,7 @@ public class SpeedController {
     }
 
     public double calculateFlywheelPower (double currentRPM, double targetRPM ){
-
+        // TODO
+        return 0;
     }
-
-
 }
