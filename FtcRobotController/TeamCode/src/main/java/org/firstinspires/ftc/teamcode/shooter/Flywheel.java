@@ -16,6 +16,12 @@ public class Flywheel {
     public Flywheel(HardwareMap hardwareMap) {
         flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel_1");
         flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel_2");
+
+        flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
+        flywheelMotor2.setDirection(DcMotorEx.Direction.FORWARD);
+
+        flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     public double getRpm() {
