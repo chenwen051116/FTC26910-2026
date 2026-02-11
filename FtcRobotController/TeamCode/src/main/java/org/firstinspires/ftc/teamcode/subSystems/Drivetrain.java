@@ -75,7 +75,5 @@ public class Drivetrain extends SubsystemBase {
     public double getBackRightPower() {
         return backRightMotor.getPower();
     }
-
-
 }
 

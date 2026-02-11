@@ -11,6 +11,7 @@ public class Flywheel {
         IDLE,
     }
 
+    public static final double TO_RPM_CONVERSION_FACTOR = 60.0 / 28.0;
     private final DcMotorEx flywheelMotor1;
     private final DcMotorEx flywheelMotor2;
     private final SpeedController speedController;
@@ -31,21 +32,18 @@ public class Flywheel {
         speedController = new SpeedController();
     }
 
-    public double getRpm() {
-        return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) * 60.0 / 28.0;
+    public double getRPM() {
+        return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) * TO_RPM_CONVERSION_FACTOR;
     }
 
-    // Directly set the motor power into the value calculated by PID
     public void setRPM(double targetRPM){
         setBothMotorPower(getCalculatedFlywheelPower(targetRPM));
     }
 
-    // Public double method allowing debug usages
     public double getCalculatedFlywheelPower(double targetRPM){
-        return speedController.calculateFlywheelPower(getRpm(), targetRPM);
+        return speedController.calculateFlywheelPower(getRPM(), targetRPM);
     }
 
-    // Set the power for both motors
     private void setBothMotorPower(double motorPower){
         flywheelMotor1.setPower(motorPower);
         flywheelMotor2.setPower(motorPower);
