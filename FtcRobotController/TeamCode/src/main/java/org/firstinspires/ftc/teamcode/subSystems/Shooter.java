@@ -139,6 +139,7 @@ public class Shooter extends SubsystemBase {
     public double getTargetRPM() {
         return targetRPM;
     }
+
     public boolean isAtTargetRPM() {
         return (getTargetRPM() < getFlyWheelRPM() + RPMThreshold && getTargetRPM() > getFlyWheelRPM() - RPMThreshold) && getFlyWheelRPM()>1000;
     }
