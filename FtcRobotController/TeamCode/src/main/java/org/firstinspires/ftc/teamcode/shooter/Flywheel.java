@@ -25,6 +25,10 @@ public class Flywheel {
     }
 
     public double getRpm() {
-        return (flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2;
+        return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) * 60.0 / 28.0;
+    }
+
+    public void setRPM(){
+
     }
 }
