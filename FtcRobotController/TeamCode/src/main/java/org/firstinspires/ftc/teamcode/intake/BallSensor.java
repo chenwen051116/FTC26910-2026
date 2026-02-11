@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import java.util.ArrayList;
 
 public class BallSensor {
-    private final double MAX_DISTANCE_WHEN_BALL_PRESENT = 4.0;
+    private static final double MAX_DISTANCE_WHEN_BALL_PRESENT = 4.0;
     private final ArrayList<DistanceSensor> sensors = new ArrayList<DistanceSensor>();
     private int ballCount = 0;
 

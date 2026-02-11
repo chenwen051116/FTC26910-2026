@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Intake extends SubsystemBase {
     public enum IntakeState{
-        intakeMotor(0.8),
+        INTAKE(0.8),
         STOP(0),
         REVERSE(-0.8);
 
