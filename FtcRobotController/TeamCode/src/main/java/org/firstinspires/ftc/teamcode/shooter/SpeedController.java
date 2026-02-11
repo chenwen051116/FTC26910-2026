@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDController;
 
 @Config
-public class PIDController {
+public class SpeedController {
     // Initialize PID Controller for flywheel
     private final PIDController flyWheelPidController;
 
@@ -17,8 +18,8 @@ public class PIDController {
 
     // Constructor to initialize all the PID controllers. Must call before using the methods
     // otherwise the PIDControllers will not be initialized.
-    public PIDController(){
-        flyWheelPidController = new com.arcrobotics.ftclib.controller.PIDController(flyWheelK)
+    public SpeedController(){
+        flyWheelPidController = new PIDController(flyWheelKp, flyWheelKi, flyWheelKd);
     }
 
     public double calculateFlywheelPower (double currentRPM, double targetRPM ){
