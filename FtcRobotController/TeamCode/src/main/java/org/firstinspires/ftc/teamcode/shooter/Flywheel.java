@@ -16,9 +16,9 @@ public class Flywheel {
     private final DcMotorEx flywheelMotor2;
     private final SpeedController speedController;
 
-    public Flywheel(HardwareMap hardwareMap) {
-        flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel_1");
-        flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel_2");
+    public Flywheel(DcMotorEx flywheel1, DcMotorEx flywheel2) {
+        flywheelMotor1 = flywheel1;
+        flywheelMotor2 = flywheel2;
 
         flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
@@ -38,17 +38,17 @@ public class Flywheel {
     }
 
     // Let both motor to run at targetRPM using pid controller
-    public void setRPM(double targetRPM){
+    public void setRPM(double targetRPM ) {
         setBothMotorPower(getCalculatedFlywheelPower(targetRPM));
     }
 
     // Get the calculatedFlywheelPower from speedController;
-    private double getCalculatedFlywheelPower(double targetRPM){
+    private double getCalculatedFlywheelPower(double targetRPM ) {
         return speedController.calculateFlywheelPower(getRPM(), targetRPM);
     }
 
     // Set the power of both motor to motorPower
-    private void setBothMotorPower(double motorPower){
+    private void setBothMotorPower(double motorPower ) {
         flywheelMotor1.setPower(motorPower);
         flywheelMotor2.setPower(motorPower);
     }

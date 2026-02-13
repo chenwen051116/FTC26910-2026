@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode.shooter;
 
 public class ShooterState {
     public final double turretAngle;
-    public final double hoodAngle;
-    public final double rpm;
+    public final double hoodPosition;
+    public final double flywheelRPM;
 
-    public ShooterState(double turretAngle, double hoodAngle, double rpm) {
+    public ShooterState(double turretAngle, double hoodPosition, double flywheelRPM ) {
         this.turretAngle = turretAngle;
-        this.hoodAngle = hoodAngle;
-        this.rpm = rpm;
+        this.hoodPosition = hoodPosition;
+        this.flywheelRPM = flywheelRPM;
     }
 }

@@ -11,8 +11,8 @@ public class Turret {
     private final SpeedController speedController;
     public static double encoderConstant; // 1 radian = 1 encoder unit * encoderConstant
 
-    public Turret(HardwareMap hardwareMap) {
-        turretMotor = hardwareMap.get(DcMotorEx.class, "turret");
+    public Turret(DcMotorEx turret ) {
+        turretMotor = turret;
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
         turretMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         speedController = new SpeedController();
@@ -38,7 +38,7 @@ public class Turret {
         setAngle(0);
     }
 
-    private double getCalculatedTurretPower(double targetAngle){
+    private double getCalculatedTurretPower(double targetAngle ) {
         return speedController.calculateTurretPower(getAngle(), targetAngle);
     }
 }

@@ -29,7 +29,7 @@ public class SpeedController {
 
     // Constructor to initialize all the PID controllers. Must call before using the methods
     // otherwise the PIDControllers will not be initialized.
-    public SpeedController(){
+    public SpeedController() {
         flywheelPidController = new PIDController(flywheelKp, flywheelKi, flywheelKd);
         flywheelPidController.setTolerance(flywheelPidTolerance);
 
@@ -39,7 +39,7 @@ public class SpeedController {
 
     }
 
-    public double calculateFlywheelPower (double currentRPM, double targetRPM ){
+    public double calculateFlywheelPower(double currentRPM, double targetRPM ) {
         if (targetRPM > 0){
             double pidCalculationOutput;
             double rpmDifference = targetRPM - currentRPM;
@@ -66,7 +66,7 @@ public class SpeedController {
         return 0;
     }
 
-    public double calculateTurretPower (double currentPosition, double targetPosition ){
+    public double calculateTurretPower(double currentPosition, double targetPosition ) {
         turretPidController.setSetPoint(targetPosition);
         turretPidController.setPIDF(turretKp, turretKi, turretKd, turretKf);
         return Math.max(-1.0, Math.min(1.0, turretPidController.calculate(currentPosition)));
