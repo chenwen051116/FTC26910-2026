@@ -5,20 +5,14 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Flywheel {
-    public enum FlywheelState {
-        OFF,
-        SHOOTING,
-        IDLE,
-    }
-
     public static final double TO_RPM_CONVERSION_FACTOR = 60.0 / 28.0;
     private final DcMotorEx flywheelMotor1;
     private final DcMotorEx flywheelMotor2;
     private final SpeedController speedController;
 
-    public Flywheel(HardwareMap hardwareMap) {
-        flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel_1");
-        flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel_2");
+    public Flywheel(DcMotorEx flywheel1, DcMotorEx flywheel2) {
+        flywheelMotor1 = flywheel1;
+        flywheelMotor2 = flywheel2;
 
         flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
@@ -32,19 +26,23 @@ public class Flywheel {
         speedController = new SpeedController();
     }
 
+    // Get the current motor RPM
     public double getRPM() {
         return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) * TO_RPM_CONVERSION_FACTOR;
     }
 
-    public void setRPM(double targetRPM){
+    // Let both motor to run at targetRPM using pid controller
+    public void setRPM(double targetRPM ) {
         setBothMotorPower(getCalculatedFlywheelPower(targetRPM));
     }
 
-    public double getCalculatedFlywheelPower(double targetRPM){
+    // Get the calculatedFlywheelPower from speedController;
+    private double getCalculatedFlywheelPower(double targetRPM ) {
         return speedController.calculateFlywheelPower(getRPM(), targetRPM);
     }
 
-    private void setBothMotorPower(double motorPower){
+    // Set the power of both motor to motorPower
+    private void setBothMotorPower(double motorPower ) {
         flywheelMotor1.setPower(motorPower);
         flywheelMotor2.setPower(motorPower);
     }
