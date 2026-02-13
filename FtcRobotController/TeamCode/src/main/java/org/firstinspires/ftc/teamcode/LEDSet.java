@@ -4,7 +4,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.shooter.Flywheel.FlywheelState;
+import org.firstinspires.ftc.teamcode.shooter.Shooter.ShooterState;
 
 public class LEDSet extends SubsystemBase {
     private enum Color {
@@ -35,7 +35,7 @@ public class LEDSet extends SubsystemBase {
     private Servo ballIndicator2;
     private Servo flywheelStateIndicator;
     private int ballCount;
-    private FlywheelState flywheelState = FlywheelState.OFF;
+    private ShooterState flywheelState = ShooterState.OFF;
 
     public LEDSet(HardwareMap hardwareMap) {
         ballIndicator1 = hardwareMap.get(Servo.class, "ball_indicator_1");
@@ -48,7 +48,7 @@ public class LEDSet extends SubsystemBase {
         this.ballCount = ballCount;
     }
 
-    public void setFlywheelState(FlywheelState flywheelState) {
+    public void setFlywheelState(ShooterState flywheelState) {
         this.flywheelState = flywheelState;
     }
 

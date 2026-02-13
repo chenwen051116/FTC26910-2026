@@ -1,18 +1,25 @@
 package org.firstinspires.ftc.teamcode.shooter;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 public class Shooter extends SubsystemBase {
+    public enum ShooterState{
+        OFF,
+        IDLE,
+        SHOOTING;
+    }
+    private ShooterState shooterState;
+    private ShooterConfig shooterConfig;
     private final boolean isBlue;
-
     private final Flywheel flywheel;
     private final Turret turret;
     private final Hood hood;
-    private ShooterState shooterState;
-
+    public static double idleRPM;
 
     // Constructor
     public Shooter(boolean isBlue, HardwareMap hardwareMap ) {
@@ -32,6 +39,16 @@ public class Shooter extends SubsystemBase {
         hood = new Hood(hoodServo);
     }
 
+    // Get the current shooter state
+    public ShooterState getShooterState() {
+        return shooterState;
+    }
+
+    // Set the current shooter state to he target shooter state
+    public void setShooterState(ShooterState targetShooterState ) {
+        shooterState = targetShooterState;
+    }
+
     // Getters for debugging
     // Get the current angle of turret in radians
     public double getTurretAngle() {
@@ -48,17 +65,22 @@ public class Shooter extends SubsystemBase {
         return flywheel.getRPM();
     }
 
-    // Set the shooter state and set the power of different components
-    public void setShooterState(ShooterState targetShooterState ) {
-        shooterState = targetShooterState;
+    // Set the shooter config and set the power of different components
+    public void setShooterConfig(ShooterConfig targetShooterConfig) {
+        shooterConfig = targetShooterConfig;
+    }
+
+    // Calculate shooter config based on current shooter state
+    private void calculateShooterConfig(){
+
     }
 
     // Update in every single tick of loop
     @Override
     public void periodic() {
-        turret.setAngle(shooterState.turretAngle );
-        flywheel.setRPM(shooterState.flywheelRPM );
-        hood.setPosition(shooterState.hoodPosition );
+        turret.setAngle(shooterConfig.turretAngle );
+        flywheel.setRPM(shooterConfig.flywheelRPM );
+        hood.setPosition(shooterConfig.hoodPosition );
     }
 
 }

@@ -5,12 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Flywheel {
-    public enum FlywheelState {
-        OFF,
-        SHOOTING,
-        IDLE,
-    }
-
     public static final double TO_RPM_CONVERSION_FACTOR = 60.0 / 28.0;
     private final DcMotorEx flywheelMotor1;
     private final DcMotorEx flywheelMotor2;
