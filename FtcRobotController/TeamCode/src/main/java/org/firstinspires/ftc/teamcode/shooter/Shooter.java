@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.shooter;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -73,6 +74,16 @@ public class Shooter extends SubsystemBase {
     // Calculate shooter config based on current shooter state
     private void calculateShooterConfig(){
 
+    }
+
+    // Calculate the distance based on the current position and the target position by pytag
+    public double getDistance(Pose currentPose, Pose targetPose ) {
+        double currentX = currentPose.getX();
+        double currentY = currentPose.getY();
+        double targetX = targetPose.getX();
+        double targetY = targetPose.getY();
+        return Math.sqrt(Math.abs(currentX * currentX - targetX * targetX) +
+                Math.abs(currentY * currentY + targetY * targetY));
     }
 
     // Update in every single tick of loop
