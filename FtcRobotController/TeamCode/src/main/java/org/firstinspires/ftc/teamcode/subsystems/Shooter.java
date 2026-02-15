@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -35,10 +36,12 @@ public class Shooter extends SubsystemBase {
     private final Flywheel flywheel;
     private final Turret turret;
     private final Hood hood;
+    private final Gamepad gamepad;
     public static double IDLE_RPM;
 
     // Constructor
-    public Shooter(DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
+    public Shooter(Gamepad gamepad, DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
+        this.gamepad = gamepad;
         turret = new Turret(turretMotor);
         hood = new Hood(hoodServo);
         flywheel = new Flywheel(flywheelMotor1, flywheelMotor2);
@@ -94,6 +97,25 @@ public class Shooter extends SubsystemBase {
     // Update in every single tick of loop
     @Override
     public void periodic() {
+        if (gamepad.yWasPressed()) {
+            // y button changes the shooter state
+            if (getShooterState() == ShooterState.OFF) {
+                // Set the shooter state to IDLE when the current shooter state is OFF
+                setShooterState(ShooterState.IDLE);
+            } else {
+                // Set the shooter state to OFF when the current shooter state is IDLE
+                setShooterState(ShooterState.OFF);
+            }
+        }
+        if (gamepad.xWasPressed()) {
+            if (getShooterState() == ShooterState.IDLE) {
+                setShooterState(ShooterState.SHOOTING);
+            } else if (getShooterState() == ShooterState.SHOOTING) {
+                setShooterState(ShooterState.IDLE);
+            }
+        }
+
+
         switch (shooterState) {
             case OFF:
                 turret.center();

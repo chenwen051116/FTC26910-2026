@@ -48,7 +48,7 @@ class BlueTeleOp extends LinearOpMode {
         DcMotorEx flywheelMotor1 = getMotor("flywheel_1");
         DcMotorEx flywheelMotor2 = getMotor("flywheel_2");
 
-        Shooter shooter = new Shooter(turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
+        Shooter shooter = new Shooter(gamepad1, turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
 
         Servo ballIndicator1 = getServo("ball_indicator_1");
         Servo ballIndicator2 = getServo("ball_indicator_2");
@@ -61,9 +61,12 @@ class BlueTeleOp extends LinearOpMode {
             ledSet.setBallCount(transfer.getBallCount());
             ledSet.setShooterState(Shooter.ShooterState.IDLE);
 
+
+
             drivetrain.periodic();
             transfer.periodic();
             ledSet.periodic();
+            shooter.periodic();
 
             telemetry.addData("Number of balls", transfer.getBallCount());
         }
