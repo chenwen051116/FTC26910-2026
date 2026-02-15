@@ -30,6 +30,7 @@ public class Shooter extends SubsystemBase {
         IDLE,
         SHOOTING,
     }
+
     private ShooterState shooterState;
     private ShooterConfig shooterConfig;
     private final Flywheel flywheel;
@@ -105,10 +106,13 @@ public class Shooter extends SubsystemBase {
                 break;
             case SHOOTING:
                 turret.setAngle(shooterConfig.turretAngle);
-                flywheel.setRPM(shooterConfig.flywheelRPM);
                 hood.setPosition(shooterConfig.hoodPosition);
+                flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
         }
+
+        turret.periodic();
+        flywheel.periodic();
     }
 }
 
@@ -144,12 +148,15 @@ class Turret {
 
     // Let the turret motor rotate to the desired angle in radians
     public void setAngle(double targetAngle) {
-        turretMotor.setPower(pidController.calculatePower(getCurrentAngle(), targetAngle));
-        this.targetAngle = targetAngle;
+        this.targetAngle = targetAngle % Math.PI * 2 - targetAngle;
     }
 
     public void center() {
         setAngle(0);
+    }
+
+    public void periodic() {
+        turretMotor.setPower(pidController.calculatePower(getCurrentAngle(), targetAngle));
     }
 }
 
@@ -175,11 +182,13 @@ class Hood {
 }
 
 class Flywheel {
-    public static final double TO_RPM_CONVERSION_FACTOR = 60.0 / 28.0;
+    public static final double MAX_RPM = 6000;
+    public static final double TICKS_PER_REVOLUTION = Constants.MOTOR_TICKS_PER_MINUTE / MAX_RPM;
 
     private final DcMotorEx flywheelMotor1;
     private final DcMotorEx flywheelMotor2;
     private final PIDControllerFactory.FlywheelPIDController pidController;
+    private double targetRPM = 0;
 
     public Flywheel(DcMotorEx flywheel1, DcMotorEx flywheel2) {
         flywheelMotor1 = flywheel1;
@@ -191,20 +200,20 @@ class Flywheel {
         flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        flywheelMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheelMotor1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        flywheelMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         pidController = PIDControllerFactory.createFlywheelPIDController();
     }
 
     // Get the current motor RPM
     public double getRPM() {
-        return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) * TO_RPM_CONVERSION_FACTOR;
+        return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) / TICKS_PER_REVOLUTION * 60;
     }
 
     // Let both motor to run at targetRPM using pid controller
     public void setRPM(double targetRPM) {
-        setBothMotorPower(pidController.calculatePower(getRPM(), targetRPM));
+        this.targetRPM = targetRPM;
     }
 
     public void stop() {
@@ -215,6 +224,10 @@ class Flywheel {
     private void setBothMotorPower(double motorPower) {
         flywheelMotor1.setPower(motorPower);
         flywheelMotor2.setPower(motorPower);
+    }
+
+    public void periodic() {
+        setBothMotorPower(pidController.calculatePower(getRPM(), targetRPM));
     }
 }
 
