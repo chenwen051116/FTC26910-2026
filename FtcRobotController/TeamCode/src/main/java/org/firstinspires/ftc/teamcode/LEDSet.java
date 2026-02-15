@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.shooter.Shooter.ShooterState;
@@ -31,16 +30,16 @@ public class LEDSet extends SubsystemBase {
             Color.OFF, Color.RED, Color.YELLOW, Color.GREEN
     };
 
-    private Servo ballIndicator1;
-    private Servo ballIndicator2;
-    private Servo flywheelStateIndicator;
+    private final Servo ballIndicator1;
+    private final Servo ballIndicator2;
+    private final Servo shooterIndicator;
     private int ballCount;
-    private ShooterState flywheelState = ShooterState.OFF;
+    private ShooterState shooterState = ShooterState.OFF;
 
-    public LEDSet(HardwareMap hardwareMap) {
-        ballIndicator1 = hardwareMap.get(Servo.class, "ball_indicator_1");
-        ballIndicator2 = hardwareMap.get(Servo.class, "ball_indicator_2");
-        flywheelStateIndicator = hardwareMap.get(Servo.class, "flywheel_state_indicator");
+    public LEDSet(Servo ballIndicator1, Servo ballIndicator2, Servo shooterIndicator) {
+        this.ballIndicator1 = ballIndicator1;
+        this.ballIndicator2 = ballIndicator2;
+        this.shooterIndicator = shooterIndicator;
         ballCount = 0;
     }
 
@@ -48,8 +47,8 @@ public class LEDSet extends SubsystemBase {
         this.ballCount = ballCount;
     }
 
-    public void setFlywheelState(ShooterState flywheelState) {
-        this.flywheelState = flywheelState;
+    public void setShooterState(ShooterState shooterState) {
+        this.shooterState = shooterState;
     }
 
     @Override
@@ -57,15 +56,15 @@ public class LEDSet extends SubsystemBase {
         ballIndicator1.setPosition(colorByBallCount[ballCount].pwm);
         ballIndicator2.setPosition(colorByBallCount[ballCount].pwm);
 
-        Color flywheelStateDisplayColor = Color.OFF;
-        switch (flywheelState) {
+        Color shooterStateDisplayColor = Color.OFF;
+        switch (shooterState) {
             case SHOOTING:
-                flywheelStateDisplayColor = Color.INDIGO;
+                shooterStateDisplayColor = Color.INDIGO;
                 break;
             case IDLE:
-                flywheelStateDisplayColor = Color.BLUE;
+                shooterStateDisplayColor = Color.BLUE;
                 break;
         }
-        flywheelStateIndicator.setPosition(flywheelStateDisplayColor.pwm);
+        shooterIndicator.setPosition(shooterStateDisplayColor.pwm);
     }
 }
