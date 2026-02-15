@@ -3,41 +3,43 @@ package org.firstinspires.ftc.teamcode.shooter;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.Constants;
 
 @Config
 public class Shooter extends SubsystemBase {
-    public enum ShooterState{
+    public static class ShooterConfig {
+        public final double turretAngle;
+        public final double hoodPosition;
+        public final double flywheelRPM;
+
+        public ShooterConfig(double turretAngle, double hoodPosition, double flywheelRPM) {
+            this.turretAngle = turretAngle;
+            this.hoodPosition = hoodPosition;
+            this.flywheelRPM = flywheelRPM;
+        }
+    }
+
+    public enum ShooterState {
         OFF,
         IDLE,
         SHOOTING;
     }
     private ShooterState shooterState;
     private ShooterConfig shooterConfig;
-    private final boolean isBlue;
     private final Flywheel flywheel;
     private final Turret turret;
     private final Hood hood;
-    public static double idleRPM;
+    public static double IDLE_RPM;
 
     // Constructor
-    public Shooter(boolean isBlue, HardwareMap hardwareMap ) {
-        this.isBlue = isBlue;
-
-        // Initialize flywheel class
-        DcMotorEx flywheelMotor1 = hardwareMap.get(DcMotorEx.class, "flywheel_1");
-        DcMotorEx flywheelMotor2 = hardwareMap.get(DcMotorEx.class, "flywheel_2");
-        flywheel = new Flywheel(flywheelMotor1, flywheelMotor2);
-
-        // Initialize turret class
-        DcMotorEx turretMotor = hardwareMap.get(DcMotorEx.class, "turret");
+    public Shooter(DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
         turret = new Turret(turretMotor);
-
-        // Initialize hood
-        Servo hoodServo = hardwareMap.get(Servo.class, "hood");
         hood = new Hood(hoodServo);
+        flywheel = new Flywheel(flywheelMotor1, flywheelMotor2);
     }
 
     // Get the current shooter state
@@ -46,8 +48,17 @@ public class Shooter extends SubsystemBase {
     }
 
     // Set the current shooter state to he target shooter state
-    public void setShooterState(ShooterState targetShooterState ) {
-        shooterState = targetShooterState;
+    public void setShooterState(ShooterState shooterState) {
+        this.shooterState = shooterState;
+    }
+
+    public ShooterConfig getShooterConfig() {
+        return shooterConfig;
+    }
+
+    // Set the shooter config and set the power of different components
+    public void setShooterConfig(ShooterConfig targetShooterConfig) {
+        shooterConfig = targetShooterConfig;
     }
 
     // Getters for debugging
@@ -66,32 +77,35 @@ public class Shooter extends SubsystemBase {
         return flywheel.getRPM();
     }
 
-    // Set the shooter config and set the power of different components
-    public void setShooterConfig(ShooterConfig targetShooterConfig) {
-        shooterConfig = targetShooterConfig;
-    }
+    // Calculate shooter config based on position and velocity
+    private static ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, boolean isRed) {
+        Pose goalPose = new Pose(isRed ? 144 - 6 : 6, 144 - 6);
+        Vector displacement = new Vector(goalPose.minus(robotPose)).plus(robotVelocity.times(Constants.Shooter.T1));
+        Vector ballVelocityRPM = new Vector(new Pose(Constants.Shooter.X1 * displacement.getMagnitude(), Constants.Shooter.Y1));
 
-    // Calculate shooter config based on current shooter state
-    private void calculateShooterConfig(){
-
-    }
-
-    // Calculate the distance based on the current position and the target position by pytag
-    public double getDistance(Pose currentPose, Pose targetPose ) {
-        double currentX = currentPose.getX();
-        double currentY = currentPose.getY();
-        double targetX = targetPose.getX();
-        double targetY = targetPose.getY();
-        return Math.sqrt(Math.abs(currentX * currentX - targetX * targetX) +
-                Math.abs(currentY * currentY + targetY * targetY));
+        return new ShooterConfig(
+                displacement.getTheta() - robotPose.getHeading(),
+                Math.PI / 2 - ballVelocityRPM.getTheta(),
+                ballVelocityRPM.getMagnitude());
     }
 
     // Update in every single tick of loop
     @Override
     public void periodic() {
-        turret.setAngle(shooterConfig.turretAngle );
-        flywheel.setRPM(shooterConfig.flywheelRPM );
-        hood.setPosition(shooterConfig.hoodPosition );
+        switch (shooterState) {
+            case OFF:
+                turret.center();
+                flywheel.stop();
+                break;
+            case IDLE:
+                turret.center();
+                flywheel.setRPM(IDLE_RPM);
+                break;
+            case SHOOTING:
+                turret.setAngle(shooterConfig.turretAngle);
+                flywheel.setRPM(shooterConfig.flywheelRPM);
+                hood.setPosition(shooterConfig.hoodPosition);
+                break;
+        }
     }
-
 }

@@ -32,17 +32,21 @@ public class Flywheel {
     }
 
     // Let both motor to run at targetRPM using pid controller
-    public void setRPM(double targetRPM ) {
+    public void setRPM(double targetRPM) {
         setBothMotorPower(getCalculatedFlywheelPower(targetRPM));
     }
 
+    public void stop() {
+        setBothMotorPower(0);
+    }
+
     // Get the calculatedFlywheelPower from speedController;
-    private double getCalculatedFlywheelPower(double targetRPM ) {
+    private double getCalculatedFlywheelPower(double targetRPM) {
         return speedController.calculateFlywheelPower(getRPM(), targetRPM);
     }
 
     // Set the power of both motor to motorPower
-    private void setBothMotorPower(double motorPower ) {
+    private void setBothMotorPower(double motorPower) {
         flywheelMotor1.setPower(motorPower);
         flywheelMotor2.setPower(motorPower);
     }

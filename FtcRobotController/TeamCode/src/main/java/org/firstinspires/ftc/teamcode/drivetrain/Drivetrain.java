@@ -15,14 +15,13 @@ public class Drivetrain extends SubsystemBase {
     private final DcMotor backRightMotor;
     private final Gamepad gamepad;
     private final Follower follower;
-    private Pose currentPose;
     private boolean isOverrideDriver;
 
-    public Drivetrain(HardwareMap hardwareMap, Gamepad gamepad, Follower follower) {
-        frontLeftMotor = hardwareMap.get(DcMotor.class, "front_left");
-        frontRightMotor = hardwareMap.get(DcMotor.class, "front_right");
-        backLeftMotor = hardwareMap.get(DcMotor.class, "back_left");
-        backRightMotor = hardwareMap.get(DcMotor.class, "back_right");
+    public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
+        this.frontLeftMotor = frontLeftMotor;
+        this.frontRightMotor = frontRightMotor;
+        this.backLeftMotor = backLeftMotor;
+        this.backRightMotor = backRightMotor ;
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -66,12 +65,22 @@ public class Drivetrain extends SubsystemBase {
             return;
         }
 
+        Pose currentPose = follower.getPose();
+
         follower.followPath(
                 follower.pathBuilder()
                         .addPath(new BezierLine(currentPose, pose))
                         .setLinearHeadingInterpolation(currentPose.getHeading(), pose.getHeading())
                         .build()
         );
+    }
+
+    public void overrideDriver() {
+        isOverrideDriver = true;
+    }
+
+    public void stopOverrideDriver() {
+        isOverrideDriver = false;
     }
 
     public void periodic() {
@@ -82,10 +91,10 @@ public class Drivetrain extends SubsystemBase {
             double y = gamepad.left_stick_y;
             double rx = gamepad.right_stick_x;
 
-            double frontLeftPower = y - x + rx;
+            double frontLeftPower = y - x - rx;
             double frontRightPower = y + x + rx;
             double backLeftPower = y + x - rx;
-            double backRightPower = y - x - rx;
+            double backRightPower = y - x + rx;
 
             frontLeftMotor.setPower(frontLeftPower);
             frontRightMotor.setPower(frontRightPower);
@@ -93,7 +102,6 @@ public class Drivetrain extends SubsystemBase {
             backRightMotor.setPower(backRightPower);
 
             follower.updatePose();
-            currentPose = follower.getPose();
         }
     }
 }
