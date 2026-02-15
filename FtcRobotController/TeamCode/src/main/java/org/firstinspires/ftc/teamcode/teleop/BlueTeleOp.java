@@ -7,14 +7,14 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.LEDSet;
-import org.firstinspires.ftc.teamcode.drivetrain.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.LEDSet;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.shooter.Shooter;
-import org.firstinspires.ftc.teamcode.transfer.Transfer;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
 @TeleOp(name = "Blue")
-public class BlueTeleOp extends LinearOpMode {
+class BlueTeleOp extends LinearOpMode {
     private DcMotorEx getMotor(String motorName) {
         return hardwareMap.get(DcMotorEx.class, motorName);
     }
@@ -58,12 +58,14 @@ public class BlueTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            drivetrain.periodic();
-            transfer.periodic();
-
             ledSet.setBallCount(transfer.getBallCount());
             ledSet.setShooterState(Shooter.ShooterState.IDLE);
+
+            drivetrain.periodic();
+            transfer.periodic();
             ledSet.periodic();
+
+            telemetry.addData("Number of balls", transfer.getBallCount());
         }
     }
 }

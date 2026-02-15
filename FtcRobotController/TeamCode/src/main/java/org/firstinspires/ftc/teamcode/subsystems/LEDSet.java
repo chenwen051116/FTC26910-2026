@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.shooter.Shooter.ShooterState;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter.ShooterState;
 
 public class LEDSet extends SubsystemBase {
     private enum Color {
