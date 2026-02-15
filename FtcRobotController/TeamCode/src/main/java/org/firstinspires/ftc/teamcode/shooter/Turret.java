@@ -34,11 +34,15 @@ public class Turret {
 
     // Let the turret motor rotate to the desired angle in radians
     public void setAngle(double targetAngle) {
-        turretMotor.setPower(applyRotationalConstraint(speedController.calculateTurretPower(getAngle(), targetAngle)));
+        turretMotor.setPower(applyRotationalConstraint(getCalculatedTurretPower(targetAngle)));
     }
 
     public void center() {
         setAngle(0);
+    }
+
+    private double getCalculatedTurretPower(double targetAngle ) {
+        return speedController.calculateTurretPower(getAngle(), targetAngle);
     }
 
     // Return the actual angle that the turret need to go, avoid rotations over 180 degrees.
