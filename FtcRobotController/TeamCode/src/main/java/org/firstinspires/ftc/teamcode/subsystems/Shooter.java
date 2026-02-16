@@ -7,6 +7,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Constants;
@@ -31,18 +32,21 @@ public class Shooter extends SubsystemBase {
         SHOOTING,
     }
 
-    private ShooterState shooterState;
-    private ShooterConfig shooterConfig;
+    private final Gamepad gamepad;
     private final Flywheel flywheel;
     private final Turret turret;
     private final Hood hood;
-    public static double IDLE_RPM;
+    private ShooterState shooterState;
+    private ShooterConfig shooterConfig;
+    private static final double IDLE_RPM = 4500;
 
     // Constructor
-    public Shooter(DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
+    public Shooter(Gamepad gamepad, DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
+        this.gamepad = gamepad;
         turret = new Turret(turretMotor);
         hood = new Hood(hoodServo);
         flywheel = new Flywheel(flywheelMotor1, flywheelMotor2);
+        shooterState = ShooterState.OFF;
     }
 
     // Get the current shooter state
@@ -95,10 +99,29 @@ public class Shooter extends SubsystemBase {
     // Update in every single tick of loop
     @Override
     public void periodic() {
+        if (gamepad.yWasPressed()) {
+            // y button changes the shooter state
+            if (getShooterState() == ShooterState.OFF) {
+                // Set the shooter state to IDLE when the current shooter state is OFF
+                setShooterState(ShooterState.IDLE);
+            } else {
+                // Set the shooter state to OFF when the current shooter state is IDLE
+                setShooterState(ShooterState.OFF);
+            }
+        }
+
+        if (gamepad.xWasPressed()) {
+            if (getShooterState() == ShooterState.IDLE) {
+                setShooterState(ShooterState.SHOOTING);
+            } else if (getShooterState() == ShooterState.SHOOTING) {
+                setShooterState(ShooterState.IDLE);
+            }
+        }
+
         switch (shooterState) {
             case OFF:
                 turret.center();
-                flywheel.stop();
+                flywheel.setRPM(0);
                 break;
             case IDLE:
                 turret.center();
@@ -117,8 +140,8 @@ public class Shooter extends SubsystemBase {
 }
 
 class Turret {
-    public static double MAX_RPM = 6000;
-    public static double ENCODER_CONSTANT = Constants.MOTOR_TICKS_PER_MINUTE / MAX_RPM; // 1 radian = 1 encoder unit * encoderConstant
+    public static final double MAX_RPM = 500;
+    public static final double RADIANS_PER_TICK = 2 * Math.PI * MAX_RPM / Constants.MOTOR_TICKS_PER_MINUTE;
 
     private final DcMotor turretMotor;
     private final PIDControllerFactory.TurretPIDController pidController;
@@ -138,7 +161,7 @@ class Turret {
 
     // Get the current angle of the turret motor in radians
     public double getCurrentAngle() {
-        return turretMotor.getCurrentPosition() * ENCODER_CONSTANT;
+        return toRadians(turretMotor.getCurrentPosition());
     }
 
     // Get the target angle of the turret motor in radians
@@ -148,15 +171,23 @@ class Turret {
 
     // Let the turret motor rotate to the desired angle in radians
     public void setAngle(double targetAngle) {
-        this.targetAngle = targetAngle % Math.PI * 2 - targetAngle;
+        this.targetAngle = (targetAngle % Math.PI * 2 - targetAngle);
     }
 
     public void center() {
         setAngle(0);
     }
 
+    private double toTicks(double angleInRadians) {
+        return angleInRadians * Constants.Shooter.TURRET_GEAR_RATIO / RADIANS_PER_TICK;
+    }
+
+    private double toRadians(double ticks) {
+        return ticks * RADIANS_PER_TICK / Constants.Shooter.TURRET_GEAR_RATIO;
+    }
+
     public void periodic() {
-        turretMotor.setPower(pidController.calculatePower(getCurrentAngle(), targetAngle));
+        turretMotor.setPower(pidController.calculatePower(turretMotor.getCurrentPosition(), toTicks(targetAngle)));
     }
 }
 
@@ -167,7 +198,7 @@ class Hood {
     }
 
     public void setAngle(double targetAngle) {
-        hoodServo.setPosition((targetAngle - Constants.Shooter.HOOD_BASE_ANGLE) * Constants.Shooter.HOOD_GEAR_RATIO);
+        hoodServo.setPosition((targetAngle - Constants.Shooter.HOOD_BASE_ANGLE) * Constants.Shooter.HOOD_GEAR_RATIO / Constants.SERVO_RANGE);
     }
 
     // Get the current position of hood from 0 to 1
@@ -216,10 +247,6 @@ class Flywheel {
         this.targetRPM = targetRPM;
     }
 
-    public void stop() {
-        setBothMotorPower(0);
-    }
-
     // Set the power of both motor to motorPower
     private void setBothMotorPower(double motorPower) {
         flywheelMotor1.setPower(motorPower);
@@ -233,9 +260,9 @@ class Flywheel {
 
 class PIDControllerFactory {
     static class TurretPIDController extends PIDController {
-        public static final double kp = 0.0001, ki = 0.000001, kd = 0.000005;
-        private static final double kf = 0;
-        private static final double tolerance = 0.2;
+        public static final double kp = 0.003, ki = 0.00005, kd = 0.0001;
+        public static final double kf = 0;
+        public static final double tolerance = 0.01;
 
         private TurretPIDController() {
             super(kp, ki, kd);
@@ -251,9 +278,9 @@ class PIDControllerFactory {
     }
 
     static class FlywheelPIDController extends PIDController {
-        private static final double kp = 0.002, ki = 0, kd = 0.00025;
-        private static final double kv = 0.0001955;
-        private static final double threshold = 500, tolerance = 0.3;
+        public static final double kp = 0.002, ki = 0, kd = 0.00025;
+        public static final double kv = 0.0001955;
+        public static final double threshold = 500, tolerance = 0.3;
 
         private FlywheelPIDController() {
             super(kp, ki, kd);

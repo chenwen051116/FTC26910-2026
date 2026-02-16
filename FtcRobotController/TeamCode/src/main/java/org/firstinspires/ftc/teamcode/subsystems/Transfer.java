@@ -24,6 +24,10 @@ public class Transfer extends SubsystemBase {
         ballSensor = new BallSensor(sensors);
     }
 
+    public int getBallCount() {
+        return ballSensor.getBallCount();
+    }
+
     @Override
     public void periodic() {
         if (gamepad.right_trigger > 0.1) {
@@ -40,10 +44,6 @@ public class Transfer extends SubsystemBase {
 
         intake.periodic();
         ballSensor.periodic();
-    }
-
-    public int getBallCount() {
-        return ballSensor.getBallCount();
     }
 }
 

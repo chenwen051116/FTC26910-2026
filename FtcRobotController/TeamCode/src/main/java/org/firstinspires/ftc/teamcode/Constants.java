@@ -6,7 +6,7 @@ public class Constants {
 
     public static class Shooter {
         public static final double HOOD_BASE_ANGLE = Math.toRadians(30);
-        public static final double TURRET_GEAR_RATIO = 120.0 / 19.0;
+        public static final double TURRET_GEAR_RATIO = 120.0 / 18.0;
         public static final double HOOD_GEAR_RATIO = 4.0;
         public static final double FLYWHEEL_GEAR_RATIO = 1.0;
 
