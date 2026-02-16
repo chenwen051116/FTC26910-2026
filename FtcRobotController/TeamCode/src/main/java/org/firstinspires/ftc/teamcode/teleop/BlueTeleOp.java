@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
 @TeleOp(name = "Blue")
-class BlueTeleOp extends LinearOpMode {
+public class BlueTeleOp extends LinearOpMode {
     private DcMotorEx getMotor(String motorName) {
         return hardwareMap.get(DcMotorEx.class, motorName);
     }
@@ -59,16 +59,23 @@ class BlueTeleOp extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             ledSet.setBallCount(transfer.getBallCount());
-            ledSet.setShooterState(Shooter.ShooterState.IDLE);
+            ledSet.setShooterState(Shooter.ShooterState.OFF);
+
+            // for testing - activate SHOOTING state to test
+            shooter.setShooterConfig(new Shooter.ShooterConfig(Math.toRadians(90), Math.toRadians(30), 5000));
 
 
 
             drivetrain.periodic();
             transfer.periodic();
+            shooter.periodic();
             ledSet.periodic();
             shooter.periodic();
 
+            telemetry.addData("Flywheel RPM", shooter.getFlywheelRPM());
             telemetry.addData("Number of balls", transfer.getBallCount());
+            telemetry.addData("Turret angle", shooter.getTurretAngle());
+            telemetry.update();
         }
     }
 }
