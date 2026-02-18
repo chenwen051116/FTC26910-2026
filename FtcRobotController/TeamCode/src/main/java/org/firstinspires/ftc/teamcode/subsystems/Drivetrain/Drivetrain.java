@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -7,6 +8,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+@Config
 public class Drivetrain extends SubsystemBase {
     private final DcMotor frontLeftMotor;
     private final DcMotor frontRightMotor;
@@ -42,7 +44,6 @@ public class Drivetrain extends SubsystemBase {
 
         isOverrideDriver = false;
     }
-
     public double getFrontLeftPower() {
         return frontLeftMotor.getPower();
     }
