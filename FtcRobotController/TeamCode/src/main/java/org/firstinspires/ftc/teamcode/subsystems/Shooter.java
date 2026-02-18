@@ -16,12 +16,12 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Shooter extends SubsystemBase {
     public static class ShooterConfig {
         public final double turretAngle;
-        public final double hoodPosition;
+        public final double hoodAngle;
         public final double flywheelRPM;
 
-        public ShooterConfig(double turretAngle, double hoodPosition, double flywheelRPM) {
+        public ShooterConfig(double turretAngle, double hoodAngle, double flywheelRPM) {
             this.turretAngle = turretAngle;
-            this.hoodPosition = hoodPosition;
+            this.hoodAngle = hoodAngle;
             this.flywheelRPM = flywheelRPM;
         }
     }
@@ -33,9 +33,9 @@ public class Shooter extends SubsystemBase {
     }
 
     private final Gamepad gamepad;
-    private final Flywheel flywheel;
     private final Turret turret;
     private final Hood hood;
+    private final Flywheel flywheel;
     private ShooterState shooterState;
     private ShooterConfig shooterConfig;
     private static final double IDLE_RPM = 4500;
@@ -74,6 +74,10 @@ public class Shooter extends SubsystemBase {
         return turret.getCurrentAngle();
     }
 
+    public double getTurretPower() {
+        return turret.getPower();
+    }
+
     // Get the current position of hood from 0 to 1
     public double getHoodPosition() {
         return hood.getPosition();
@@ -85,7 +89,7 @@ public class Shooter extends SubsystemBase {
     }
 
     // Calculate shooter config based on position and velocity
-    private static ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, boolean isRed) {
+    public static ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, boolean isRed) {
         Pose goalPose = new Pose(isRed ? 144 - 6 : 6, 144 - 6);
         Vector displacement = new Vector(goalPose.minus(robotPose)).plus(robotVelocity.times(Constants.Shooter.T1));
         Vector ballVelocityRPM = new Vector(new Pose(Constants.Shooter.X1 * displacement.getMagnitude(), Constants.Shooter.Y1));
@@ -129,7 +133,7 @@ public class Shooter extends SubsystemBase {
                 break;
             case SHOOTING:
                 turret.setAngle(shooterConfig.turretAngle);
-                hood.setPosition(shooterConfig.hoodPosition);
+                hood.setAngle(shooterConfig.hoodAngle);
                 flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
         }
@@ -140,8 +144,8 @@ public class Shooter extends SubsystemBase {
 }
 
 class Turret {
-    public static final double MAX_RPM = 500;
-    public static final double RADIANS_PER_TICK = 2 * Math.PI * MAX_RPM / Constants.MOTOR_TICKS_PER_MINUTE;
+    public static final double MOTOR_GEAR_RATIO = 12;
+    public static final double RADIANS_PER_TICK = 2 * Math.PI / Constants.TICKS_PER_REVOLUTION / MOTOR_GEAR_RATIO;
 
     private final DcMotor turretMotor;
     private final PIDControllerFactory.TurretPIDController pidController;
@@ -161,7 +165,7 @@ class Turret {
 
     // Get the current angle of the turret motor in radians
     public double getCurrentAngle() {
-        return toRadians(turretMotor.getCurrentPosition());
+        return turretMotor.getCurrentPosition() * RADIANS_PER_TICK / Constants.Shooter.TURRET_GEAR_RATIO;
     }
 
     // Get the target angle of the turret motor in radians
@@ -182,19 +186,25 @@ class Turret {
         return angleInRadians * Constants.Shooter.TURRET_GEAR_RATIO / RADIANS_PER_TICK;
     }
 
-    private double toRadians(double ticks) {
-        return ticks * RADIANS_PER_TICK / Constants.Shooter.TURRET_GEAR_RATIO;
+    public double getPower() {
+        return turretMotor.getPower();
     }
 
     public void periodic() {
         turretMotor.setPower(pidController.calculatePower(turretMotor.getCurrentPosition(), toTicks(targetAngle)));
+        // turretMotor.setPower(pidController.calculatePower(getCurrentAngle(), targetAngle));
     }
 }
 
 class Hood {
     private final Servo hoodServo;
+
     public Hood(Servo hood) {
         hoodServo = hood;
+    }
+
+    public double getAngle() {
+        return hoodServo.getPosition() * Constants.SERVO_RANGE / Constants.Shooter.HOOD_GEAR_RATIO + Constants.Shooter.HOOD_BASE_ANGLE;
     }
 
     public void setAngle(double targetAngle) {
@@ -207,14 +217,14 @@ class Hood {
     }
 
     // Set the hood to the position from 0 to 1
-    public void setPosition(double targetPosition) {
+    private void setPosition(double targetPosition) {
         hoodServo.setPosition(Math.max(0, Math.min(1.0, targetPosition)));
     }
 }
 
 class Flywheel {
-    public static final double MAX_RPM = 6000;
-    public static final double TICKS_PER_REVOLUTION = Constants.MOTOR_TICKS_PER_MINUTE / MAX_RPM;
+    public static final double MOTOR_GEAR_RATIO = 1;
+    public static final double TICKS_PER_REVOLUTION = Constants.TICKS_PER_REVOLUTION * MOTOR_GEAR_RATIO;
 
     private final DcMotorEx flywheelMotor1;
     private final DcMotorEx flywheelMotor2;
@@ -260,7 +270,8 @@ class Flywheel {
 
 class PIDControllerFactory {
     static class TurretPIDController extends PIDController {
-        public static final double kp = 0.003, ki = 0.00005, kd = 0.0001;
+        public static final double kp = 0.005, ki = 0.00005, kd = 0.00005;
+        // public static final double kp = 0.0001, ki = 0.000001, kd = 0.000005;
         public static final double kf = 0;
         public static final double tolerance = 0.01;
 

@@ -62,7 +62,7 @@ public class BlueTeleOp extends LinearOpMode {
             ledSet.setShooterState(Shooter.ShooterState.OFF);
 
             // for testing - activate SHOOTING state to test
-            shooter.setShooterConfig(new Shooter.ShooterConfig(Math.toRadians(90), Math.toRadians(30), 5000));
+            shooter.setShooterConfig(new Shooter.ShooterConfig(Math.toRadians(45), Math.toRadians(30), 5000));
 
             drivetrain.periodic();
             transfer.periodic();
@@ -72,6 +72,7 @@ public class BlueTeleOp extends LinearOpMode {
             telemetry.addData("Flywheel RPM", shooter.getFlywheelRPM());
             telemetry.addData("Number of balls", transfer.getBallCount());
             telemetry.addData("Turret angle", shooter.getTurretAngle());
+            telemetry.addData("Turret power", shooter.getTurretPower());
             telemetry.update();
         }
     }
