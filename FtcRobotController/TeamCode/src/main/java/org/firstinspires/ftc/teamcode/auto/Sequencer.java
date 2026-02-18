@@ -14,17 +14,17 @@ public class Sequencer {
             this.function = function;
         }
 
-        public Node(int timeInMs) {
-            this.duration = timeInMs;
-        }
-
         public Node(BooleanSupplier condition) {
             this.condition = condition;
+        }
+
+        public Node(int timeInMs) {
+            this.duration = timeInMs;
         }
     }
 
     private Node head;
-    protected Node tail;
+    private Node tail;
     private Node currentNode;
     private long timeOfNextState;
     private boolean isRunning;
