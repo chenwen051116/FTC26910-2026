@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter.PIDControllerFactory;
 
+@Config
 public class Flywheel {
     public static final double MOTOR_GEAR_RATIO = 1;
     public static final double TICKS_PER_REVOLUTION = Constants.TICKS_PER_REVOLUTION * MOTOR_GEAR_RATIO;
@@ -14,6 +16,7 @@ public class Flywheel {
     private final DcMotorEx flywheelMotor2;
     private final PIDControllerFactory.FlywheelPIDController pidController;
     private double targetRPM = 0;
+    public static double rpmThreshold = 150;
 
     public Flywheel(DcMotorEx flywheel1, DcMotorEx flywheel2) {
         flywheelMotor1 = flywheel1;
@@ -53,6 +56,10 @@ public class Flywheel {
     private void setBothMotorPower(double motorPower) {
         flywheelMotor1.setPower(motorPower);
         flywheelMotor2.setPower(motorPower);
+    }
+
+    public boolean isAtTargetRPM() {
+        return (targetRPM - rpmThreshold) < getRPM() && getRPM() < (targetRPM + rpmThreshold);
     }
 
     public void periodic() {

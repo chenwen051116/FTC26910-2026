@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -9,9 +8,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.Overridable;
 
 @Config
-public class Shooter extends SubsystemBase {
+public class Shooter extends Overridable {
     public static class ShooterConfig {
         public final double turretAngle;
         public final double hoodAngle;
@@ -91,6 +91,11 @@ public class Shooter extends SubsystemBase {
         return flywheel.getPower();
     }
 
+    // Check if the shooter is at target RPM
+    public boolean isAtTargetRPM() {
+        return flywheel.isAtTargetRPM();
+    }
+
 
     // Calculate shooter config based on position and velocity
     public static ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, boolean isRed) {
@@ -104,10 +109,8 @@ public class Shooter extends SubsystemBase {
                 ballVelocityRPM.getMagnitude());
     }
 
-    // Update in every single tick of loop
     @Override
-    public void periodic() {
-
+    public void runWithoutOverride() {
         if (gamepad.yWasPressed()) {
             // y button changes the shooter state
             if (getShooterState() == ShooterState.OFF) {
@@ -127,6 +130,25 @@ public class Shooter extends SubsystemBase {
             }
         }
 
+        switch (shooterState) {
+            case OFF:
+                turret.center();
+                flywheel.setRPM(0);
+                break;
+            case IDLE:
+                turret.center();
+                flywheel.setRPM(IDLE_RPM);
+                break;
+            case SHOOTING:
+                turret.setAngle(shooterConfig.turretAngle);
+                hood.setAngle(shooterConfig.hoodAngle);
+                flywheel.setRPM(shooterConfig.flywheelRPM);
+                break;
+        }
+    }
+
+    @Override
+    public void alwaysRunning() {
         switch (shooterState) {
             case OFF:
                 turret.center();

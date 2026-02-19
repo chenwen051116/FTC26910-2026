@@ -1,22 +1,22 @@
 package org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.subsystems.Overridable;
+
 @Config
-public class Drivetrain extends SubsystemBase {
+public class Drivetrain extends Overridable {
     private final DcMotor frontLeftMotor;
     private final DcMotor frontRightMotor;
     private final DcMotor backLeftMotor;
     private final DcMotor backRightMotor;
     private final Gamepad gamepad;
     private final Follower follower;
-    private boolean isOverrideDriver;
 
     public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
         this.frontLeftMotor = frontLeftMotor;
@@ -42,7 +42,7 @@ public class Drivetrain extends SubsystemBase {
         this.gamepad = gamepad;
         this.follower = follower;
 
-        isOverrideDriver = false;
+        stopOverrideDriver();
     }
     public double getFrontLeftPower() {
         return frontLeftMotor.getPower();
@@ -61,7 +61,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void goTo(Pose pose) {
-        if (!isOverrideDriver || follower.isBusy()) {
+        if (!isOverriding() || follower.isBusy()) {
             return;
         }
 
@@ -75,33 +75,25 @@ public class Drivetrain extends SubsystemBase {
         );
     }
 
-    public void overrideDriver() {
-        isOverrideDriver = true;
+    @Override
+    public void runWithoutOverride() {
+        double x = gamepad.left_stick_x;
+        double y = gamepad.left_stick_y;
+        double rx = gamepad.right_stick_x;
+
+        double frontLeftPower = y - x - rx;
+        double frontRightPower = y + x + rx;
+        double backLeftPower = y + x - rx;
+        double backRightPower = y - x + rx;
+
+        frontLeftMotor.setPower(frontLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backLeftMotor.setPower(backLeftPower);
+        backRightMotor.setPower(backRightPower);
     }
 
-    public void stopOverrideDriver() {
-        isOverrideDriver = false;
-    }
-
-    public void periodic() {
-        if (isOverrideDriver) {
-            follower.update();
-        } else {
-            double x = gamepad.left_stick_x;
-            double y = gamepad.left_stick_y;
-            double rx = gamepad.right_stick_x;
-
-            double frontLeftPower = y - x - rx;
-            double frontRightPower = y + x + rx;
-            double backLeftPower = y + x - rx;
-            double backRightPower = y - x + rx;
-
-            frontLeftMotor.setPower(frontLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backLeftMotor.setPower(backLeftPower);
-            backRightMotor.setPower(backRightPower);
-
-            follower.updatePose();
-        }
+    @Override
+    public void alwaysRunning() {
+        follower.updatePose();
     }
 }

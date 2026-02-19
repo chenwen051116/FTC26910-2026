@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain.Drivetrain;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.LEDSet.LEDSet;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 
 @Config
@@ -73,8 +74,19 @@ public class BlueTeleOp extends LinearOpMode {
             ledSet.setShooterState(Shooter.ShooterState.OFF);
 
             // for testing - activate SHOOTING state to test
-            shooter.setShooterConfig(new Shooter.ShooterConfig(Math.toRadians(tuningTurretAngle), Math.toRadians(tuningHoodAngle), tuningFlywheelRPM));
+            //shooter.setShooterConfig(new Shooter.ShooterConfig(Math.toRadians(tuningTurretAngle), Math.toRadians(tuningHoodAngle), tuningFlywheelRPM));
 
+            if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
+                transfer.overrideDriver();
+                if (shooter.isAtTargetRPM()){
+                    transfer.setIntakeState(Intake.IntakeState.INTAKE);
+                }
+                else {
+                    transfer.setIntakeState(Intake.IntakeState.STOP);
+                }
+            } else{
+                transfer.stopOverrideDriver();
+            }
 
 
             drivetrain.periodic();
