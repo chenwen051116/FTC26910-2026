@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.Constants;
@@ -21,8 +22,8 @@ public class Flywheel {
         flywheelMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         flywheelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
 
-        flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        flywheelMotor1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        flywheelMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         flywheelMotor1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         flywheelMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
@@ -35,9 +36,13 @@ public class Flywheel {
         return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) / TICKS_PER_REVOLUTION * 60;
     }
 
-//    public double getPower() {
-//        return pidController.calculatePower(getRPM(), targetRPM);
-//    }
+    public double getTargetRPM() {
+        return targetRPM;
+    }
+
+    public double getPower() {
+        return pidController.calculatePower(getRPM(), targetRPM);
+    }
 
     // Let both motor to run at targetRPM using pid controller
     public void setRPM(double targetRPM) {

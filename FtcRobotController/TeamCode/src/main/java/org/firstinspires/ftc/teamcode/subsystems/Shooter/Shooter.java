@@ -2,10 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -38,7 +36,7 @@ public class Shooter extends SubsystemBase {
     private final Flywheel flywheel;
     private ShooterState shooterState;
     private ShooterConfig shooterConfig;
-    private static final double IDLE_RPM = 4500;
+    public static double IDLE_RPM = 4500;
 
     // Constructor
     public Shooter(Gamepad gamepad, DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
@@ -89,9 +87,9 @@ public class Shooter extends SubsystemBase {
     }
 
     // Get the current power of flywheel
-//    public double getFlywheelPower(){
-//        return flywheel.getPower();
-//    }
+    public double getFlywheelPower(){
+        return flywheel.getPower();
+    }
 
 
     // Calculate shooter config based on position and velocity

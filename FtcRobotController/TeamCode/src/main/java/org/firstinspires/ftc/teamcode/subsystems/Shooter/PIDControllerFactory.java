@@ -48,7 +48,7 @@ public class PIDControllerFactory {
                 return 0;
             }
             double pidOutput = calculate(rpmDifference / 100) + kv * targetRPM;
-            return Math.max(-1, Math.min(1, calculate(pidOutput)));
+            return Math.max(-1, Math.min(1, pidOutput));
         }
     }
 

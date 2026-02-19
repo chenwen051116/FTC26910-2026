@@ -87,7 +87,7 @@ public class BlueTeleOp extends LinearOpMode {
             telemetry.addData("Number of balls", transfer.getBallCount());
             telemetry.addData("Turret angle", shooter.getTurretAngle());
             telemetry.addData("Turret power", shooter.getTurretPower());
-//            telemetry.addData("Flywheel power", shooter.getFlywheelPower());
+            telemetry.addData("Flywheel power", shooter.getFlywheelPower());
             telemetry.update();
         }
     }
