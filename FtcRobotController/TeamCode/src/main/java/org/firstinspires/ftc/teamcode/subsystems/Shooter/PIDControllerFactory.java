@@ -20,6 +20,7 @@ public class PIDControllerFactory {
 
         public double calculatePower(double currentPosition, double targetPosition) {
             setSetPoint(targetPosition);
+            setTolerance(tolerance);
             setPIDF(kp, ki, kd, kf);
             return Math.max(-1, Math.min(1, calculate(currentPosition)));
         }
@@ -42,6 +43,8 @@ public class PIDControllerFactory {
             }
 
             double rpmDifference = targetRPM - currentRPM;
+            setPID(kp, ki, kd);
+            setTolerance(tolerance);
             if (rpmDifference > threshold) {
                 return 1;
             } else if (rpmDifference < -threshold) {
