@@ -52,7 +52,7 @@ public class Shooter extends Overridable {
         return shooterState;
     }
 
-    // Set the current shooter state to he target shooter state
+    // Set the current shooter state to the target shooter state
     public void setShooterState(ShooterState shooterState) {
         this.shooterState = shooterState;
     }
