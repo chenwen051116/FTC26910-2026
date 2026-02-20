@@ -16,7 +16,7 @@ public class Hood {
     }
 
     public void setAngle(double targetAngle) {
-        hoodServo.setPosition((targetAngle - Constants.Shooter.HOOD_BASE_ANGLE) * Constants.Shooter.HOOD_GEAR_RATIO / Constants.SERVO_RANGE);
+        setPosition((targetAngle - Constants.Shooter.HOOD_BASE_ANGLE) * Constants.Shooter.HOOD_GEAR_RATIO / Constants.SERVO_RANGE);
     }
 
     // Get the current position of hood from 0 to 1
