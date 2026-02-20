@@ -81,6 +81,11 @@ public class Shooter extends Overridable {
         return hood.getPosition();
     }
 
+    // Get the current angle of hood
+    public double getHoodAngle() {
+        return hood.getAngle();
+    }
+
     // Get the current RPM of flywheel
     public double getFlywheelRPM() {
         return flywheel.getRPM();
