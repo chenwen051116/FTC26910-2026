@@ -18,7 +18,6 @@ public class Drivetrain extends Overridable {
     private final DcMotor backRightMotor;
     private final Gamepad gamepad;
     private final Follower follower;
-    private double speedMultiplier = 1;
     public static double regularSpeedMultiplier = 1;
     public static double slowSpeedMultiplier = 0.3;
 
@@ -28,10 +27,10 @@ public class Drivetrain extends Overridable {
         this.backLeftMotor = backLeftMotor;
         this.backRightMotor = backRightMotor ;
 
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
-        backRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -96,15 +95,16 @@ public class Drivetrain extends Overridable {
 
     @Override
     public void runWithoutOverride() {
-        double x = gamepad.left_stick_x;
-        double y = gamepad.left_stick_y;
-        double rx = gamepad.right_stick_x;
+        double x = -gamepad.left_stick_x;
+        double y = -gamepad.left_stick_y;
+        double rx = -gamepad.right_stick_x;
 
         double frontLeftPower = y - x - rx;
         double frontRightPower = y + x + rx;
         double backLeftPower = y + x - rx;
         double backRightPower = y - x + rx;
 
+        double speedMultiplier;
         if (gamepad.left_trigger > 0.3){
             speedMultiplier = slowSpeedMultiplier;
         } else{
