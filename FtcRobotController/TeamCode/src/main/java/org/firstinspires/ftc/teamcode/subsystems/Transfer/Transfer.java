@@ -11,6 +11,7 @@ public class Transfer extends Overridable {
     private final Intake intake;
     private final Gate gate;
     private final BallSensor ballSensor;
+    private boolean hasRanOnlyOnce = false;
     public Transfer(Gamepad gamepad, DcMotor intakeMotor, Servo gateServo, DistanceSensor[] sensors) {
         if (sensors.length != 3) {
             throw new IllegalArgumentException();
@@ -37,12 +38,17 @@ public class Transfer extends Overridable {
     public void runWhenStartingOverride() {
         intake.setIntakeState(Intake.IntakeState.STOP);
         gate.open();
+        hasRanOnlyOnce = false;
     }
 
     @Override
     public void runWhenStoppingOverride() {
         intake.setIntakeState(Intake.IntakeState.STOP);
-        gate.close();
+        if (!hasRanOnlyOnce){
+            gate.close();
+            hasRanOnlyOnce = true;
+        }
+
     }
 
     @Override

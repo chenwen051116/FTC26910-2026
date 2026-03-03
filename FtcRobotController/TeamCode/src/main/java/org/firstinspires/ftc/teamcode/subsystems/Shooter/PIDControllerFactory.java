@@ -7,8 +7,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 public class PIDControllerFactory {
     @Config
     public static class TurretPIDController extends PIDController {
-        public static double kp = 0.005, ki = 0.00005, kd = 0.00005;
-        // public static final double kp = 0.0001, ki = 0.000001, kd = 0.000005;
+        public static double kp = -0.00045, ki = 0, kd = -0.00001;
         public static double kf = 0;
         public static double tolerance = 0.01;
 

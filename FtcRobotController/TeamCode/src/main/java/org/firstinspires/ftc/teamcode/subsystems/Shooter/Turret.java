@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class Turret {
-    public static final double MOTOR_GEAR_RATIO = 12;
-    public static final double RADIANS_PER_TICK = 2 * Math.PI / Constants.TICKS_PER_REVOLUTION / MOTOR_GEAR_RATIO;
+    public static final double MOTOR_GEAR_RATIO = 1;
+    public static final double RADIANS_PER_TICK = 2 * Math.PI / Constants.ENCODER_TICKS_PER_REVOLUTION / MOTOR_GEAR_RATIO;
 
     private final DcMotor turretMotor;
     private final PIDControllerFactory.TurretPIDController pidController;

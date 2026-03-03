@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -17,6 +18,9 @@ public class Drivetrain extends Overridable {
     private final DcMotor backRightMotor;
     private final Gamepad gamepad;
     private final Follower follower;
+    private double speedMultiplier = 1;
+    public static double regularSpeedMultiplier = 1;
+    public static double slowSpeedMultiplier = 0.3;
 
     public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
         this.frontLeftMotor = frontLeftMotor;
@@ -60,6 +64,21 @@ public class Drivetrain extends Overridable {
         return backRightMotor.getPower();
     }
 
+    public void initEncoder(Pose lastPose){
+        follower.startTeleopDrive();
+        follower.update();
+        follower.setStartingPose(new Pose(0, 0, 0));
+        follower.setPose(lastPose);
+    }
+
+    public Pose getCurrentPose(){
+        return follower.getPose();
+    }
+
+    public Vector getCurrentVelocity(){
+        return follower.getVelocity();
+    }
+
     public void goTo(Pose pose) {
         if (!isOverriding() || follower.isBusy()) {
             return;
@@ -86,10 +105,15 @@ public class Drivetrain extends Overridable {
         double backLeftPower = y + x - rx;
         double backRightPower = y - x + rx;
 
-        frontLeftMotor.setPower(frontLeftPower);
-        frontRightMotor.setPower(frontRightPower);
-        backLeftMotor.setPower(backLeftPower);
-        backRightMotor.setPower(backRightPower);
+        if (gamepad.left_trigger > 0.3){
+            speedMultiplier = slowSpeedMultiplier;
+        } else{
+            speedMultiplier = regularSpeedMultiplier;
+        }
+        frontLeftMotor.setPower(frontLeftPower * speedMultiplier);
+        frontRightMotor.setPower(frontRightPower * speedMultiplier);
+        backLeftMotor.setPower(backLeftPower * speedMultiplier);
+        backRightMotor.setPower(backRightPower * speedMultiplier);
     }
 
     @Override

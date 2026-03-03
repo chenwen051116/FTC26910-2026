@@ -101,9 +101,13 @@ public class Shooter extends Overridable {
         return flywheel.isAtTargetRPM();
     }
 
+    public void initTurretEncoder(){
+        turret.initEncoder();
+    }
+
 
     // Calculate shooter config based on position and velocity
-    public static ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, boolean isRed) {
+    public ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, boolean isRed) {
         Pose goalPose = new Pose(isRed ? 144 - 6 : 6, 144 - 6);
         Vector displacement = new Vector(goalPose.minus(robotPose)).plus(robotVelocity.times(Constants.Shooter.T1));
         Vector ballVelocityRPM = new Vector(new Pose(Constants.Shooter.X1 * displacement.getMagnitude(), Constants.Shooter.Y1));
@@ -130,22 +134,21 @@ public class Shooter extends Overridable {
         if (gamepad.xWasPressed()) {
             if (getShooterState() == ShooterState.IDLE) {
                 setShooterState(ShooterState.SHOOTING);
+
             } else if (getShooterState() == ShooterState.SHOOTING) {
                 setShooterState(ShooterState.IDLE);
             }
         }
 
+
         switch (shooterState) {
             case OFF:
-                turret.center();
                 flywheel.setRPM(0);
                 break;
             case IDLE:
-                turret.center();
                 flywheel.setRPM(IDLE_RPM);
                 break;
             case SHOOTING:
-                turret.setAngle(shooterConfig.turretAngle);
                 hood.setAngle(shooterConfig.hoodAngle);
                 flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
@@ -156,20 +159,17 @@ public class Shooter extends Overridable {
     public void alwaysRunning() {
         switch (shooterState) {
             case OFF:
-                turret.center();
                 flywheel.setRPM(0);
                 break;
             case IDLE:
-                turret.center();
                 flywheel.setRPM(IDLE_RPM);
                 break;
             case SHOOTING:
-                turret.setAngle(shooterConfig.turretAngle);
                 hood.setAngle(shooterConfig.hoodAngle);
                 flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
         }
-
+        turret.setAngle(shooterConfig.turretAngle);
         turret.periodic();
         flywheel.periodic();
     }
