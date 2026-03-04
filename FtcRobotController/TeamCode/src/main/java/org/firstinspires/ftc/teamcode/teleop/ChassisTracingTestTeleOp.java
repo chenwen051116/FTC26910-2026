@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 public class ChassisTracingTestTeleOp extends LinearOpMode {
     public static double tuningFlywheelRPM = 3000;
     public static double tuningTurretAngle = 0;
-    public static double tuningHoodAngle = 0;
+    public static double tuningHoodPosition = 0;
 
 
     private DcMotorEx getMotor(String motorName) {

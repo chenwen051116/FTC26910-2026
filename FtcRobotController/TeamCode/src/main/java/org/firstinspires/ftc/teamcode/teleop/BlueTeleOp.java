@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 public class BlueTeleOp extends LinearOpMode {
     public static double tuningFlywheelRPM = 3000;
     public static double tuningTurretAngle = 0;
-    public static double tuningHoodAngle = 0;
+    public static double tuningHoodPosition = 0;
 
     private DcMotorEx getMotor(String motorName) {
         return hardwareMap.get(DcMotorEx.class, motorName);
@@ -74,7 +74,7 @@ public class BlueTeleOp extends LinearOpMode {
             ledSet.setShooterState(Shooter.ShooterState.OFF);
 
             // for testing - activate SHOOTING state to test
-            shooter.setShooterConfig(new Shooter.ShooterConfig(Math.toRadians(tuningTurretAngle), Math.toRadians(tuningHoodAngle), tuningFlywheelRPM));
+            shooter.setShooterConfig(new Shooter.ShooterConfig(Math.toRadians(tuningTurretAngle), Math.toRadians(tuningHoodPosition), tuningFlywheelRPM));
 
             if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 transfer.overrideDriver();
