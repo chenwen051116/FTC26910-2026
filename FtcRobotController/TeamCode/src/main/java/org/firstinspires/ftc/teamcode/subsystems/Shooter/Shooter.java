@@ -7,11 +7,11 @@ import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_VY;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONGEST_SHORT_DISTANCE;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_DISTANCE;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_DISTANCE_INTERVAL;
-import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_HOOD_ANGLE;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_HOOD_POSITION;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_RPM;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTANCE;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTANCE_INTERVAL;
-import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_HOOD_ANGLE;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_HOOD_POSITION;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_RPM;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -21,19 +21,18 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Overridable;
 
 @Config
 public class Shooter extends Overridable {
     public static class ShooterConfig {
         public final double turretAngle;
-        public final double hoodAngle;
+        public final double hoodPosition;
         public final double flywheelRPM;
 
-        public ShooterConfig(double turretAngle, double hoodAngle, double flywheelRPM) {
+        public ShooterConfig(double turretAngle, double hoodPosition, double flywheelRPM) {
             this.turretAngle = turretAngle;
-            this.hoodAngle = hoodAngle;
+            this.hoodPosition = hoodPosition;
             this.flywheelRPM = flywheelRPM;
         }
     }
@@ -95,11 +94,6 @@ public class Shooter extends Overridable {
         return hood.getPosition();
     }
 
-    // Get the current angle of hood
-    public double getHoodAngle() {
-        return hood.getAngle();
-    }
-
     // Get the current RPM of flywheel
     public double getFlywheelRPM() {
         return flywheel.getRPM();
@@ -137,27 +131,29 @@ public class Shooter extends Overridable {
         double targetHoodAngle;
         double targetRPM;
 
+        // Using linear approximation to find the ideal RPM
+
         if (distance < LONGEST_SHORT_DISTANCE) {
             index = (int)Math.floor((distance - SHORT_RANGE_DISTANCE[0]) / SHORT_RANGE_DISTANCE_INTERVAL);
             index = Math.max(0, Math.min(index, SHORT_RANGE_DISTANCE.length - 2));
 
-            targetHoodAngle = (SHORT_RANGE_HOOD_ANGLE[index + 1] - SHORT_RANGE_HOOD_ANGLE[index])/
+            targetHoodAngle = (SHORT_RANGE_HOOD_POSITION[index + 1] - SHORT_RANGE_HOOD_POSITION[index])/
                     (SHORT_RANGE_DISTANCE[index + 1] - SHORT_RANGE_DISTANCE[index]) *
                     (distance - SHORT_RANGE_DISTANCE[index]) +
-                    SHORT_RANGE_HOOD_ANGLE[index];
+                    SHORT_RANGE_HOOD_POSITION[index];
 
             targetRPM = (SHORT_RANGE_RPM[index + 1] - SHORT_RANGE_RPM[index])/
                     (SHORT_RANGE_DISTANCE[index + 1] - SHORT_RANGE_DISTANCE[index]) *
                     (distance - SHORT_RANGE_DISTANCE[index]) +
-                    SHORT_RANGE_HOOD_ANGLE[index];
+                    SHORT_RANGE_HOOD_POSITION[index];
         } else{
             index = (int)Math.floor((distance - LONG_RANGE_DISTANCE[0]) / LONG_RANGE_DISTANCE_INTERVAL);
             index = Math.max(0, Math.min(index, LONG_RANGE_DISTANCE.length - 2));
 
-            targetHoodAngle = (LONG_RANGE_HOOD_ANGLE[index + 1] - LONG_RANGE_HOOD_ANGLE[index])/
+            targetHoodAngle = (LONG_RANGE_HOOD_POSITION[index + 1] - LONG_RANGE_HOOD_POSITION[index])/
                     (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
                     (distance - LONG_RANGE_DISTANCE[index]) +
-                    LONG_RANGE_HOOD_ANGLE[index];
+                    LONG_RANGE_HOOD_POSITION[index];
 
             targetRPM = (LONG_RANGE_RPM[index + 1] - LONG_RANGE_RPM[index])/
                     (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
@@ -207,7 +203,7 @@ public class Shooter extends Overridable {
                 flywheel.setRPM(IDLE_RPM);
                 break;
             case SHOOTING:
-                hood.setAngle(shooterConfig.hoodAngle);
+                hood.setPosition(shooterConfig.hoodPosition);
                 flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
         }
@@ -223,7 +219,7 @@ public class Shooter extends Overridable {
                 flywheel.setRPM(IDLE_RPM);
                 break;
             case SHOOTING:
-                hood.setAngle(shooterConfig.hoodAngle);
+                hood.setPosition(shooterConfig.hoodPosition);
                 flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
         }
