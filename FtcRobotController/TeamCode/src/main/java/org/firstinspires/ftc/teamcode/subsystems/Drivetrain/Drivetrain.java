@@ -78,6 +78,10 @@ public class Drivetrain extends Overridable {
         return follower.getVelocity();
     }
 
+    public Vector getCurrentAcceleration(){
+        return follower.getAcceleration();
+    }
+
     public void goTo(Pose pose) {
         if (!isOverriding() || follower.isBusy()) {
             return;
@@ -92,7 +96,6 @@ public class Drivetrain extends Overridable {
                         .build()
         );
     }
-
     @Override
     public void runWithoutOverride() {
         double x = -gamepad.left_stick_x;

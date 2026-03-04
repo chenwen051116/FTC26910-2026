@@ -20,11 +20,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 
 @Config
 @TeleOp(name = "Red Chassis Testing Teleop")
-public class ChassisTracingTestTeleOp extends LinearOpMode {
+public class ShooterTestingTeleOp extends LinearOpMode {
     public static double tuningFlywheelRPM = 3000;
     public static double tuningTurretAngle = 0;
-    public static double tuningHoodAngle = 0;
-
+    public static double tuningHoodAngle = 0;// NOTE THAT THIS WILL BE A MULTIPLIER!
+    // The real hood angle would be this number times PI!
 
     private DcMotorEx getMotor(String motorName) {
         return hardwareMap.get(DcMotorEx.class, motorName);
@@ -78,11 +78,7 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
             ledSet.setBallCount(transfer.getBallCount());
             ledSet.setShooterState(Shooter.ShooterState.OFF);
 
-            Shooter.ShooterConfig shooterConfig = shooter.calculateShooterConfig(drivetrain.getCurrentPose(),
-                    drivetrain.getCurrentVelocity(),
-                    drivetrain.getCurrentAcceleration(),
-                    true);
-            shooter.setShooterConfig(shooterConfig);
+            shooter.setShooterConfig(new Shooter.ShooterConfig(tuningTurretAngle, tuningHoodAngle * Math.PI, tuningFlywheelRPM));
 
             if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 transfer.overrideDriver();
@@ -104,12 +100,13 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
             ledSet.periodic();
             shooter.periodic();
 
+
             telemetry.addData("Follower X", drivetrain.getCurrentPose().getX());
             telemetry.addData("Follower Y", drivetrain.getCurrentPose().getY());
             telemetry.addData("Follower heading", drivetrain.getCurrentPose().getHeading());
             telemetry.addData("Flywheel RPM", shooter.getFlywheelRPM());
-            telemetry.addData("Target turret angle", shooterConfig.turretAngle);
             telemetry.addData("Number of balls", transfer.getBallCount());
+            telemetry.addData("Hood Angle", shooter.getHoodAngle());
             telemetry.addData("Turret angle", shooter.getTurretAngle());
             telemetry.addData("Turret power", shooter.getTurretPower());
             telemetry.addData("Flywheel power", shooter.getFlywheelPower());

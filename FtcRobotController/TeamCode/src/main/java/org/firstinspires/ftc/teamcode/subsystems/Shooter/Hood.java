@@ -9,6 +9,7 @@ public class Hood {
 
     public Hood(Servo hood) {
         hoodServo = hood;
+        hood.setPosition(0);
     }
 
     public double getAngle() {

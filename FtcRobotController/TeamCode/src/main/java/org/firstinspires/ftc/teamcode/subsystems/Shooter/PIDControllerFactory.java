@@ -27,8 +27,8 @@ public class PIDControllerFactory {
 
     @Config
     public static class FlywheelPIDController extends PIDController {
-        public static double kp = 0.002, ki = 0, kd = 0.00025;
-        public static double kv = 0.0001955;
+        public static double kp = -0.3, ki = 0, kd = -0.001;
+        public static double kv = 0.00026;
         public static double threshold = 500, tolerance = 0.3;
 
         private FlywheelPIDController() {

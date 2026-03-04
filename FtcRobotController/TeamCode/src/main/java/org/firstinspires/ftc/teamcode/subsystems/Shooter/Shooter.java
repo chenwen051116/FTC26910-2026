@@ -1,5 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_AX;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_AY;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_VX;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_VY;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONGEST_SHORT_DISTANCE;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_DISTANCE;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_DISTANCE_INTERVAL;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_HOOD_ANGLE;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_RPM;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTANCE;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTANCE_INTERVAL;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_HOOD_ANGLE;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_RPM;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
@@ -36,7 +50,7 @@ public class Shooter extends Overridable {
     private final Flywheel flywheel;
     private ShooterState shooterState;
     private ShooterConfig shooterConfig;
-    public static double IDLE_RPM = 4500;
+    public static double IDLE_RPM = 2000;
 
     // Constructor
     public Shooter(Gamepad gamepad, DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
@@ -107,15 +121,59 @@ public class Shooter extends Overridable {
 
 
     // Calculate shooter config based on position and velocity
-    public ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, boolean isRed) {
+    public ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, Vector robotAcceleration, boolean isRed) {
         Pose goalPose = new Pose(isRed ? 144 - 6 : 6, 144 - 6);
-        Vector displacement = new Vector(goalPose.minus(robotPose)).plus(robotVelocity.times(Constants.Shooter.T1));
-        Vector ballVelocityRPM = new Vector(new Pose(Constants.Shooter.X1 * displacement.getMagnitude(), Constants.Shooter.Y1));
+
+        double vx = robotVelocity.getXComponent();
+        double vy = robotVelocity.getYComponent();
+        double ax = robotAcceleration.getXComponent();
+        double ay = robotAcceleration.getYComponent();
+
+        goalPose = new Pose((goalPose.getX() + vx * C_VX + ax * C_AX), (goalPose.getY() + vy * C_VY + ay * C_AY));
+
+        Vector displacement = getDisplacement(goalPose, robotPose);
+        double distance = displacement.getMagnitude();
+        int index;
+        double targetHoodAngle;
+        double targetRPM;
+
+        if (distance < LONGEST_SHORT_DISTANCE) {
+            index = (int)Math.floor((distance - SHORT_RANGE_DISTANCE[0]) / SHORT_RANGE_DISTANCE_INTERVAL);
+            index = Math.max(0, Math.min(index, SHORT_RANGE_DISTANCE.length - 2));
+
+            targetHoodAngle = (SHORT_RANGE_HOOD_ANGLE[index + 1] - SHORT_RANGE_HOOD_ANGLE[index])/
+                    (SHORT_RANGE_DISTANCE[index + 1] - SHORT_RANGE_DISTANCE[index]) *
+                    (distance - SHORT_RANGE_DISTANCE[index]) +
+                    SHORT_RANGE_HOOD_ANGLE[index];
+
+            targetRPM = (SHORT_RANGE_RPM[index + 1] - SHORT_RANGE_RPM[index])/
+                    (SHORT_RANGE_DISTANCE[index + 1] - SHORT_RANGE_DISTANCE[index]) *
+                    (distance - SHORT_RANGE_DISTANCE[index]) +
+                    SHORT_RANGE_HOOD_ANGLE[index];
+        } else{
+            index = (int)Math.floor((distance - LONG_RANGE_DISTANCE[0]) / LONG_RANGE_DISTANCE_INTERVAL);
+            index = Math.max(0, Math.min(index, LONG_RANGE_DISTANCE.length - 2));
+
+            targetHoodAngle = (LONG_RANGE_HOOD_ANGLE[index + 1] - LONG_RANGE_HOOD_ANGLE[index])/
+                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
+                    (distance - LONG_RANGE_DISTANCE[index]) +
+                    LONG_RANGE_HOOD_ANGLE[index];
+
+            targetRPM = (LONG_RANGE_RPM[index + 1] - LONG_RANGE_RPM[index])/
+                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
+                    (distance - LONG_RANGE_DISTANCE[index]) +
+                    LONG_RANGE_RPM[index];
+        }
 
         return new ShooterConfig(
                 displacement.getTheta() - robotPose.getHeading(),
-                Math.PI / 2 - ballVelocityRPM.getTheta(),
-                ballVelocityRPM.getMagnitude());
+                targetHoodAngle,
+                targetRPM
+        );
+    }
+
+    public Vector getDisplacement(Pose goalPose, Pose robotPose){
+        return new Vector(goalPose.minus(robotPose));
     }
 
     @Override
