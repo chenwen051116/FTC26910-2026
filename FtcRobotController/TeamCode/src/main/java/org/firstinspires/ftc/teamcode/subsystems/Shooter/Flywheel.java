@@ -35,9 +35,9 @@ public class Flywheel {
         return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) / TICKS_PER_REVOLUTION * 60;
     }
 
-//    public double getPower() {
-//        return pidController.calculatePower(getRPM(), targetRPM);
-//    }
+    public double getPower() {
+        return pidController.calculatePower(getRPM(), targetRPM);
+    }
 
     // Let both motor to run at targetRPM using pid controller
     public void setRPM(double targetRPM) {

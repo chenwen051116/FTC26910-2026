@@ -28,14 +28,26 @@ public class Transfer extends SubsystemBase {
         return ballSensor.getBallCount();
     }
 
+    public void openGate() {
+        gate.open();
+    }
+
+    public void closeGate() {
+        gate.close();
+    }
+
+    public void setIntakeState(Intake.IntakeState intakeState) {
+        intake.setIntakeState(intakeState);
+    }
+
     @Override
     public void periodic() {
         if (gamepad.right_trigger > 0.1) {
-            intake.setIntakeState(Intake.IntakeState.INTAKE);
+            setIntakeState(Intake.IntakeState.INTAKE);
         } else if (gamepad.dpad_up) {
-            intake.setIntakeState(Intake.IntakeState.REVERSE);
+            setIntakeState(Intake.IntakeState.REVERSE);
         } else {
-            intake.setIntakeState(Intake.IntakeState.STOP);
+            setIntakeState(Intake.IntakeState.STOP);
         }
 
         if (gamepad.dpadDownWasPressed()) {
