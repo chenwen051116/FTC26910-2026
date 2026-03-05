@@ -109,6 +109,14 @@ public class Shooter extends Overridable {
         return flywheel.isAtTargetRPM();
     }
 
+    public double getFlywheelMotor1RPM(){
+        return flywheel.getRPM1();
+    }
+
+    public double getFlywheelMotor2RPM(){
+        return flywheel.getRPM2();
+    }
+
     public void initTurretEncoder(){
         turret.initEncoder();
     }
@@ -116,7 +124,7 @@ public class Shooter extends Overridable {
 
     // Calculate shooter config based on position and velocity
     public ShooterConfig calculateShooterConfig(Pose robotPose, Vector robotVelocity, Vector robotAcceleration, boolean isRed) {
-        Pose goalPose = new Pose(isRed ? 144 - 6 : 6, 144 - 6);
+        Pose goalPose = getGoalPose(isRed);
 
         double vx = robotVelocity.getXComponent();
         double vy = robotVelocity.getYComponent();
@@ -142,24 +150,28 @@ public class Shooter extends Overridable {
                     (distance - SHORT_RANGE_DISTANCE[index]) +
                     SHORT_RANGE_HOOD_POSITION[index];
 
-            targetRPM = (SHORT_RANGE_RPM[index + 1] - SHORT_RANGE_RPM[index])/
+            targetRPM = (double)(SHORT_RANGE_RPM[index + 1] - SHORT_RANGE_RPM[index])/
                     (SHORT_RANGE_DISTANCE[index + 1] - SHORT_RANGE_DISTANCE[index]) *
                     (distance - SHORT_RANGE_DISTANCE[index]) +
-                    SHORT_RANGE_HOOD_POSITION[index];
-        } else{
-            index = (int)Math.floor((distance - LONG_RANGE_DISTANCE[0]) / LONG_RANGE_DISTANCE_INTERVAL);
-            index = Math.max(0, Math.min(index, LONG_RANGE_DISTANCE.length - 2));
-
-            targetHoodAngle = (LONG_RANGE_HOOD_POSITION[index + 1] - LONG_RANGE_HOOD_POSITION[index])/
-                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
-                    (distance - LONG_RANGE_DISTANCE[index]) +
-                    LONG_RANGE_HOOD_POSITION[index];
-
-            targetRPM = (LONG_RANGE_RPM[index + 1] - LONG_RANGE_RPM[index])/
-                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
-                    (distance - LONG_RANGE_DISTANCE[index]) +
-                    LONG_RANGE_RPM[index];
+                    SHORT_RANGE_RPM[index];
+        } else {
+            targetRPM = 0;
+            targetHoodAngle = 0;
         }
+//            index = (int)Math.floor((distance - LONG_RANGE_DISTANCE[0]) / LONG_RANGE_DISTANCE_INTERVAL);
+//            index = Math.max(0, Math.min(index, LONG_RANGE_DISTANCE.length - 2));
+//
+//            targetHoodAngle = (LONG_RANGE_HOOD_POSITION[index + 1] - LONG_RANGE_HOOD_POSITION[index])/
+//                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
+//                    (distance - LONG_RANGE_DISTANCE[index]) +
+//                    LONG_RANGE_HOOD_POSITION[index];
+//
+//            targetRPM = (LONG_RANGE_RPM[index + 1] - LONG_RANGE_RPM[index])/
+//                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
+//                    (distance - LONG_RANGE_DISTANCE[index]) +
+//                    LONG_RANGE_RPM[index];
+
+
 
         return new ShooterConfig(
                 displacement.getTheta() - robotPose.getHeading(),
@@ -172,6 +184,9 @@ public class Shooter extends Overridable {
         return new Vector(goalPose.minus(robotPose));
     }
 
+    public Pose getGoalPose(boolean isRed){
+        return new Pose(isRed ? 144 - 6 : 6, 144 - 6);
+    }
     @Override
     public void runWithoutOverride() {
         if (gamepad.yWasPressed()) {
@@ -193,20 +208,11 @@ public class Shooter extends Overridable {
                 setShooterState(ShooterState.IDLE);
             }
         }
+    }
 
-
-        switch (shooterState) {
-            case OFF:
-                flywheel.setRPM(0);
-                break;
-            case IDLE:
-                flywheel.setRPM(IDLE_RPM);
-                break;
-            case SHOOTING:
-                hood.setPosition(shooterConfig.hoodPosition);
-                flywheel.setRPM(shooterConfig.flywheelRPM);
-                break;
-        }
+    @Override
+    public void runWhenStartingOverride(){
+        turret.center();
     }
 
     @Override

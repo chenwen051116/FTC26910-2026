@@ -21,11 +21,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 @Config
 @TeleOp(name = "Red Chassis Testing Teleop")
 public class ChassisTracingTestTeleOp extends LinearOpMode {
-    public static double tuningFlywheelRPM = 3000;
-    public static double tuningTurretAngle = 0;
-    public static double tuningHoodPosition = 0;
-
-
     private DcMotorEx getMotor(String motorName) {
         return hardwareMap.get(DcMotorEx.class, motorName);
     }
@@ -113,6 +108,12 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
             telemetry.addData("Turret angle", shooter.getTurretAngle());
             telemetry.addData("Turret power", shooter.getTurretPower());
             telemetry.addData("Flywheel power", shooter.getFlywheelPower());
+            telemetry.addData("Hood Position", shooter.getHoodPosition());
+            telemetry.addData("Target RPM", shooter.getShooterConfig().flywheelRPM);
+
+            telemetry.addData("Distance to RED goal",
+                    shooter.getDisplacement(shooter.getGoalPose(true), drivetrain.getCurrentPose()).getMagnitude());
+            telemetry.update();
             telemetry.update();
         }
     }

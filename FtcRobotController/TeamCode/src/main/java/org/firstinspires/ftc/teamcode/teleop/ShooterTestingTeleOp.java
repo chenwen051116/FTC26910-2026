@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Transfer.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 
 @Config
-@TeleOp(name = "Red Chassis Testing Teleop")
+@TeleOp(name = "Red Shooter Testing Teleop")
 public class ShooterTestingTeleOp extends LinearOpMode {
     public static double tuningFlywheelRPM = 3000;
     public static double tuningTurretAngle = 0;
@@ -74,24 +74,7 @@ public class ShooterTestingTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            ledSet.setBallCount(transfer.getBallCount());
-            ledSet.setShooterState(Shooter.ShooterState.OFF);
-
-            shooter.setShooterConfig(new Shooter.ShooterConfig(tuningTurretAngle, tuningHoodPosition * Math.PI, tuningFlywheelRPM));
-
-            if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
-                transfer.overrideDriver();
-                if (shooter.isAtTargetRPM()) {
-                    transfer.setIntakeState(Intake.IntakeState.INTAKE);
-                }
-                else {
-                    transfer.setIntakeState(Intake.IntakeState.STOP);
-                }
-            } else {
-                transfer.stopOverrideDriver();
-            }
-
-
+            shooter.setShooterConfig(new Shooter.ShooterConfig(tuningTurretAngle, tuningHoodPosition, tuningFlywheelRPM));
 
             drivetrain.periodic();
             transfer.periodic();
@@ -104,11 +87,16 @@ public class ShooterTestingTeleOp extends LinearOpMode {
             telemetry.addData("Follower Y", drivetrain.getCurrentPose().getY());
             telemetry.addData("Follower heading", drivetrain.getCurrentPose().getHeading());
             telemetry.addData("Flywheel RPM", shooter.getFlywheelRPM());
+            telemetry.addData("Target RPM", shooter.getShooterConfig().flywheelRPM);
             telemetry.addData("Number of balls", transfer.getBallCount());
             telemetry.addData("Hood Position", shooter.getHoodPosition());
             telemetry.addData("Turret angle", shooter.getTurretAngle());
             telemetry.addData("Turret power", shooter.getTurretPower());
             telemetry.addData("Flywheel power", shooter.getFlywheelPower());
+            telemetry.addData("Flywheel RPM1", shooter.getFlywheelMotor1RPM());
+            telemetry.addData("Flywheel RPM2", shooter.getFlywheelMotor2RPM());
+            telemetry.addData("Distance to RED goal",
+                    shooter.getDisplacement(shooter.getGoalPose(true), drivetrain.getCurrentPose()).getMagnitude());
             telemetry.update();
         }
     }

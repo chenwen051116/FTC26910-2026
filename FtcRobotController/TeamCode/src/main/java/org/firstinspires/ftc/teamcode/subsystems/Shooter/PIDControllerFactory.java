@@ -7,7 +7,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 public class PIDControllerFactory {
     @Config
     public static class TurretPIDController extends PIDController {
-        public static double kp = -0.00045, ki = 0, kd = -0.00001;
+        public static double kp = -0.0003, ki = 0, kd = -0.00001;
         public static double kf = 0;
         public static double tolerance = 0.01;
 
@@ -27,7 +27,7 @@ public class PIDControllerFactory {
 
     @Config
     public static class FlywheelPIDController extends PIDController {
-        public static double kp = -0.3, ki = 0, kd = -0.001;
+        public static double kp = -0.125, ki = 0, kd = 0;
         public static double kv = 0.00026;
         public static double threshold = 500, tolerance = 0.3;
 

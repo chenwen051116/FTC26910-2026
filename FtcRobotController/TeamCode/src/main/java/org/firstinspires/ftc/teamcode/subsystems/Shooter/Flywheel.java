@@ -39,6 +39,14 @@ public class Flywheel {
         return ((flywheelMotor1.getVelocity() + flywheelMotor2.getVelocity()) / 2) / TICKS_PER_REVOLUTION * 60;
     }
 
+    public double getRPM1(){
+        return flywheelMotor1.getVelocity() / TICKS_PER_REVOLUTION * 60;
+    }
+
+    public double getRPM2(){
+        return flywheelMotor2.getVelocity() / TICKS_PER_REVOLUTION * 60;
+    }
+
     public double getTargetRPM() {
         return targetRPM;
     }
