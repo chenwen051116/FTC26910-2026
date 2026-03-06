@@ -9,7 +9,7 @@ public class Hood {
 
     public Hood(Servo hood) {
         hoodServo = hood;
-        hood.setPosition(0);
+        hood.setPosition(1);
     }
 
     // Get the current position of hood from 0 to 1

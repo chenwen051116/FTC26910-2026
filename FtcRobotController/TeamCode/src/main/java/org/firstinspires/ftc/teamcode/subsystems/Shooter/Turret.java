@@ -36,7 +36,7 @@ public class Turret {
 
     // Let the turret motor rotate to the desired angle in radians
     public void setAngle(double targetAngle) {
-        this.targetAngle = Math.min((double) -3 /8 * Math.PI, Math.max((double) 3 /8 * Math.PI, (targetAngle % Math.PI * 2 - targetAngle)));
+        this.targetAngle = Math.max((double) -3 /4 * Math.PI, Math.min((double) 3 /4 * Math.PI, (targetAngle % Math.PI * 2 - targetAngle)));
     }
 
     public void center() {

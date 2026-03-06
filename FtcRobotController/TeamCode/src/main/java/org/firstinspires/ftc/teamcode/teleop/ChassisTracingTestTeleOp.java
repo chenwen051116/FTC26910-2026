@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONGEST_SHORT_DISTANCE;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,7 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Transfer.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 
 @Config
-@TeleOp(name = "Red Chassis Testing Teleop")
+@TeleOp(name = "Red Chassis Tracing Teleop")
 public class ChassisTracingTestTeleOp extends LinearOpMode {
     private DcMotorEx getMotor(String motorName) {
         return hardwareMap.get(DcMotorEx.class, motorName);
@@ -56,6 +59,7 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
 
         Shooter shooter = new Shooter(gamepad1, turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
 
+        Vector toTargetVector;
         Servo ballIndicator1 = getServo("ball_indicator_1");
         Servo ballIndicator2 = getServo("ball_indicator_2");
         Servo shooterIndicator = getServo("shooter_indicator");
@@ -70,6 +74,9 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            toTargetVector = new Vector(shooter.getGoalPose(true).minus(drivetrain.getCurrentPose()));
+
+
             ledSet.setBallCount(transfer.getBallCount());
             ledSet.setShooterState(Shooter.ShooterState.OFF);
 
@@ -81,11 +88,16 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
 
             if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 transfer.overrideDriver();
-                if (shooter.isAtTargetRPM()) {
-                    transfer.setIntakeState(Intake.IntakeState.INTAKE);
-                }
-                else {
-                    transfer.setIntakeState(Intake.IntakeState.STOP);
+                if (toTargetVector.getMagnitude() < LONGEST_SHORT_DISTANCE) {
+                    if (shooter.isAtTargetRPM()) {
+                        transfer.setIntakeState(Intake.IntakeState.INTAKE);
+                    }
+                } else {
+                    if (shooter.isAtTargetRPM()) {
+                        transfer.setIntakeState(Intake.IntakeState.INTAKE);
+                    } else {
+                        transfer.setIntakeState(Intake.IntakeState.STOP);
+                    }
                 }
             } else {
                 transfer.stopOverrideDriver();
@@ -110,6 +122,8 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
             telemetry.addData("Flywheel power", shooter.getFlywheelPower());
             telemetry.addData("Hood Position", shooter.getHoodPosition());
             telemetry.addData("Target RPM", shooter.getShooterConfig().flywheelRPM);
+            telemetry.addData("Flywheel RPM1", shooter.getFlywheelMotor1RPM());
+            telemetry.addData("Flywheel RPM2", shooter.getFlywheelMotor2RPM());
 
             telemetry.addData("Distance to RED goal",
                     shooter.getDisplacement(shooter.getGoalPose(true), drivetrain.getCurrentPose()).getMagnitude());

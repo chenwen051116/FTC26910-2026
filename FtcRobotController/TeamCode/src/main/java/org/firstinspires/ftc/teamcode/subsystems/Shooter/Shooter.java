@@ -85,6 +85,10 @@ public class Shooter extends Overridable {
         return turret.getCurrentAngle();
     }
 
+    public double getTurretTargetAngle(){
+        return turret.getTargetAngle();
+    }
+
     public double getTurretPower() {
         return turret.getPower();
     }

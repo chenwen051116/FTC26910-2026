@@ -15,12 +15,11 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.LEDSet.LEDSet;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 
 @Config
-@TeleOp(name = "Red Shooter Testing Teleop")
-public class ShooterTestingTeleOp extends LinearOpMode {
+@TeleOp(name = "Red Moving While Shooting Tuning Teleop")
+public class MovingWhileShootingTuningTeleOp extends LinearOpMode {
     public static double tuningFlywheelRPM = 3000;
     public static double tuningTurretAngle = 0;
     public static double tuningHoodPosition = 0;
