@@ -72,6 +72,8 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
         drivetrain.initEncoder(new Pose(0, 0, 0));
         shooter.initTurretEncoder();
 
+        boolean isShooting = false;
+
         waitForStart();
         while (opModeIsActive()) {
             toTargetVector = new Vector(shooter.getGoalPose(true).minus(drivetrain.getCurrentPose()));
@@ -90,16 +92,18 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
                 transfer.overrideDriver();
                 if (toTargetVector.getMagnitude() < LONGEST_SHORT_DISTANCE) {
                     if (shooter.isAtTargetRPM()) {
+                        isShooting = true;
+                    }
+                    if (isShooting){
                         transfer.setIntakeState(Intake.IntakeState.INTAKE);
                     }
                 } else {
                     if (shooter.isAtTargetRPM()) {
                         transfer.setIntakeState(Intake.IntakeState.INTAKE);
-                    } else {
-                        transfer.setIntakeState(Intake.IntakeState.STOP);
                     }
                 }
             } else {
+                isShooting = false;
                 transfer.stopOverrideDriver();
             }
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.TURRET_OFFSET;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -66,7 +68,7 @@ public class Drivetrain extends Overridable {
     public void initEncoder(Pose lastPose){
         follower.startTeleopDrive();
         follower.update();
-        follower.setStartingPose(new Pose(0, 0, 0));
+        follower.setStartingPose(new Pose(-TURRET_OFFSET, 0, 0));
         follower.setPose(lastPose);
     }
 

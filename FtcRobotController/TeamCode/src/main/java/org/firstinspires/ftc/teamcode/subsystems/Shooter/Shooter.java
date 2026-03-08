@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTA
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTANCE_INTERVAL;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_HOOD_POSITION;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_RPM;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.TURRET_OFFSET;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -185,11 +186,13 @@ public class Shooter extends Overridable {
     }
 
     public Vector getDisplacement(Pose goalPose, Pose robotPose){
-        return new Vector(goalPose.minus(robotPose));
+        double v1 = goalPose.getY() - (robotPose.getY() - TURRET_OFFSET * Math.sin(robotPose.getHeading()));
+        double v2 = goalPose.getX() - (robotPose.getX() - TURRET_OFFSET * Math.cos(robotPose.getHeading()));
+        return new Vector(Math.hypot(v2, v1), Math.atan2(v1, v2));
     }
 
     public Pose getGoalPose(boolean isRed){
-        return new Pose(isRed ? 144 - 6 : 6, 144 - 6);
+        return new Pose(isRed ? 144 - 6 : 6, 144 - 8);
     }
     @Override
     public void runWithoutOverride() {
@@ -233,6 +236,7 @@ public class Shooter extends Overridable {
                 flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
         }
+
         turret.setAngle(shooterConfig.turretAngle);
         turret.periodic();
         flywheel.periodic();

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONGEST_SHORT_DISTANCE;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -71,6 +73,7 @@ public class ShooterTestingTeleOp extends LinearOpMode {
 
         drivetrain.initEncoder(new Pose(0, 0, 0));
         shooter.initTurretEncoder();
+        boolean isShooting = false;
 
         waitForStart();
         while (opModeIsActive()) {
@@ -82,12 +85,17 @@ public class ShooterTestingTeleOp extends LinearOpMode {
             ledSet.periodic();
             shooter.periodic();
 
-            if (gamepad1.dpadLeftWasPressed()){
-                tuningTurretAngle -= (double) 5 / 2 / Math.PI;
-            }
-
-            if (gamepad1.dpadRightWasPressed()){
-                tuningTurretAngle += (double) 5 / 2 / Math.PI;
+            if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
+                transfer.overrideDriver();
+                if (shooter.isAtTargetRPM()) {
+                    isShooting = true;
+                }
+                if (isShooting){
+                    transfer.setIntakeState(Intake.IntakeState.INTAKE);
+                }
+            } else {
+                isShooting = false;
+                transfer.stopOverrideDriver();
             }
 
 

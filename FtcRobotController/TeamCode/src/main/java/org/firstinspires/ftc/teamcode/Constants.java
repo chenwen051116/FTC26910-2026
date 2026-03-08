@@ -14,21 +14,22 @@ public class Constants {
         public static final double C_VY = 0;
         public static final double C_AX = 0;
         public static final double C_AY = 0;
+        public static final double TURRET_OFFSET = 2.7138;
 
         public static final double[] SHORT_RANGE_DISTANCE = {
-                50.6998,
-                55.1927,
-                60.0192,
-                65.1723,
-                70.0511,
-                75.0961,
-                80.6312,
-                85.0506,
-                90.1664,
-                95.0526,
-                100.7450,
-                105.2476,
-                110.2539
+                50.7377,
+                55.0823,
+                60.2121,
+                65.2985,
+                70.5233,
+                75.2409, // THIS POINT NEEDS TO BE DOUBLE-CHECKED
+                80.1729,
+                85.2679,
+                90.2571,
+                95.1201,
+                100.2495,
+                105.2593,
+                110.0269
         };
 
         public static final int SHORT_RANGE_DISTANCE_INTERVAL = 5;
@@ -38,31 +39,31 @@ public class Constants {
                 2500,
                 2500,
                 2500,
-                2500,
-                2500,
+                2550,
                 2600,
                 2700,
+                2725,
                 2750,
-                2850,
-                3100,
-                3150,
-                3200
+                2825,
+                2950,
+                3050,
+                3175
         };
 
         public static final double[] SHORT_RANGE_HOOD_POSITION = {
-                0.95,
-                0.65,
-                0.25,
+                0.9,
+                0.5,
+                0.3,
                 0.2,
-                0.2,
+                0.175,
+                0.175,
                 0.15,
                 0.125,
                 0.125,
                 0.125,
                 0.125,
                 0.125,
-                0.125,
-                0.125
+                0.1125
         };
 
         public static final double[] LONG_RANGE_DISTANCE = {
@@ -80,5 +81,7 @@ public class Constants {
         };
 
         public static final double LONGEST_SHORT_DISTANCE = 110;
+
+
     }
 }
