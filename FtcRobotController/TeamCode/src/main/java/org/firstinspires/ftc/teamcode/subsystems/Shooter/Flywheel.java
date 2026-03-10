@@ -16,7 +16,7 @@ public class Flywheel {
     private final DcMotorEx flywheelMotor2;
     private final PIDControllerFactory.FlywheelPIDController pidController;
     private double targetRPM = 0;
-    public static double rpmThreshold = 150;
+    public static double rpmThreshold = 80;
 
     public Flywheel(DcMotorEx flywheel1, DcMotorEx flywheel2) {
         flywheelMotor1 = flywheel1;

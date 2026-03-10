@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class Intake {
     public enum IntakeState {
-        INTAKE(1),
+        INTAKE(0.9),
         STOP(0),
         REVERSE(-0.8);
 

@@ -232,11 +232,11 @@ public class Shooter extends Overridable {
                 flywheel.setRPM(IDLE_RPM);
                 break;
             case SHOOTING:
-                hood.setPosition(shooterConfig.hoodPosition);
                 flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
         }
 
+        hood.setPosition(shooterConfig.hoodPosition);
         turret.setAngle(shooterConfig.turretAngle);
         turret.periodic();
         flywheel.periodic();

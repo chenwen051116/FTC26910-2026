@@ -21,17 +21,17 @@ public class PIDControllerFactory {
             setSetPoint(targetPosition);
             setTolerance(tolerance);
             setPIDF(kp, ki, kd, kf);
-            return Math.max(-1, Math.min(1, calculate(currentPosition)));
+            return Math.max(-0.6, Math.min(0.6, calculate(currentPosition)));
         }
     }
 
     @Config
     public static class FlywheelPIDController extends PIDController {
         // PID FOR V = 12.5
-        public static double kp = -0.05, ki = 0, kd = -0.004;
-        public static double ks = 0.2025;
-        public static double kv = 0.0002025;
-        public static double threshold = 200, tolerance = 0.3;
+        public static double kp = -0.27, ki = 0, kd = 0;
+        public static double ks = 0;
+        public static double kv = 0.000245;
+        public static double threshold = 300, tolerance = 0;
 
         // 13.5V : KS = 0.165, vf = 0.000195
 
