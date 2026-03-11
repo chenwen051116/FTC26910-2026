@@ -41,6 +41,10 @@ public class Transfer extends Overridable {
         gate.close();
     }
 
+    public boolean isGateOpen() {
+        return gate.isOpen();
+    }
+
     public void toggleGate() {
         gate.toggle();
     }

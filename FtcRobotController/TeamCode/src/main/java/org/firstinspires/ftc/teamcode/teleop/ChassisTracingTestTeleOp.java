@@ -91,7 +91,7 @@ public class ChassisTracingTestTeleOp extends LinearOpMode {
             if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 transfer.overrideDriver();
                 if (toTargetVector.getMagnitude() < LONGEST_SHORT_DISTANCE) {
-                    if (shooter.isAtTargetRPM()) {
+                    if (shooter.isAtTargetRPM() && transfer.isGateOpen()) {
                         isShooting = true;
                     }
                     if (isShooting){

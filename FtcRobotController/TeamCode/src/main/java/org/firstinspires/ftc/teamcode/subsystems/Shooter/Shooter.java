@@ -160,21 +160,19 @@ public class Shooter extends Overridable {
                     (distance - SHORT_RANGE_DISTANCE[index]) +
                     SHORT_RANGE_RPM[index];
         } else {
-            targetRPM = 0;
-            targetHoodAngle = 0;
+            index = (int) Math.floor((distance - LONG_RANGE_DISTANCE[0]) / LONG_RANGE_DISTANCE_INTERVAL);
+            index = Math.max(0, Math.min(index, LONG_RANGE_DISTANCE.length - 2));
+
+            targetHoodAngle = (LONG_RANGE_HOOD_POSITION[index + 1] - LONG_RANGE_HOOD_POSITION[index]) /
+                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
+                    (distance - LONG_RANGE_DISTANCE[index]) +
+                    LONG_RANGE_HOOD_POSITION[index];
+
+            targetRPM = (LONG_RANGE_RPM[index + 1] - LONG_RANGE_RPM[index]) /
+                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
+                    (distance - LONG_RANGE_DISTANCE[index]) +
+                    LONG_RANGE_RPM[index];
         }
-//            index = (int)Math.floor((distance - LONG_RANGE_DISTANCE[0]) / LONG_RANGE_DISTANCE_INTERVAL);
-//            index = Math.max(0, Math.min(index, LONG_RANGE_DISTANCE.length - 2));
-//
-//            targetHoodAngle = (LONG_RANGE_HOOD_POSITION[index + 1] - LONG_RANGE_HOOD_POSITION[index])/
-//                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
-//                    (distance - LONG_RANGE_DISTANCE[index]) +
-//                    LONG_RANGE_HOOD_POSITION[index];
-//
-//            targetRPM = (LONG_RANGE_RPM[index + 1] - LONG_RANGE_RPM[index])/
-//                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
-//                    (distance - LONG_RANGE_DISTANCE[index]) +
-//                    LONG_RANGE_RPM[index];
 
 
 

@@ -179,7 +179,7 @@ public class RedNearAuto extends OpMode {
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         // Start Shooting
         sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.SHOOTING));
-        sequencer.waitUntil(() -> shooter.isAtTargetRPM());
+        sequencer.waitUntil(() -> shooter.isAtTargetRPM() && transfer.isGateOpen());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
         sequencer.wait(800);
         // Finish Shooting

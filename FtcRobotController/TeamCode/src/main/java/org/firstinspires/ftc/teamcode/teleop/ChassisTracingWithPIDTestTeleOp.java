@@ -90,7 +90,7 @@ public class ChassisTracingWithPIDTestTeleOp extends LinearOpMode {
 
             if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 transfer.overrideDriver();
-                if (shooter.isAtTargetRPM()){
+                if (shooter.isAtTargetRPM() && transfer.isGateOpen()){
                     transfer.setIntakeState(Intake.IntakeState.INTAKE);
                 }
             } else {

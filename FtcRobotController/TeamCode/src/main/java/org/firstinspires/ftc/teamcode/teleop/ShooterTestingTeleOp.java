@@ -87,7 +87,7 @@ public class ShooterTestingTeleOp extends LinearOpMode {
 
             if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 transfer.overrideDriver();
-                if (shooter.isAtTargetRPM()) {
+                if (shooter.isAtTargetRPM() && transfer.isGateOpen()) {
                     isShooting = true;
                 }
                 if (isShooting){
