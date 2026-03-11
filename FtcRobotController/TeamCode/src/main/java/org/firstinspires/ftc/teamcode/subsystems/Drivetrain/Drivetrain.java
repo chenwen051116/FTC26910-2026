@@ -90,7 +90,11 @@ public class Drivetrain extends Overridable {
         return follower.atPose(pose, xAtPoseTolerance, yAtPoseTolerance);
     }
 
-    public void goTo(Pose pose) {
+    public void goTo(Pose pose){
+        goTo(pose, 0.6);
+    }
+
+    public void goTo(Pose pose, double power) {
         if (!isOverriding() || follower.isBusy()) {
             return;
         }
@@ -101,9 +105,9 @@ public class Drivetrain extends Overridable {
                 follower.pathBuilder()
                         .addPath(new BezierLine(currentPose, pose))
                         .setLinearHeadingInterpolation(currentPose.getHeading(), pose.getHeading())
-                        .build()
-
-
+                        .build(),
+                power,
+                true
         );
     }
 

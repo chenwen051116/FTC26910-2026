@@ -26,6 +26,9 @@ public class RedNearAuto extends OpMode {
     private Drivetrain drivetrain;
     private Transfer transfer;
     private LEDSet ledSet;
+
+    public static double defaultMoveMaxPower = 0.6;
+
     // START POINT
     public static double startX = 110, startY = 113, startHeading = 0.76;
     private final Pose startPose = new Pose(startX, startY, startHeading);
@@ -122,63 +125,21 @@ public class RedNearAuto extends OpMode {
 
         // Initialize Sequencer
         // From Start pose to shooting pose
-        sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> drivetrain.goTo(shootPose));
-        sequencer.run(() -> transfer.openGate());
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
-        // Start Shooting
-        sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.SHOOTING));
-        sequencer.waitUntil(() -> shooter.isAtTargetRPM());
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.wait(800);
-        // Finish Shooting
-        sequencer.run(() -> transfer.closeGate());
-        sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
+        shoot();
 
         // From shooting pose to get first ball
-        sequencer.run(() -> drivetrain.goTo(ball1StartPose));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy() && drivetrain.isAtPosition(ball1StartPose));
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.goTo(ball1EndPose));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
+        intakeAtPos(ball1StartPose, ball1EndPose);
 
         // Move from first ball pose to shooting
-        sequencer.run(() -> drivetrain.goTo(shootPose));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
-        // Start Shooting
-        sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.SHOOTING));
-        sequencer.waitUntil(() -> shooter.isAtTargetRPM());
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.wait(800);
-        // Finish Shooting
-        sequencer.run(() -> transfer.closeGate());
-        sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
+        shoot();
 
         // From shooting pose to get the second ball
-        sequencer.run(() -> drivetrain.goTo(ball2StartPose));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy() && drivetrain.isAtPosition(ball2StartPose));
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.goTo(ball2EndPose));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
+        intakeAtPos(ball2StartPose, ball2EndPose);
 
         // Move from second ball pose to shooting
         sequencer.run(() -> drivetrain.goTo(ball2StartPose));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
-        sequencer.run(() -> drivetrain.goTo(shootPose));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
-        // Start Shooting
-        sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.SHOOTING));
-        sequencer.waitUntil(() -> shooter.isAtTargetRPM());
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.wait(800);
-        // Finish Shooting
-        sequencer.run(() -> transfer.closeGate());
-        sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
+        shoot();
 
         // Open gate
         sequencer.run(() -> drivetrain.goTo(beforeGatePose));
@@ -187,15 +148,34 @@ public class RedNearAuto extends OpMode {
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
 
         // Move from gate to third ball pose
-        sequencer.run(() -> drivetrain.goTo(ball3StartPose));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy() && drivetrain.isAtPosition(ball3StartPose));
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.goTo(ball3EndPose));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
-        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
+        intakeAtPos(ball3StartPose, ball3EndPose);
 
         // Move from third ball pose to shooting
-        sequencer.run(() -> drivetrain.goTo(shootPose));
+        shoot();
+    }
+
+    private void intakeAtPos(Pose startPose, Pose endPose) {
+        intakeAtPos(startPose, endPose, defaultMoveMaxPower);
+    }
+
+
+    private void intakeAtPos(Pose startPose, Pose endPose, double maxPower) {
+        sequencer.run(() -> drivetrain.goTo(startPose, maxPower));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy() && drivetrain.isAtPosition(startPose));
+        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
+        sequencer.run(() -> drivetrain.goTo(endPose, maxPower));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+        sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
+    }
+
+    private void shoot() {
+        shoot(defaultMoveMaxPower);
+    }
+
+    private void shoot(double maxPower) {
+        sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
+        sequencer.run(() -> drivetrain.goTo(shootPose, maxPower));
+        sequencer.run(() -> transfer.openGate());
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         // Start Shooting
         sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.SHOOTING));
