@@ -107,6 +107,10 @@ public class Drivetrain extends Overridable {
         );
     }
 
+    public void updateFollower() {
+        follower.update();
+    }
+
     public boolean followerIsBusy() {
         return follower.isBusy();
     }
@@ -135,6 +139,6 @@ public class Drivetrain extends Overridable {
 
     @Override
     public void alwaysRunning() {
-        follower.update();
+        follower.updatePose();
     }
 }

@@ -220,8 +220,8 @@ public class RedNearAuto extends OpMode {
                 drivetrain.getCurrentAcceleration(),
                 true));
         shooter.alwaysRunning();
-        drivetrain.alwaysRunning();
         sequencer.update();
+        drivetrain.updateFollower();
 
 
         telemetry.addData("Current X", drivetrain.getCurrentPose().getX());
