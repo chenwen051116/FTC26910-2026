@@ -22,6 +22,8 @@ public class Drivetrain extends Overridable {
     private final Follower follower;
     public static double regularSpeedMultiplier = 1;
     public static double slowSpeedMultiplier = 0.3;
+    public static double xAtPoseTolerance = 2;
+    public static double yAtPoseTolerance = 2;
 
     public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
         this.frontLeftMotor = frontLeftMotor;
@@ -84,6 +86,10 @@ public class Drivetrain extends Overridable {
         return follower.getAcceleration();
     }
 
+    public boolean isAtPosition(Pose pose){
+        return follower.atPose(pose, xAtPoseTolerance, yAtPoseTolerance);
+    }
+
     public void goTo(Pose pose) {
         if (!isOverriding() || follower.isBusy()) {
             return;
@@ -96,7 +102,13 @@ public class Drivetrain extends Overridable {
                         .addPath(new BezierLine(currentPose, pose))
                         .setLinearHeadingInterpolation(currentPose.getHeading(), pose.getHeading())
                         .build()
+
+
         );
+    }
+
+    public boolean followerIsBusy() {
+        return follower.isBusy();
     }
     @Override
     public void runWithoutOverride() {
@@ -123,6 +135,6 @@ public class Drivetrain extends Overridable {
 
     @Override
     public void alwaysRunning() {
-        follower.updatePose();
+        follower.update();
     }
 }

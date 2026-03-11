@@ -33,6 +33,18 @@ public class Transfer extends Overridable {
         intake.setIntakeState(intakeState);
     }
 
+    public void openGate() {
+        gate.open();
+    }
+
+    public void closeGate() {
+        gate.close();
+    }
+
+    public void toggleGate() {
+        gate.toggle();
+    }
+
     // Stop the intake when starting / stopping overriding
     @Override
     public void runWhenStartingOverride() {
@@ -48,7 +60,6 @@ public class Transfer extends Overridable {
             gate.close();
             hasRanOnlyOnce = true;
         }
-
     }
 
     @Override

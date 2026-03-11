@@ -192,7 +192,7 @@ public class Shooter extends Overridable {
     }
 
     public Pose getGoalPose(boolean isRed){
-        return new Pose(isRed ? 144 - 6 : 6, 144 - 8);
+        return new Pose(isRed ? 144 - 4 : 4, 144 - 8);
     }
     @Override
     public void runWithoutOverride() {
