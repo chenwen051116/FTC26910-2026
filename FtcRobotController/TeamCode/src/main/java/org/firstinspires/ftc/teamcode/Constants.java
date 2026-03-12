@@ -34,59 +34,51 @@ public class Constants {
         public static final int SHORT_RANGE_DISTANCE_INTERVAL = 5;
 
         public static final int[] SHORT_RANGE_RPM = {
-                2250,
-                2275,
-                2285,
-                2300,
-                2315,
-                2335,
-                2385,
-                2420,
-                2515,
-                2685,
-                2780,
-                2985
+                2400,
+                2415,
+                2430,
+                2475,
+                2550,
+                2650,
+                2750,
+                2850,
+                3125,
+                3200,
+                3300,
+                3350
         };
 
         public static final double[] SHORT_RANGE_HOOD_POSITION = {
                 1,
-                0.8,
-                0.65,
-                0.625,
+                0.7,
                 0.6,
-                0.555,
                 0.55,
-                0.535,
-                0.530,
-                0.515,
-                0.485,
-                0.46
+                0.45,
+                0.4,
+                0.3,
+                0.25,
+                0.15,
+                0.1,
+                0,
+                0
+
         };
 
         public static final double[] LONG_RANGE_DISTANCE = {
-                140.0012,
-                145.4787,
-                150.6533,
-                155.6174,
-                160.1078
+                138.0012,
+                147.4787
         };
 
         public static final int LONG_RANGE_DISTANCE_INTERVAL = 5;
 
         public static final int[] LONG_RANGE_RPM = {
-                3465,
-                3525,
-                3575,
-                3600,
-                3650
+                3800,
+                3900
         };
 
         public static final double[] LONG_RANGE_HOOD_POSITION = {
-                0.29,
-                0.25,
-                0.24,
-                0.23,
-                0.215
+                0,
+                0
         };
 
         public static final double LONGEST_SHORT_DISTANCE = 110;

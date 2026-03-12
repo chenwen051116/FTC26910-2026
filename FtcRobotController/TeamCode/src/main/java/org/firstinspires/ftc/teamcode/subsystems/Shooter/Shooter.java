@@ -51,6 +51,7 @@ public class Shooter extends Overridable {
     private ShooterState shooterState;
     private ShooterConfig shooterConfig;
     public static double IDLE_RPM = 2000;
+    public static double turretOffsetIncrement = 5;
 
     // Constructor
     public Shooter(Gamepad gamepad, DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
@@ -190,7 +191,7 @@ public class Shooter extends Overridable {
     }
 
     public Pose getGoalPose(boolean isRed){
-        return new Pose(isRed ? 144 - 4 : 4, 144 - 8);
+        return new Pose(isRed ? 144 - 4 : 4, 144 - 12);
     }
     @Override
     public void runWithoutOverride() {
@@ -212,6 +213,14 @@ public class Shooter extends Overridable {
             } else if (getShooterState() == ShooterState.SHOOTING) {
                 setShooterState(ShooterState.IDLE);
             }
+        }
+
+        if (gamepad.dpadLeftWasPressed()) {
+            turret.addOffset(Math.toRadians(-turretOffsetIncrement));
+        }
+
+        if (gamepad.dpadRightWasPressed()) {
+            turret.addOffset(Math.toRadians(turretOffsetIncrement));
         }
     }
 

@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Transfer.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
 
 @Config
-@Autonomous(name = "RedNearAuto")
-public class RedNearAuto extends OpMode {
+@Autonomous(name = "RedNearAuto15Balls")
+public class RedNearAuto15Balls extends OpMode {
     private final Sequencer sequencer = new Sequencer();
     private Shooter shooter;
     private Drivetrain drivetrain;

@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class Turret {
     public static final double MOTOR_GEAR_RATIO = 1;
     public static final double RADIANS_PER_TICK = 2 * Math.PI / Constants.ENCODER_TICKS_PER_REVOLUTION / MOTOR_GEAR_RATIO;
-    private double offset = 0;
+    private double offset = 0; // IN RADIANS
 
     private final DcMotor turretMotor;
     private final PIDControllerFactory.TurretPIDController pidController;
@@ -73,7 +73,7 @@ public class Turret {
     }
 
     public void periodic() {
-        double targetPower = pidController.calculatePower(turretMotor.getCurrentPosition(), toTicks(targetAngle));
+        double targetPower = pidController.calculatePower(toTicks(getCurrentAngle()), toTicks(targetAngle));
         targetPower *= isRotatingLargeDegree() ? 0.7 : 1;
         turretMotor.setPower(targetPower);
 
