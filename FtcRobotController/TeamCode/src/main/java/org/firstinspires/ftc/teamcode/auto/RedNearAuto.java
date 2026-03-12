@@ -38,11 +38,11 @@ public class RedNearAuto extends OpMode {
     private final Pose shootPose = new Pose(shootX, shootY, shootHeading);
 
     // BALL 1 START POINT
-    public static double ball1StartX = 84, ball1StartY = 74, ball1StartHeading = 0;
+    public static double ball1StartX = 84, ball1StartY = 70, ball1StartHeading = 0;
     private final Pose ball1StartPose = new Pose(ball1StartX, ball1StartY, ball1StartHeading);
 
     // BALL 1 END POINT
-    public static double ball1EndX = 117, ball1EndY = 74, ball1EndHeading = 0;
+    public static double ball1EndX = 115, ball1EndY = 70, ball1EndHeading = 0;
     private final Pose ball1EndPose = new Pose(ball1EndX, ball1EndY, ball1EndHeading);
 
     // BALL 2 START POINT
@@ -53,12 +53,17 @@ public class RedNearAuto extends OpMode {
     public static double ball2EndX = 115, ball2EndY = 55, ball2EndHeading = 0;
     private final Pose ball2EndPose = new Pose(ball2EndX, ball2EndY, ball2EndHeading);
 
+    // BALL 2 AFTER POINT
+    public static double ball2AfterX = 100, ball2AfterY = 55, ball2AfterHeading = 0;
+    private final Pose ball2AfterPose = new Pose(ball2AfterX, ball2AfterY, ball2AfterHeading);
+
+
     // BALL 3 START POINT
-    public static double ball3StartX = 84, ball3StartY = 30, ball3StartHeading = 0;
+    public static double ball3StartX = 84, ball3StartY = 20, ball3StartHeading = 0;
     private final Pose ball3StartPose = new Pose(ball3StartX, ball3StartY, ball3StartHeading);
 
     // BALL 3 END POINT
-    public static double ball3EndX = 115, ball3EndY = 30, ball3EndHeading = 0;
+    public static double ball3EndX = 115, ball3EndY = 20, ball3EndHeading = 0;
     private final Pose ball3EndPose = new Pose(ball3EndX, ball3EndY, ball3EndHeading);
 
     // BEFORE GATE POSE
@@ -137,6 +142,10 @@ public class RedNearAuto extends OpMode {
         // From shooting pose to get the second ball & open gate
         intakeAtPos(ball2StartPose, ball2EndPose);
 
+        // Move away from ball 2
+        sequencer.run(() -> drivetrain.goTo(ball2AfterPose));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+
         // Move from second ball pose to shooting
         shoot();
 
@@ -154,7 +163,7 @@ public class RedNearAuto extends OpMode {
 
     private void intakeAtPos(Pose startPose, Pose endPose, double maxPower) {
         sequencer.run(() -> drivetrain.goTo(startPose, maxPower));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy() && drivetrain.isAtPosition(startPose));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
         sequencer.run(() -> drivetrain.goTo(endPose, maxPower));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());

@@ -27,7 +27,7 @@ public class RedNearAuto15Balls extends OpMode {
     private Transfer transfer;
     private LEDSet ledSet;
 
-    public static double defaultMoveMaxPower = 0.8, intakeDefaultMoveMaxPower = 0.6;
+    public static double defaultMoveMaxPower = 1, intakeDefaultMoveMaxPower = 1;
 
     // START POINT
     public static double startX = 117.8501, startY = 107.7211, startHeading = 0.76;
@@ -53,6 +53,10 @@ public class RedNearAuto15Balls extends OpMode {
     public static double ball2EndX = 115, ball2EndY = 55, ball2EndHeading = 0;
     private final Pose ball2EndPose = new Pose(ball2EndX, ball2EndY, ball2EndHeading);
 
+    // BALL 2 AFTER
+    public static double ball2AfterX = 100, ball2AfterY= 55, ball2AfterHeading = 0;
+    private final Pose ball2AfterPose = new Pose(ball2AfterX, ball2AfterY, ball2AfterHeading);
+
     // BALL 3 START POINT
     public static double ball3StartX = 84, ball3StartY = 30, ball3StartHeading = 0;
     private final Pose ball3StartPose = new Pose(ball3StartX, ball3StartY, ball3StartHeading);
@@ -68,6 +72,9 @@ public class RedNearAuto15Balls extends OpMode {
     // OPEN GATE POSE
     public static double openGateX = 126.86, openGateY = 46.23, openGateHeading = 0.1157;
     private final Pose openGatePose = new Pose(openGateX, openGateY, openGateHeading);
+
+    public static double getGateBallX = 124.37, getGateBallY = 38.16, getGateBallHeading = 0.9484;
+    private final Pose getGateBallPose = new Pose(getGateBallX, getGateBallY, getGateBallHeading);
     
 
     private DcMotorEx getMotor(String motorName) {
@@ -128,22 +135,30 @@ public class RedNearAuto15Balls extends OpMode {
         // From Start pose to shooting pose
         shoot();
 
-        // From shooting pose to get first ball
-        intakeAtPos(ball1StartPose, ball1EndPose);
-
-        // Move from first ball pose to shooting
-        shoot();
-
-        // From shooting pose to get the second ball & open gate
+        // From shooting pose to get the second ball
         intakeAtPos(ball2StartPose, ball2EndPose);
 
         // Move from second ball pose to shooting
         shoot();
 
-        // Move from gate to third ball pose
+        // Open gate
+        sequencer.run(() -> drivetrain.goTo(beforeGatePose));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+
+        intakeAtPos(openGatePose, getGateBallPose);
+
+        // From gate pose to shooting pose
+        shoot();
+
+        // Move from gate to first ball pose
+        intakeAtPos(ball1StartPose, ball1EndPose);
+
+        // Move from first ball pose to shooting
+        shoot();
+        // Move from gate to first ball pose
         intakeAtPos(ball3StartPose, ball3EndPose);
 
-        // Move from third ball pose to shooting
+        // Move from first ball pose to shooting
         shoot();
     }
 
@@ -154,7 +169,7 @@ public class RedNearAuto15Balls extends OpMode {
 
     private void intakeAtPos(Pose startPose, Pose endPose, double maxPower) {
         sequencer.run(() -> drivetrain.goTo(startPose, maxPower));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy() && drivetrain.isAtPosition(startPose));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
         sequencer.run(() -> drivetrain.goTo(endPose, maxPower));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
