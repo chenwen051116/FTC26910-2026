@@ -24,6 +24,8 @@ public class Drivetrain extends Overridable {
     public static double slowSpeedMultiplier = 0.3;
     public static double xAtPoseTolerance = 3;
     public static double yAtPoseTolerance = 3;
+    public static double defaultBreakingStrength = 1.25;
+    public static double defaultPowerLimit = 0.8;
 
     public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
         this.frontLeftMotor = frontLeftMotor;
@@ -91,10 +93,14 @@ public class Drivetrain extends Overridable {
     }
 
     public void goTo(Pose pose){
-        goTo(pose, 0.6);
+        goTo(pose, defaultBreakingStrength);
     }
 
-    public void goTo(Pose pose, double power) {
+    public void goTo(Pose pose, double breakingStrength) {
+        goTo(pose, defaultPowerLimit, defaultBreakingStrength);
+    }
+
+    public void goTo(Pose pose, double power, double breakingStrength) {
         if (!isOverriding() || follower.isBusy()) {
             return;
         }

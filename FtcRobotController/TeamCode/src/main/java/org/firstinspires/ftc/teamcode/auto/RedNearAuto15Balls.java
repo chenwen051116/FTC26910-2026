@@ -27,7 +27,8 @@ public class RedNearAuto15Balls extends OpMode {
     private Transfer transfer;
     private LEDSet ledSet;
 
-    public static double defaultMoveMaxPower = 1, intakeDefaultMoveMaxPower = 1;
+    public static double defaultMoveMaxPower = 0.9, intakeDefaultMoveMaxPower = 0.6;
+    public static double intakeBreakingStrength = 1, shootingBreakingStrength = 0.8;
 
     // START POINT
     public static double startX = 117.8501, startY = 107.7211, startHeading = 0.76;
@@ -38,31 +39,32 @@ public class RedNearAuto15Balls extends OpMode {
     private final Pose shootPose = new Pose(shootX, shootY, shootHeading);
 
     // BALL 1 START POINT
-    public static double ball1StartX = 84, ball1StartY = 74, ball1StartHeading = 0;
+    public static double ball1StartX = 84, ball1StartY = 70, ball1StartHeading = 0;
     private final Pose ball1StartPose = new Pose(ball1StartX, ball1StartY, ball1StartHeading);
 
     // BALL 1 END POINT
-    public static double ball1EndX = 117, ball1EndY = 74, ball1EndHeading = 0;
+    public static double ball1EndX = 115, ball1EndY = 70, ball1EndHeading = 0;
     private final Pose ball1EndPose = new Pose(ball1EndX, ball1EndY, ball1EndHeading);
 
     // BALL 2 START POINT
-    public static double ball2StartX = 84, ball2StartY = 55, ball2StartHeading = 0;
+    public static double ball2StartX = 84, ball2StartY = 45, ball2StartHeading = 0;
     private final Pose ball2StartPose = new Pose(ball2StartX, ball2StartY, ball2StartHeading);
 
     // BALL 2 END POINT
-    public static double ball2EndX = 115, ball2EndY = 55, ball2EndHeading = 0;
+    public static double ball2EndX = 120, ball2EndY = 45, ball2EndHeading = 0;
     private final Pose ball2EndPose = new Pose(ball2EndX, ball2EndY, ball2EndHeading);
 
-    // BALL 2 AFTER
-    public static double ball2AfterX = 100, ball2AfterY= 55, ball2AfterHeading = 0;
+    // BALL 2 AFTER POINT
+    public static double ball2AfterX = 108, ball2AfterY = 45, ball2AfterHeading = 0;
     private final Pose ball2AfterPose = new Pose(ball2AfterX, ball2AfterY, ball2AfterHeading);
 
+
     // BALL 3 START POINT
-    public static double ball3StartX = 84, ball3StartY = 30, ball3StartHeading = 0;
+    public static double ball3StartX = 84, ball3StartY = 20, ball3StartHeading = 0;
     private final Pose ball3StartPose = new Pose(ball3StartX, ball3StartY, ball3StartHeading);
 
     // BALL 3 END POINT
-    public static double ball3EndX = 115, ball3EndY = 30, ball3EndHeading = 0;
+    public static double ball3EndX = 115, ball3EndY = 20, ball3EndHeading = 0;
     private final Pose ball3EndPose = new Pose(ball3EndX, ball3EndY, ball3EndHeading);
 
     // BEFORE GATE POSE
@@ -138,8 +140,13 @@ public class RedNearAuto15Balls extends OpMode {
         // From shooting pose to get the second ball
         intakeAtPos(ball2StartPose, ball2EndPose);
 
+        // Move away from ball 2
+        sequencer.run(() -> drivetrain.goTo(ball2AfterPose));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+
         // Move from second ball pose to shooting
         shoot();
+
 
         // Open gate
         sequencer.run(() -> drivetrain.goTo(beforeGatePose));
@@ -168,10 +175,10 @@ public class RedNearAuto15Balls extends OpMode {
 
 
     private void intakeAtPos(Pose startPose, Pose endPose, double maxPower) {
-        sequencer.run(() -> drivetrain.goTo(startPose, maxPower));
+        sequencer.run(() -> drivetrain.goTo(startPose, defaultMoveMaxPower, intakeBreakingStrength));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.goTo(endPose, maxPower));
+        sequencer.run(() -> drivetrain.goTo(endPose, maxPower, intakeBreakingStrength));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
@@ -182,7 +189,7 @@ public class RedNearAuto15Balls extends OpMode {
 
     private void shoot(double maxPower) {
         sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> drivetrain.goTo(shootPose, maxPower));
+        sequencer.run(() -> drivetrain.goTo(shootPose, maxPower, shootingBreakingStrength));
         sequencer.run(() -> transfer.openGate());
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         // Start Shooting

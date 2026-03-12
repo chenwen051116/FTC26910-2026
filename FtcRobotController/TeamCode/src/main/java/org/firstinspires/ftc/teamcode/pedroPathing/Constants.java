@@ -46,12 +46,6 @@ public class Constants {
 //            .rightRearEncoderDirection(Encoder.FORWARD)
 //            ;
 
-    //1: -80.24
-    //2: -72.06
-    //3: -70.27
-    //4: -68.94
-    //5: -68.06
-
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(1)
             .strafePodX(0)
