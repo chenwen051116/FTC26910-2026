@@ -10,71 +10,62 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Config
 @Autonomous(name = "New Red Auto 12 Balls")
 public class NewRedAuto extends AutoBase{
-    // START POINT
-    private final Pose startPose = new Pose(startX, startY, startHeading);
-
-    // SHOOT POINT
-    private final Pose shootPose = new Pose(shootX, shootY, shootHeading);
-
-    // BALL 1 START POINT
-    private final Pose ball1StartPose = new Pose(ball1StartX, ball1StartY, ball1StartHeading);
-
-    // BALL 1 END POINT
-    private final Pose ball1EndPose = new Pose(ball1EndX, ball1EndY, ball1EndHeading);
-
-    // BALL 2 START POINT
-    private final Pose ball2StartPose = new Pose(ball2StartX, ball2StartY, ball2StartHeading);
-
-    // BALL 2 END POINT
-    private final Pose ball2EndPose = new Pose(ball2EndX, ball2EndY, ball2EndHeading);
-
-    // BALL 2 AFTER POINT
-    private final Pose ball2AfterPose = new Pose(ball2AfterX, ball2AfterY, ball2AfterHeading);
-    // BALL 3 START POINT
-    private final Pose ball3StartPose = new Pose(ball3StartX, ball3StartY, ball3StartHeading);
-
-    // BALL 3 END POINT
-    private final Pose ball3EndPose = new Pose(ball3EndX, ball3EndY, ball3EndHeading);
-
-    // BEFORE GATE POSE
-    private final Pose beforeGatePose = new Pose(beforeGateX, beforeGateY, beforeGateHeading);
-
-    // OPEN GATE POSE
-    private final Pose openGatePose = new Pose(openGateX, openGateY, openGateHeading);
-
-    // FROM START TO SHOOTING
-    private final PathChain startToShootingPath = buildShootingPath(startPose, shootPose);
-
-    // FROM SHOOTING TO BALL 1 BEGIN
-    private final PathChain shootingToBall1StartPath = buildIntakePath(shootPose, ball1StartPose);
-
-    // FROM BALL 1 BEGIN TO BALL 1 END
-    private final PathChain ball1StartToBall1EndPath = buildIntakePath(ball1StartPose, ball1EndPose);
-
-    // FROM BALL 1 END TO SHOOTING
-    private final PathChain ball1EndToShootingPath = buildShootingPath(ball1EndPose, shootPose);
-
-    // FROM SHOOTING TO BALL 2 BEGIN
-    private final PathChain shootingToBall2StartPath = buildIntakePath(shootPose, ball2StartPose);
-
-    // FROM BALL 2 BEGIN TO BALL 2 END
-    private final PathChain ball2StartToBall2EndPath = buildIntakePath(ball2StartPose, ball2EndPose);
-
-    // FROM BALL 2 END TO SHOOTING
-    private final PathChain ball2EndToShootingPath = buildShootingPath(ball2EndPose, shootPose);
-
-    // FROM SHOOTING TO BALL 3 BEGIN
-    private final PathChain shootingToBall3StartPath = buildIntakePath(shootPose, ball3StartPose);
-
-    // FROM BALL 3 BEGIN TO BALL 3 END
-    private final PathChain ball3StartToBall3EndPath = buildIntakePath(ball3StartPose, ball3EndPose);
-
-    // FROM BALL 3 END TO SHOOTING
-    private final PathChain ball3EndToShootingPath = buildShootingPath(ball3EndPose, shootPose);
-
-
     @Override
     public void initializePath() {
+        // START POINT
+        Pose startPose = new Pose(startX, startY, startHeading);
+
+        // SHOOT POINT
+        Pose shootPose = new Pose(shootX, shootY, shootHeading);
+
+        // BALL 1 START POINT
+        Pose ball1StartPose = new Pose(ball1StartX, ball1StartY, ball1StartHeading);
+
+        // BALL 1 END POINT
+        Pose ball1EndPose = new Pose(ball1EndX, ball1EndY, ball1EndHeading);
+
+        // BALL 2 START POINT
+        Pose ball2StartPose = new Pose(ball2StartX, ball2StartY, ball2StartHeading);
+
+        // BALL 2 END POINT
+        Pose ball2EndPose = new Pose(ball2EndX, ball2EndY, ball2EndHeading);
+
+        // BALL 3 START POINT
+        Pose ball3StartPose = new Pose(ball3StartX, ball3StartY, ball3StartHeading);
+
+        // BALL 3 END POINT
+        Pose ball3EndPose = new Pose(ball3EndX, ball3EndY, ball3EndHeading);
+
+
+        // FROM START TO SHOOTING
+        PathChain startToShootingPath = buildShootingPath(startPose, shootPose);
+
+        // FROM SHOOTING TO BALL 1 BEGIN
+        PathChain shootingToBall1StartPath = buildIntakePath(shootPose, ball1StartPose);
+
+        // FROM BALL 1 BEGIN TO BALL 1 END
+        PathChain ball1StartToBall1EndPath = buildIntakePath(ball1StartPose, ball1EndPose);
+
+        // FROM BALL 1 END TO SHOOTING
+        PathChain ball1EndToShootingPath = buildShootingPath(ball1EndPose, shootPose);
+
+        // FROM SHOOTING TO BALL 2 BEGIN
+        PathChain shootingToBall2StartPath = buildIntakePath(shootPose, ball2StartPose);
+
+        // FROM BALL 2 BEGIN TO BALL 2 END
+        PathChain ball2StartToBall2EndPath = buildIntakePath(ball2StartPose, ball2EndPose);
+
+        // FROM BALL 2 END TO SHOOTING
+        PathChain ball2EndToShootingPath = buildShootingPath(ball2EndPose, shootPose);
+
+        // FROM SHOOTING TO BALL 3 BEGIN
+        PathChain shootingToBall3StartPath = buildIntakePath(shootPose, ball3StartPose);
+
+        // FROM BALL 3 BEGIN TO BALL 3 END
+        PathChain ball3StartToBall3EndPath = buildIntakePath(ball3StartPose, ball3EndPose);
+
+        // FROM BALL 3 END TO SHOOTING
+        PathChain ball3EndToShootingPath = buildShootingPath(ball3EndPose, shootPose);
         // Initialize Sequencer
         // From Start pose to shooting pose
         shoot(startToShootingPath);

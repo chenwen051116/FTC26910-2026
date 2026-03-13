@@ -7,8 +7,10 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -28,9 +30,9 @@ public class AutoBase extends OpMode {
 
     protected final Sequencer sequencer = new Sequencer();
     protected Shooter shooter;
-    protected Drivetrain drivetrain;
     protected Transfer transfer;
     protected LEDSet ledSet;
+    protected Follower follower;
     protected static TelemetryManager telemetryM;
 
     private DcMotorEx getMotor(String motorName) {
@@ -61,15 +63,8 @@ public class AutoBase extends OpMode {
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         Drawing.init();
 
-        // Initializing Drivetrain
-        DcMotor frontLeftMotor = getMotor("front_left");
-        DcMotor frontRightMotor = getMotor("front_right");
-        DcMotor backLeftMotor = getMotor("back_left");
-        DcMotor backRightMotor = getMotor("back_right");
-
-        drivetrain = new Drivetrain(gamepad1, frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, Constants.createFollower(hardwareMap));
-        drivetrain.initEncoder(startPose);
-        drivetrain.overrideDriver();
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);
 
         // Initializing Intake
         DcMotor intakeMotor = getMotor("intake");
@@ -106,9 +101,19 @@ public class AutoBase extends OpMode {
     public void initializePath() {
 
     }
+    public PathChain buildPath(Pose startPose,
+                               Pose endPose,
+                               double brakingStrength,
+                               double brakingStart) {
+        return follower.pathBuilder()
+                .addPath(new BezierLine(startPose, endPose))
+                .setConstantHeadingInterpolation(endPose.getHeading())
+                .setTValueConstraint(0.997)
+                .build();
+    }
 
     public PathChain buildIntakePath(Pose startPose, Pose endPose) {
-        return drivetrain.buildPath(startPose,
+        return buildPath(startPose,
                 endPose,
                 intakeBrakingStrength,
                 defaultIntakeBrakingDistance
@@ -116,7 +121,7 @@ public class AutoBase extends OpMode {
     }
 
     public PathChain buildShootingPath(Pose startPose, Pose endPose) {
-        return drivetrain.buildPath(startPose,
+        return buildPath(startPose,
                 endPose,
                 shootingBrakingStrength,
                 defaultShootingBrakingDistance
@@ -129,11 +134,13 @@ public class AutoBase extends OpMode {
 
 
     public void intakeAtPos(PathChain beginPathChain, PathChain endPathChain, double maxPower) {
-        sequencer.run(() -> drivetrain.followPath(beginPathChain, maxPower));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+        sequencer.run(() -> follower.followPath(beginPathChain));
+        sequencer.waitUntil(() -> follower.isBusy());
+        sequencer.waitUntil(() -> !follower.isBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.followPath(endPathChain, maxPower));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+        sequencer.run(() -> follower.followPath(endPathChain));
+        sequencer.waitUntil(() -> follower.isBusy());
+        sequencer.waitUntil(() -> !follower.isBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
 
@@ -147,8 +154,9 @@ public class AutoBase extends OpMode {
 
     public void intakeToPos(PathChain pathChain, int duration, double maxPower) {
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.followPath(pathChain, maxPower));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+        sequencer.run(() -> followPath(pathChain));
+        sequencer.waitUntil(() -> follower.isBusy());
+        sequencer.waitUntil(() -> !follower.isBusy());
         sequencer.wait(duration);
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
@@ -159,9 +167,10 @@ public class AutoBase extends OpMode {
 
     public void shoot(PathChain pathChain, double maxPower) {
         sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> drivetrain.followPath(pathChain, maxPower));
+        sequencer.run(() -> followPath(pathChain));
         sequencer.run(() -> transfer.openGate());
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+        sequencer.waitUntil(() -> follower.isBusy());
+        sequencer.waitUntil(() -> !follower.isBusy());
         // Start Shooting
         sequencer.wait(defaultTimeBeforeShooting);
         sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.SHOOTING));
@@ -179,8 +188,13 @@ public class AutoBase extends OpMode {
     }
 
     public void goTo(PathChain pathChain, double maxPower) {
-        sequencer.run(() -> drivetrain.followPath(pathChain, maxPower));
-        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+        sequencer.run(() -> followPath(pathChain));
+        sequencer.waitUntil(() -> follower.isBusy());
+        sequencer.waitUntil(() -> !follower.isBusy());
+    }
+
+    public void draw() {
+        Drawing.drawDebug(follower);
     }
 
     @Override
@@ -188,21 +202,44 @@ public class AutoBase extends OpMode {
         sequencer.begin();
     }
 
+    public void followPath(PathChain pathChain) {
+        followPath(pathChain, defaultMoveMaxPower);
+    }
+
+    public void followPath(PathChain pathChain, double maxPower) {
+        follower.followPath(pathChain, maxPower, true);
+    }
+
+    public Pose getCurrentPose(){
+        return follower.getPose();
+    }
+
+    public Vector getCurrentVelocity(){
+        return follower.getVelocity();
+    }
+
+    public Vector getCurrentAcceleration(){
+        return follower.getAcceleration();
+    }
+
     @Override
     public void loop() {
-        Shooter.ShooterConfig config = shooter.calculateShooterConfig(drivetrain.getCurrentPose(),
-                drivetrain.getCurrentVelocity(),
-                drivetrain.getCurrentAcceleration(),
+        Shooter.ShooterConfig config = shooter.calculateShooterConfig(getCurrentPose(),
+                getCurrentVelocity(),
+                getCurrentAcceleration(),
                 true);
         shooter.setShooterConfig(config);
         shooter.alwaysRunning();
+        follower.update();
+
         sequencer.update();
-        drivetrain.updateFollower();
-        drivetrain.draw();
+
+
+        draw();
         transfer.alwaysRunning();
 
-        telemetry.addData("Current X", drivetrain.getCurrentPose().getX());
-        telemetry.addData("Current Y", drivetrain.getCurrentPose().getY());
+        telemetry.addData("Current X", follower.getPose() .getX());
+        telemetry.addData("Current Y", follower.getPose().getY());
         telemetry.addData("Shooter Status", shooter.getShooterState() == Shooter.ShooterState.SHOOTING ? "Shooting" :
                 shooter.getShooterState() == Shooter.ShooterState.IDLE ? "Idle" : "Off");
         telemetry.addData("target rpm", shooter.getShooterConfig().flywheelRPM);

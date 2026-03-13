@@ -100,11 +100,6 @@ public class Drivetrain extends Overridable {
     }
 
     public void followPath(PathChain pathChain, double maxPower) {
-        if (!isOverriding() || follower.isBusy()) {
-            return;
-        }
-
-        Pose currentPose = follower.getPose();
         follower.followPath(pathChain, maxPower, true);
     }
 
@@ -115,7 +110,7 @@ public class Drivetrain extends Overridable {
         return follower.pathBuilder()
                 .addPath(new BezierLine(startPose, endPose))
                 .setConstantHeadingInterpolation(endPose.getHeading())
-                .setBrakingStrength(brakingStrength)
+                .setGlobalDeceleration(brakingStrength)
                 .setTValueConstraint(0.997)
                 .setBrakingStart(brakingStart)
                 .build();
