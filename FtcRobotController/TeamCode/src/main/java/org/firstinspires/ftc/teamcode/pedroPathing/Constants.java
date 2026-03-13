@@ -26,12 +26,12 @@ public class Constants {
             .mass(11)
             .lateralZeroPowerAcceleration(-73)
             .forwardZeroPowerAcceleration(-43)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.0625, 0, 0, 0))
-            .headingPIDFCoefficients(new PIDFCoefficients(0.8, 0, 0.015, 0.04))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025, 0, 0.00001, 0.6, 0.01))
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.01, 0, 0.01, 0.6, 0.000005))
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1.55, 0, 0.015, 0.04))
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.0115, 0, 0.002, 0.01))
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.0350, 0.001, 0, 0.05))
+            .headingPIDFCoefficients(new PIDFCoefficients(0.5, 0, 0.015, 0.035))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.04, 0, 0.00001, 0.6, 0.01))
+            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.03, 0, 0.01, 0.6, 0.000005))
+            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0.95, 0, 0.015, 0.04))
+            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.08, 0, 0.002, 0.05))
             .centripetalScaling(0.000225)
             ;
 
@@ -46,15 +46,9 @@ public class Constants {
 //            .rightRearEncoderDirection(Encoder.FORWARD)
 //            ;
 
-    //1: -80.24
-    //2: -72.06
-    //3: -70.27
-    //4: -68.94
-    //5: -68.06
-
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(0.125)
-            .strafePodX(-0.05)
+            .forwardPodY(1)
+            .strafePodX(0)
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

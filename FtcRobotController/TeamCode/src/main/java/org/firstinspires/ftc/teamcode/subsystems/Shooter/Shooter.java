@@ -89,9 +89,9 @@ public class Shooter extends SubsystemBase {
     }
 
     // Get the current power of flywheel
-    public double getFlywheelPower(){
-        return flywheel.getPower();
-    }
+//    public double getFlywheelPower(){
+//        return flywheel.getPower();
+//    }
 
 
     // Calculate shooter config based on position and velocity
@@ -109,6 +109,7 @@ public class Shooter extends SubsystemBase {
     // Update in every single tick of loop
     @Override
     public void periodic() {
+
         if (gamepad.yWasPressed()) {
             // y button changes the shooter state
             if (getShooterState() == ShooterState.OFF) {

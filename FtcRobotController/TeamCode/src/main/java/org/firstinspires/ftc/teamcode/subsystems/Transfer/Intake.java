@@ -30,6 +30,7 @@ public class Intake {
         return intakeState;
     }
 
+
     public void setIntakeState(IntakeState intakeState) {
         this.intakeState = intakeState;
     }

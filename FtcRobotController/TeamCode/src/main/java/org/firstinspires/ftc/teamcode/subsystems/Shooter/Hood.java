@@ -9,14 +9,7 @@ public class Hood {
 
     public Hood(Servo hood) {
         hoodServo = hood;
-    }
-
-    public double getAngle() {
-        return hoodServo.getPosition() * Constants.SERVO_RANGE / Constants.Shooter.HOOD_GEAR_RATIO + Constants.Shooter.HOOD_BASE_ANGLE;
-    }
-
-    public void setAngle(double targetAngle) {
-        hoodServo.setPosition((targetAngle - Constants.Shooter.HOOD_BASE_ANGLE) * Constants.Shooter.HOOD_GEAR_RATIO / Constants.SERVO_RANGE);
+        hood.setPosition(1);
     }
 
     // Get the current position of hood from 0 to 1
@@ -25,7 +18,7 @@ public class Hood {
     }
 
     // Set the hood to the position from 0 to 1
-    private void setPosition(double targetPosition) {
+    public void setPosition(double targetPosition) {
         hoodServo.setPosition(Math.max(0, Math.min(1.0, targetPosition)));
     }
 }

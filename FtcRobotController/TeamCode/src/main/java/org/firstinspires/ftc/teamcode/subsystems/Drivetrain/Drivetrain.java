@@ -1,22 +1,31 @@
 package org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.TURRET_OFFSET;
+
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.subsystems.Overridable;
+
 @Config
-public class Drivetrain extends SubsystemBase {
+public class Drivetrain extends Overridable {
     private final DcMotor frontLeftMotor;
     private final DcMotor frontRightMotor;
     private final DcMotor backLeftMotor;
     private final DcMotor backRightMotor;
     private final Gamepad gamepad;
     private final Follower follower;
-    private boolean isOverrideDriver;
+    public static double regularSpeedMultiplier = 1;
+    public static double slowSpeedMultiplier = 0.3;
+    public static double xAtPoseTolerance = 3;
+    public static double yAtPoseTolerance = 3;
+    public static double defaultBreakingStrength = 1.25;
+    public static double defaultPowerLimit = 0.8;
 
     public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
         this.frontLeftMotor = frontLeftMotor;
@@ -24,10 +33,10 @@ public class Drivetrain extends SubsystemBase {
         this.backLeftMotor = backLeftMotor;
         this.backRightMotor = backRightMotor ;
 
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
-        backRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -42,7 +51,7 @@ public class Drivetrain extends SubsystemBase {
         this.gamepad = gamepad;
         this.follower = follower;
 
-        isOverrideDriver = false;
+        stopOverrideDriver();
     }
     public double getFrontLeftPower() {
         return frontLeftMotor.getPower();
@@ -60,8 +69,39 @@ public class Drivetrain extends SubsystemBase {
         return backRightMotor.getPower();
     }
 
-    public void goTo(Pose pose) {
-        if (!isOverrideDriver || follower.isBusy()) {
+    public void initEncoder(Pose lastPose){
+        follower.startTeleopDrive();
+        follower.update();
+        follower.setStartingPose(new Pose(-TURRET_OFFSET, 0, 0));
+        follower.setPose(lastPose);
+    }
+
+    public Pose getCurrentPose(){
+        return follower.getPose();
+    }
+
+    public Vector getCurrentVelocity(){
+        return follower.getVelocity();
+    }
+
+    public Vector getCurrentAcceleration(){
+        return follower.getAcceleration();
+    }
+
+    public boolean isAtPosition(Pose pose){
+        return follower.atPose(pose, xAtPoseTolerance, yAtPoseTolerance);
+    }
+
+    public void goTo(Pose pose){
+        goTo(pose, defaultBreakingStrength);
+    }
+
+    public void goTo(Pose pose, double breakingStrength) {
+        goTo(pose, defaultPowerLimit, defaultBreakingStrength);
+    }
+
+    public void goTo(Pose pose, double power, double breakingStrength) {
+        if (!isOverriding() || follower.isBusy()) {
             return;
         }
 
@@ -71,37 +111,44 @@ public class Drivetrain extends SubsystemBase {
                 follower.pathBuilder()
                         .addPath(new BezierLine(currentPose, pose))
                         .setLinearHeadingInterpolation(currentPose.getHeading(), pose.getHeading())
-                        .build()
+                        .build(),
+                power,
+                true
         );
     }
 
-    public void overrideDriver() {
-        isOverrideDriver = true;
+    public void updateFollower() {
+        follower.update();
     }
 
-    public void stopOverrideDriver() {
-        isOverrideDriver = false;
+    public boolean followerIsBusy() {
+        return follower.isBusy();
     }
+    @Override
+    public void runWithoutOverride() {
+        double x = -gamepad.left_stick_x;
+        double y = -gamepad.left_stick_y;
+        double rx = -gamepad.right_stick_x;
 
-    public void periodic() {
-        if (isOverrideDriver) {
-            follower.update();
-        } else {
-            double x = gamepad.left_stick_x;
-            double y = gamepad.left_stick_y;
-            double rx = gamepad.right_stick_x;
+        double frontLeftPower = y - x - rx;
+        double frontRightPower = y + x + rx;
+        double backLeftPower = y + x - rx;
+        double backRightPower = y - x + rx;
 
-            double frontLeftPower = y - x - rx;
-            double frontRightPower = y + x + rx;
-            double backLeftPower = y + x - rx;
-            double backRightPower = y - x + rx;
-
-            frontLeftMotor.setPower(frontLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backLeftMotor.setPower(backLeftPower);
-            backRightMotor.setPower(backRightPower);
-
-            follower.updatePose();
+        double speedMultiplier;
+        if (gamepad.left_trigger > 0.3){
+            speedMultiplier = slowSpeedMultiplier;
+        } else{
+            speedMultiplier = regularSpeedMultiplier;
         }
+        frontLeftMotor.setPower(frontLeftPower * speedMultiplier);
+        frontRightMotor.setPower(frontRightPower * speedMultiplier);
+        backLeftMotor.setPower(backLeftPower * speedMultiplier);
+        backRightMotor.setPower(backRightPower * speedMultiplier);
+    }
+
+    @Override
+    public void alwaysRunning() {
+        follower.updatePose();
     }
 }

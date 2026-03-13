@@ -7,8 +7,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 public class PIDControllerFactory {
     @Config
     public static class TurretPIDController extends PIDController {
-        public static double kp = 0.005, ki = 0.00005, kd = 0.00005;
-        // public static final double kp = 0.0001, ki = 0.000001, kd = 0.000005;
+        public static double kp = -0.0003, ki = 0, kd = -0.00001;
         public static double kf = 0;
         public static double tolerance = 0.01;
 
@@ -20,16 +19,21 @@ public class PIDControllerFactory {
 
         public double calculatePower(double currentPosition, double targetPosition) {
             setSetPoint(targetPosition);
+            setTolerance(tolerance);
             setPIDF(kp, ki, kd, kf);
-            return Math.max(-1, Math.min(1, calculate(currentPosition)));
+            return Math.max(-0.5, Math.min(0.5, calculate(currentPosition)));
         }
     }
 
     @Config
     public static class FlywheelPIDController extends PIDController {
-        public static double kp = 0.002, ki = 0, kd = 0.00025;
-        public static double kv = 0.0001955;
-        public static double threshold = 500, tolerance = 0.3;
+        // PID FOR V = 12.5
+        public static double kp = -0.24, ki = 0, kd = -0.003;
+        public static double ks = 0;
+        public static double kv = 0.000245;
+        public static double threshold = 300, tolerance = 0;
+
+        // 13.5V : KS = 0.165, vf = 0.000195
 
         private FlywheelPIDController() {
             super(kp, ki, kd);
@@ -42,13 +46,15 @@ public class PIDControllerFactory {
             }
 
             double rpmDifference = targetRPM - currentRPM;
+            setPID(kp, ki, kd);
+            setTolerance(tolerance);
             if (rpmDifference > threshold) {
                 return 1;
             } else if (rpmDifference < -threshold) {
                 return 0;
             }
-            double pidOutput = calculate(rpmDifference / 100) + kv * targetRPM;
-            return Math.max(-1, Math.min(1, calculate(pidOutput)));
+            double pidOutput = calculate(rpmDifference / 100) + kv * targetRPM + ks;
+            return Math.max(-1, Math.min(1, pidOutput));
         }
     }
 

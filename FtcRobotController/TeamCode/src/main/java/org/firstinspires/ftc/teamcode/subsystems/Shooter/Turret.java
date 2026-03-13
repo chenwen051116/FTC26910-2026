@@ -15,8 +15,7 @@ public class Turret {
     public Turret(DcMotor motor) {
         turretMotor = motor;
         turretMotor.setDirection(DcMotor.Direction.FORWARD);
-        turretMotor.setTargetPosition(0);
-        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         pidController = PIDControllerFactory.createTurretPIDController();
     }
 
@@ -53,8 +52,7 @@ public class Turret {
     }
 
     public void periodic() {
-        turretMotor.setTargetPosition((int) toTicks(targetAngle));
-        // turretMotor.setPower(pidController.calculatePower(turretMotor.getCurrentPosition(), toTicks(targetAngle)));
+        turretMotor.setPower(pidController.calculatePower(turretMotor.getCurrentPosition(), toTicks(targetAngle)));
         // turretMotor.setPower(pidController.calculatePower(getCurrentAngle(), targetAngle));
     }
 }

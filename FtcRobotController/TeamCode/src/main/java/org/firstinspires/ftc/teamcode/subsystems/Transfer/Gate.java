@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Gate {
     private final double CLOSED_POSITION = 0, OPEN_POSITION = 0.8;
+    private final double tolerance = 0.1;
     private final Servo gateServo;
     private boolean isOpen;
 
@@ -15,7 +16,12 @@ public class Gate {
     }
 
     public boolean isOpen() {
-        return isOpen;
+        return OPEN_POSITION - tolerance <= getGatePosition() &&
+                getGatePosition() <= OPEN_POSITION + tolerance;
+    }
+
+    public double getGatePosition() {
+        return gateServo.getPosition();
     }
 
     public void open() {
