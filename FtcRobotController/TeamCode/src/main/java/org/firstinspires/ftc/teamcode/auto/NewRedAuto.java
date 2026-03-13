@@ -9,6 +9,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Config
 @Autonomous(name = "New Red Auto 12 Balls")
 public class NewRedAuto extends AutoBase{
+    // START POINT
+    private final Pose startPose = new Pose(startX, startY, startHeading);
+
+    // SHOOT POINT
+    private final Pose shootPose = new Pose(shootX, shootY, shootHeading);
+
     // BALL 1 START POINT
     private final Pose ball1StartPose = new Pose(ball1StartX, ball1StartY, ball1StartHeading);
 
@@ -39,24 +45,24 @@ public class NewRedAuto extends AutoBase{
     public void initializePath() {
         // Initialize Sequencer
         // From Start pose to shooting pose
-        shoot();
+        shoot(startPose);
 
         // From shooting pose to get first ball
-        intakeAtPos(ball1StartPose, ball1EndPose);
+        intakeAtPos(shootPose, ball1StartPose, ball1EndPose);
 
         // Move from first ball pose to shooting
-        shoot();
+        shoot(ball1EndPose);
 
         // From shooting pose to get the second ball & open gate
-        intakeAtPos(ball2StartPose, ball2EndPose);
+        intakeAtPos(shootPose, ball2StartPose, ball2EndPose);
 
         // Move from second ball pose to shooting
-        shoot();
+        shoot(ball2EndPose);
 
         // Move from gate to third ball pose
-        intakeAtPos(ball3StartPose, ball3EndPose);
+        intakeAtPos(shootPose, ball3StartPose, ball3EndPose);
 
         // Move from third ball pose to shooting
-        shoot();
+        shoot(ball3EndPose);
     }
 }

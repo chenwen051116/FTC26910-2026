@@ -46,7 +46,7 @@ public class AutoBase extends OpMode {
 
     public static double defaultMoveMaxPower = 1, defaultIntakeMoveMaxPower = 1;
     public static double defaultIntakeBrakingDistance = 3, defaultShootingBrakingDistance = 2;
-    public static double intakeBrakingStrength = 1.5, shootingBrakingStrength = 1.5;
+    public static double intakeBrakingStrength = 1.3, shootingBrakingStrength = 1.3;
     public static int defaultIntakeDuration = 800;
     public static int defaultTimeBeforeShooting = 500;
 
@@ -105,39 +105,39 @@ public class AutoBase extends OpMode {
 
     }
 
-    public void intakeAtPos(Pose startPose, Pose endPose) {
-        intakeAtPos(startPose, endPose, defaultIntakeMoveMaxPower);
+    public void intakeAtPos(Pose startPose, Pose beginIntakePose, Pose finishIntakePose) {
+        intakeAtPos(startPose, beginIntakePose, finishIntakePose, defaultIntakeMoveMaxPower);
     }
 
 
-    public void intakeAtPos(Pose startPose, Pose endPose, double maxPower) {
-        sequencer.run(() -> drivetrain.goTo(startPose, maxPower, intakeBrakingStrength));
+    public void intakeAtPos(Pose startPose, Pose beginIntakePose, Pose finishIntakePose, double maxPower) {
+        sequencer.run(() -> drivetrain.followPath(startPose, beginIntakePose, maxPower, intakeBrakingStrength));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.goTo(endPose, maxPower, intakeBrakingStrength));
+        sequencer.run(() -> drivetrain.followPath(beginIntakePose, finishIntakePose, maxPower, intakeBrakingStrength));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
 
-    public void intakeToPos(Pose intakePose) {
-        intakeToPos(intakePose, defaultIntakeDuration, defaultIntakeMoveMaxPower);
+    public void intakeToPos(Pose startPose, Pose intakePose) {
+        intakeToPos(startPose, intakePose, defaultIntakeDuration, defaultIntakeMoveMaxPower);
     }
 
-    public void intakeToPos(Pose intakePose, int duration, double maxPower) {
+    public void intakeToPos(Pose startPose, Pose intakePose, int duration, double maxPower) {
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.goTo(intakePose, maxPower, intakeBrakingStrength));
+        sequencer.run(() -> drivetrain.followPath(startPose, intakePose, maxPower, intakeBrakingStrength));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.wait(duration);
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
 
-    public void shoot() {
-        shoot(defaultMoveMaxPower);
+    public void shoot(Pose startPose) {
+        shoot(startPose, defaultMoveMaxPower);
     }
 
-    public void shoot(double maxPower) {
+    public void shoot(Pose startPose, double maxPower) {
         sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> drivetrain.goTo(shootPose, maxPower, shootingBrakingStrength));
+        sequencer.run(() -> drivetrain.followPath(startPose, shootPose, maxPower, shootingBrakingStrength));
         sequencer.run(() -> transfer.openGate());
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         // Start Shooting
@@ -152,12 +152,12 @@ public class AutoBase extends OpMode {
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
 
-    public void goTo(Pose targetPose) {
-        goTo(targetPose, defaultMoveMaxPower);
+    public void goTo(Pose startPose, Pose targetPose) {
+        goTo(startPose, targetPose, defaultMoveMaxPower);
     }
 
-    public void goTo(Pose targetPose, double maxPower) {
-        sequencer.run(() -> drivetrain.goTo(targetPose, maxPower));
+    public void goTo(Pose startPose, Pose targetPose, double maxPower) {
+        sequencer.run(() -> drivetrain.followPath(startPose, targetPose, maxPower));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
     }
 

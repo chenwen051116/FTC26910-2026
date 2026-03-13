@@ -116,7 +116,7 @@ public class TestRedAuto extends OpMode {
         switch (pathState){
             case 0: // Path: From initial position to shooting position
                 follower.followPath(Shootpath1, true);
-                setPathState(1);
+                setPathState(2);
                 prevDis = 0;
                 break;
 
@@ -150,7 +150,7 @@ public class TestRedAuto extends OpMode {
             case 4: // Path: From gather ball position 1 back to shooting position
                 follower.followPath(Shootpath2,true);
                 shooting = false;
-                setPathState(5);
+                setPathState(6);
                 break;
 
             case 5: // Shooting 2
@@ -183,7 +183,7 @@ public class TestRedAuto extends OpMode {
             case 8: // Path: From gather ball position 2 back to shooting position
                 follower.followPath(Shootpath3,true);
                 shooting = false;
-                setPathState(9);
+                setPathState(10);
                 break;
 
             case 9: // Shooting 3
