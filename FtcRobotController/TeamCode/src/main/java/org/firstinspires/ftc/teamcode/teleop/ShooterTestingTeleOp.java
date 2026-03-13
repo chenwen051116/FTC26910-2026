@@ -71,7 +71,7 @@ public class ShooterTestingTeleOp extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.setMsTransmissionInterval(50);
 
-        drivetrain.initEncoder(new Pose(0, 0, 0));
+        drivetrain.initEncoder(new Pose(9, 9, 0));
         shooter.initTurretEncoder();
         boolean isShooting = false;
 
@@ -111,7 +111,7 @@ public class ShooterTestingTeleOp extends LinearOpMode {
             telemetry.addData("Flywheel power", shooter.getFlywheelPower());
             telemetry.addData("Flywheel RPM1", shooter.getFlywheelMotor1RPM());
             telemetry.addData("Flywheel RPM2", shooter.getFlywheelMotor2RPM());
-            telemetry.addData("Distance to RED goal",
+            telemetry.addData("Distance to RED goal (TURRET)",
                     shooter.getDisplacement(shooter.getGoalPose(true), drivetrain.getCurrentPose()).getMagnitude());
             telemetry.update();
         }

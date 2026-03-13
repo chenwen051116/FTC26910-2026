@@ -50,7 +50,7 @@ public class Shooter extends Overridable {
     private final Flywheel flywheel;
     private ShooterState shooterState;
     private ShooterConfig shooterConfig;
-    public static double IDLE_RPM = 3000;
+    public static double IDLE_RPM = 2600;
     public static double turretOffsetIncrement = 5;
 
     // Constructor

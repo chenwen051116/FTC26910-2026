@@ -7,8 +7,8 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Config
-@Autonomous(name = "New Red Auto 12 Balls")
-public class NewRedAuto extends AutoBase{
+@Autonomous(name = "New Red Auto 15 Balls")
+public class NewRedAuto15Balls extends AutoBase{
     // BALL 1 START POINT
     private final Pose ball1StartPose = new Pose(ball1StartX, ball1StartY, ball1StartHeading);
 
@@ -23,6 +23,8 @@ public class NewRedAuto extends AutoBase{
 
     // BALL 2 AFTER POINT
     private final Pose ball2AfterPose = new Pose(ball2AfterX, ball2AfterY, ball2AfterHeading);
+
+
     // BALL 3 START POINT
     private final Pose ball3StartPose = new Pose(ball3StartX, ball3StartY, ball3StartHeading);
 
@@ -35,28 +37,43 @@ public class NewRedAuto extends AutoBase{
     // OPEN GATE POSE
     private final Pose openGatePose = new Pose(openGateX, openGateY, openGateHeading);
 
+    private final Pose getGateBallPose = new Pose(getGateBallX, getGateBallY, getGateBallHeading);
+
     @Override
     public void initializePath() {
         // Initialize Sequencer
         // From Start pose to shooting pose
         shoot();
 
-        // From shooting pose to get first ball
-        intakeAtPos(ball1StartPose, ball1EndPose);
-
-        // Move from first ball pose to shooting
-        shoot();
-
-        // From shooting pose to get the second ball & open gate
+        // From shooting pose to get the second ball
         intakeAtPos(ball2StartPose, ball2EndPose);
+
+        // Move away from ball 2
+        sequencer.run(() -> drivetrain.goTo(ball2AfterPose));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
 
         // Move from second ball pose to shooting
         shoot();
 
-        // Move from gate to third ball pose
+
+        // Open gate
+        sequencer.run(() -> drivetrain.goTo(beforeGatePose));
+        sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
+
+        intakeAtPos(openGatePose, getGateBallPose);
+
+        // From gate pose to shooting pose
+        shoot();
+
+        // Move from gate to first ball pose
+        intakeAtPos(ball1StartPose, ball1EndPose);
+
+        // Move from first ball pose to shooting
+        shoot();
+        // Move from gate to first ball pose
         intakeAtPos(ball3StartPose, ball3EndPose);
 
-        // Move from third ball pose to shooting
+        // Move from first ball pose to shooting
         shoot();
     }
 }

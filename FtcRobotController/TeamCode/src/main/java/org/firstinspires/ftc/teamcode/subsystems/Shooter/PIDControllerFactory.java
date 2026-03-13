@@ -31,7 +31,7 @@ public class PIDControllerFactory {
         public static double kp = -0.24, ki = 0, kd = -0.003;
         public static double ks = 0;
         public static double kv = 0.000245;
-        public static double threshold = 300, tolerance = 0;
+        public static double threshold = 200, tolerance = 0;
 
         // 13.5V : KS = 0.165, vf = 0.000195
 

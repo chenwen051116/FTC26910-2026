@@ -7,9 +7,11 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.auto.Drawing;
 import org.firstinspires.ftc.teamcode.subsystems.Overridable;
 
 @Config
@@ -24,8 +26,9 @@ public class Drivetrain extends Overridable {
     public static double slowSpeedMultiplier = 0.3;
     public static double xAtPoseTolerance = 3;
     public static double yAtPoseTolerance = 3;
-    public static double defaultBreakingStrength = 1.25;
-    public static double defaultPowerLimit = 0.8;
+    public static double defaultBrakingStrength = 1.25;
+    public static double defaultMaxPower = 0.8;
+    public static double defaultBrakingDistance = 1.5;
 
     public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
         this.frontLeftMotor = frontLeftMotor;
@@ -51,6 +54,8 @@ public class Drivetrain extends Overridable {
         this.gamepad = gamepad;
         this.follower = follower;
 
+        Drawing.init();
+
         stopOverrideDriver();
     }
     public double getFrontLeftPower() {
@@ -72,7 +77,7 @@ public class Drivetrain extends Overridable {
     public void initEncoder(Pose lastPose){
         follower.startTeleopDrive();
         follower.update();
-        follower.setStartingPose(new Pose(-TURRET_OFFSET, 0, 0));
+        follower.setStartingPose(new Pose(0, 0, 0));
         follower.setPose(lastPose);
     }
 
@@ -93,28 +98,38 @@ public class Drivetrain extends Overridable {
     }
 
     public void goTo(Pose pose){
-        goTo(pose, defaultBreakingStrength);
+        goTo(pose, defaultMaxPower);
     }
 
-    public void goTo(Pose pose, double breakingStrength) {
-        goTo(pose, defaultPowerLimit, defaultBreakingStrength);
+    public void goTo(Pose pose, double maxPower) {
+        goTo(pose, maxPower, defaultBrakingStrength);
     }
 
-    public void goTo(Pose pose, double power, double breakingStrength) {
+    public void goTo(Pose pose, double maxPower, double brakingStrength) {
+        goTo(pose, maxPower, brakingStrength, defaultBrakingDistance);
+    }
+
+    public void goTo(Pose pose, double maxPower, double brakingStrength, double brakingDistance) {
         if (!isOverriding() || follower.isBusy()) {
             return;
         }
 
         Pose currentPose = follower.getPose();
-
         follower.followPath(
                 follower.pathBuilder()
                         .addPath(new BezierLine(currentPose, pose))
                         .setLinearHeadingInterpolation(currentPose.getHeading(), pose.getHeading())
+                        .setBrakingStrength(brakingStrength)
+                        .setTValueConstraint(0.997)
+                        .setBrakingStart(brakingDistance)
                         .build(),
-                power,
+                maxPower,
                 true
         );
+    }
+
+    public void draw() {
+        Drawing.drawDebug(follower);
     }
 
     public void updateFollower() {
@@ -150,5 +165,6 @@ public class Drivetrain extends Overridable {
     @Override
     public void alwaysRunning() {
         follower.updatePose();
+        draw();
     }
 }
