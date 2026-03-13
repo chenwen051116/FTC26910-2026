@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Config
 @Autonomous(name = "New Red Auto 12 Balls")
-public class NewRedAuto extends AutoBase{
+public class NewRedAuto extends OldAutoBase {
     @Override
     public void initializePath() {
         // START POINT
