@@ -5,6 +5,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -24,7 +25,7 @@ public class Drivetrain extends Overridable {
     public static double xAtPoseTolerance = 3;
     public static double yAtPoseTolerance = 3;
     public static double defaultBrakingStrength = 1.3;
-    public static double defaultMaxPower = 0.8;
+    public static double defaultMaxPower = 1;
     public static double defaultBrakingDistance = 1.3;
 
     public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
@@ -94,35 +95,30 @@ public class Drivetrain extends Overridable {
         return follower.atPose(pose, xAtPoseTolerance, yAtPoseTolerance);
     }
 
-    public void followPath(Pose startPose, Pose endPose){
-        followPath(startPose, endPose, defaultMaxPower);
+    public void followPath(PathChain pathChain) {
+        followPath(pathChain, defaultMaxPower);
     }
 
-    public void followPath(Pose startPose, Pose endPose, double maxPower) {
-        followPath(startPose, endPose, maxPower, defaultBrakingStrength);
-    }
-
-    public void followPath(Pose startPose, Pose endPose, double maxPower, double brakingStrength) {
-        followPath(startPose, endPose, maxPower, brakingStrength, defaultBrakingDistance);
-    }
-
-    public void followPath(Pose startPose, Pose endPose, double maxPower, double brakingStrength, double brakingDistance) {
+    public void followPath(PathChain pathChain, double maxPower) {
         if (!isOverriding() || follower.isBusy()) {
             return;
         }
 
         Pose currentPose = follower.getPose();
-        follower.followPath(
-                follower.pathBuilder()
-                        .addPath(new BezierLine(startPose, endPose))
-                        .setConstantHeadingInterpolation(endPose.getHeading())
-                        .setBrakingStrength(brakingStrength)
-                        .setTValueConstraint(0.997)
-                        .setBrakingStart(brakingDistance)
-                        .build(),
-                maxPower,
-                true
-        );
+        follower.followPath(pathChain, maxPower, true);
+    }
+
+    public PathChain buildPath(Pose startPose,
+                               Pose endPose,
+                               double brakingStrength,
+                               double brakingStart) {
+        return follower.pathBuilder()
+                .addPath(new BezierLine(startPose, endPose))
+                .setConstantHeadingInterpolation(endPose.getHeading())
+                .setBrakingStrength(brakingStrength)
+                .setTValueConstraint(0.997)
+                .setBrakingStart(brakingStart)
+                .build();
     }
 
 

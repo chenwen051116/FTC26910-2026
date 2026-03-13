@@ -7,7 +7,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -105,39 +107,59 @@ public class AutoBase extends OpMode {
 
     }
 
-    public void intakeAtPos(Pose startPose, Pose beginIntakePose, Pose finishIntakePose) {
-        intakeAtPos(startPose, beginIntakePose, finishIntakePose, defaultIntakeMoveMaxPower);
+    public PathChain buildIntakePath(Pose startPose, Pose endPose) {
+        return drivetrain.buildPath(startPose,
+                endPose,
+                intakeBrakingStrength,
+                defaultIntakeBrakingDistance
+        );
+    }
+
+    public PathChain buildShootingPath(Pose startPose, Pose endPose) {
+        return drivetrain.buildPath(startPose,
+                endPose,
+                shootingBrakingStrength,
+                defaultShootingBrakingDistance
+        );
+    }
+
+    public void intakeAtPos(PathChain beginPathChain, PathChain endPathChain) {
+        intakeAtPos(beginPathChain, endPathChain, defaultIntakeMoveMaxPower);
     }
 
 
-    public void intakeAtPos(Pose startPose, Pose beginIntakePose, Pose finishIntakePose, double maxPower) {
-        sequencer.run(() -> drivetrain.followPath(startPose, beginIntakePose, maxPower, intakeBrakingStrength));
+    public void intakeAtPos(PathChain beginPathChain, PathChain endPathChain, double maxPower) {
+        sequencer.run(() -> drivetrain.followPath(beginPathChain, maxPower));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.followPath(beginIntakePose, finishIntakePose, maxPower, intakeBrakingStrength));
+        sequencer.run(() -> drivetrain.followPath(endPathChain, maxPower));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
 
-    public void intakeToPos(Pose startPose, Pose intakePose) {
-        intakeToPos(startPose, intakePose, defaultIntakeDuration, defaultIntakeMoveMaxPower);
+    public void intakeToPos(PathChain pathChain) {
+        intakeToPos(pathChain, defaultIntakeDuration);
     }
 
-    public void intakeToPos(Pose startPose, Pose intakePose, int duration, double maxPower) {
+    public void intakeToPos(PathChain pathChain, int duration) {
+        intakeToPos(pathChain, duration, defaultIntakeMoveMaxPower);
+    }
+
+    public void intakeToPos(PathChain pathChain, int duration, double maxPower) {
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> drivetrain.followPath(startPose, intakePose, maxPower, intakeBrakingStrength));
+        sequencer.run(() -> drivetrain.followPath(pathChain, maxPower));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         sequencer.wait(duration);
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
 
-    public void shoot(Pose startPose) {
-        shoot(startPose, defaultMoveMaxPower);
+    public void shoot(PathChain pathChain) {
+        shoot(pathChain, defaultMoveMaxPower);
     }
 
-    public void shoot(Pose startPose, double maxPower) {
+    public void shoot(PathChain pathChain, double maxPower) {
         sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> drivetrain.followPath(startPose, shootPose, maxPower, shootingBrakingStrength));
+        sequencer.run(() -> drivetrain.followPath(pathChain, maxPower));
         sequencer.run(() -> transfer.openGate());
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
         // Start Shooting
@@ -152,12 +174,12 @@ public class AutoBase extends OpMode {
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
     }
 
-    public void goTo(Pose startPose, Pose targetPose) {
-        goTo(startPose, targetPose, defaultMoveMaxPower);
+    public void goTo(PathChain pathChain) {
+        goTo(pathChain, defaultMoveMaxPower);
     }
 
-    public void goTo(Pose startPose, Pose targetPose, double maxPower) {
-        sequencer.run(() -> drivetrain.followPath(startPose, targetPose, maxPower));
+    public void goTo(PathChain pathChain, double maxPower) {
+        sequencer.run(() -> drivetrain.followPath(pathChain, maxPower));
         sequencer.waitUntil(() -> !drivetrain.followerIsBusy());
     }
 

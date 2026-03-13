@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.*;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Config
@@ -41,28 +42,59 @@ public class NewRedAuto extends AutoBase{
     // OPEN GATE POSE
     private final Pose openGatePose = new Pose(openGateX, openGateY, openGateHeading);
 
+    // FROM START TO SHOOTING
+    private final PathChain startToShootingPath = buildShootingPath(startPose, shootPose);
+
+    // FROM SHOOTING TO BALL 1 BEGIN
+    private final PathChain shootingToBall1StartPath = buildIntakePath(shootPose, ball1StartPose);
+
+    // FROM BALL 1 BEGIN TO BALL 1 END
+    private final PathChain ball1StartToBall1EndPath = buildIntakePath(ball1StartPose, ball1EndPose);
+
+    // FROM BALL 1 END TO SHOOTING
+    private final PathChain ball1EndToShootingPath = buildShootingPath(ball1EndPose, shootPose);
+
+    // FROM SHOOTING TO BALL 2 BEGIN
+    private final PathChain shootingToBall2StartPath = buildIntakePath(shootPose, ball2StartPose);
+
+    // FROM BALL 2 BEGIN TO BALL 2 END
+    private final PathChain ball2StartToBall2EndPath = buildIntakePath(ball2StartPose, ball2EndPose);
+
+    // FROM BALL 2 END TO SHOOTING
+    private final PathChain ball2EndToShootingPath = buildShootingPath(ball2EndPose, shootPose);
+
+    // FROM SHOOTING TO BALL 3 BEGIN
+    private final PathChain shootingToBall3StartPath = buildIntakePath(shootPose, ball3StartPose);
+
+    // FROM BALL 3 BEGIN TO BALL 3 END
+    private final PathChain ball3StartToBall3EndPath = buildIntakePath(ball3StartPose, ball3EndPose);
+
+    // FROM BALL 3 END TO SHOOTING
+    private final PathChain ball3EndToShootingPath = buildShootingPath(ball3EndPose, shootPose);
+
+
     @Override
     public void initializePath() {
         // Initialize Sequencer
         // From Start pose to shooting pose
-        shoot(startPose);
+        shoot(startToShootingPath);
 
         // From shooting pose to get first ball
-        intakeAtPos(shootPose, ball1StartPose, ball1EndPose);
+        intakeAtPos(shootingToBall1StartPath, ball1StartToBall1EndPath);
 
         // Move from first ball pose to shooting
-        shoot(ball1EndPose);
+        shoot(ball1EndToShootingPath);
 
         // From shooting pose to get the second ball & open gate
-        intakeAtPos(shootPose, ball2StartPose, ball2EndPose);
+        intakeAtPos(shootingToBall2StartPath, ball2StartToBall2EndPath);
 
         // Move from second ball pose to shooting
-        shoot(ball2EndPose);
+        shoot(ball2EndToShootingPath);
 
         // Move from gate to third ball pose
-        intakeAtPos(shootPose, ball3StartPose, ball3EndPose);
+        intakeAtPos(shootingToBall3StartPath, ball3StartToBall3EndPath);
 
         // Move from third ball pose to shooting
-        shoot(ball3EndPose);
+        shoot(ball3EndToShootingPath);
     }
 }
