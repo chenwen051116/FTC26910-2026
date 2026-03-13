@@ -44,9 +44,9 @@ public class AutoBase extends OpMode {
     }
 
 
-    public static double defaultMoveMaxPower = 0.9, defaultIntakeMoveMaxPower = 0.8;
+    public static double defaultMoveMaxPower = 1, defaultIntakeMoveMaxPower = 1;
     public static double defaultIntakeBrakingDistance = 3, defaultShootingBrakingDistance = 2;
-    public static double intakeBrakingStrength = 1.45, shootingBrakingStrength = 1.2;
+    public static double intakeBrakingStrength = 1.5, shootingBrakingStrength = 1.5;
     public static int defaultIntakeDuration = 800;
     public static int defaultTimeBeforeShooting = 500;
 

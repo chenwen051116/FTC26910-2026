@@ -26,9 +26,9 @@ public class Drivetrain extends Overridable {
     public static double slowSpeedMultiplier = 0.3;
     public static double xAtPoseTolerance = 3;
     public static double yAtPoseTolerance = 3;
-    public static double defaultBrakingStrength = 1.25;
+    public static double defaultBrakingStrength = 1.5;
     public static double defaultMaxPower = 0.8;
-    public static double defaultBrakingDistance = 1.5;
+    public static double defaultBrakingDistance = 1.3;
 
     public Drivetrain(Gamepad gamepad, DcMotor frontLeftMotor, DcMotor frontRightMotor, DcMotor backLeftMotor, DcMotor backRightMotor, Follower follower) {
         this.frontLeftMotor = frontLeftMotor;
