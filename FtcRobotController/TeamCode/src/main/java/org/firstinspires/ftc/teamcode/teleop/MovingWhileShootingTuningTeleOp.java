@@ -57,7 +57,7 @@ public class MovingWhileShootingTuningTeleOp extends LinearOpMode {
         DcMotorEx flywheelMotor1 = getMotor("flywheel_1");
         DcMotorEx flywheelMotor2 = getMotor("flywheel_2");
 
-        Shooter shooter = new Shooter(gamepad1, turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
+        Shooter shooter = new Shooter(gamepad1, gamepad2, turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
 
         Servo ballIndicator1 = getServo("ball_indicator_1");
         Servo ballIndicator2 = getServo("ball_indicator_2");
@@ -68,7 +68,8 @@ public class MovingWhileShootingTuningTeleOp extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.setMsTransmissionInterval(200);
 
-        drivetrain.initEncoder(new Pose(0, 0, 0));
+        drivetrain.setLastPose(new Pose(9, 9, 0));
+        drivetrain.initEncoder();
         shooter.initTurretEncoder();
 
         waitForStart();

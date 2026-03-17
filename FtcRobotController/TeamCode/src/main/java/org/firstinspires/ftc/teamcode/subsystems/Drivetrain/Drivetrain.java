@@ -20,6 +20,7 @@ public class Drivetrain extends Overridable {
     private final DcMotor backRightMotor;
     private final Gamepad gamepad;
     private final Follower follower;
+    public static Pose lastPose;
     public static double regularSpeedMultiplier = 1;
     public static double slowSpeedMultiplier = 0.3;
     public static double xAtPoseTolerance = 3;
@@ -72,7 +73,11 @@ public class Drivetrain extends Overridable {
         return backRightMotor.getPower();
     }
 
-    public void initEncoder(Pose lastPose){
+    public void setLastPose(Pose lastPose) {
+        this.lastPose = lastPose;
+    }
+
+    public void initEncoder(){
         follower.startTeleopDrive();
         follower.update();
         follower.setStartingPose(new Pose(0, 0, 0));

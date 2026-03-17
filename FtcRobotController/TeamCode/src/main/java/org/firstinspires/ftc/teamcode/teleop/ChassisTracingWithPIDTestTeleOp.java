@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONGEST_SHORT_DISTANCE;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -57,7 +55,7 @@ public class ChassisTracingWithPIDTestTeleOp extends LinearOpMode {
         DcMotorEx flywheelMotor1 = getMotor("flywheel_1");
         DcMotorEx flywheelMotor2 = getMotor("flywheel_2");
 
-        Shooter shooter = new Shooter(gamepad1, turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
+        Shooter shooter = new Shooter(gamepad1, gamepad2, turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
 
         Vector toTargetVector;
         Servo ballIndicator1 = getServo("ball_indicator_1");
@@ -69,7 +67,8 @@ public class ChassisTracingWithPIDTestTeleOp extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.setMsTransmissionInterval(200);
 
-        drivetrain.initEncoder(new Pose(0, 0, 0));
+        drivetrain.setLastPose(new Pose(9, 9, 0));
+        drivetrain.initEncoder();
         shooter.initTurretEncoder();
 
         boolean isShooting = false;
@@ -91,7 +90,7 @@ public class ChassisTracingWithPIDTestTeleOp extends LinearOpMode {
             if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 transfer.overrideDriver();
                 if (shooter.isAtTargetRPM() && transfer.isGateOpen()){
-                    transfer.setIntakeState(Intake.IntakeState.INTAKE);
+                    transfer.setIntakeState(Intake.IntakeState.TRANSFER);
                 }
             } else {
                 transfer.stopOverrideDriver();

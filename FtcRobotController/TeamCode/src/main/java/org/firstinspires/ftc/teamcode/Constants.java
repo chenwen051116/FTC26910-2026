@@ -6,7 +6,7 @@ public class Constants {
     public static final double ENCODER_TICKS_PER_REVOLUTION = -8192;
 
     public static class Shooter {
-        public static final double TURRET_GEAR_RATIO = 120.0 / 20.0;
+        public static final double TURRET_GEAR_RATIO = 120.0 / 18.0;
         public static final double FLYWHEEL_GEAR_RATIO = 1.0;
 
         // TODO: find these constants experimentally
@@ -17,56 +17,56 @@ public class Constants {
         public static final double TURRET_OFFSET = 2.7138;
 
         public static final double[] SHORT_RANGE_DISTANCE = {
-                55.1936,
-                60.2264,
-                65.4608,
-                70.2686,
-                75.2001,
-                80.3232,
-                85.2354,
-                90.3840,
-                95.2980,
-                100.1824,
-                105.2118,
-                110.2972
+                40.1641,
+                45.0128,
+                50.2853,
+                55.2221,
+                60.0832,
+                64.9781,
+                70.0819,
+                74.9951,
+                80.0476,
+                85.0591,
+                90.0496,
+                95.0801
         };
 
         public static final int SHORT_RANGE_DISTANCE_INTERVAL = 5;
 
         public static final int[] SHORT_RANGE_RPM = {
                 2400,
-                2415,
-                2430,
-                2475,
+                2480,
                 2550,
+                2620,
                 2650,
-                2750,
-                2850,
+                2680,
+                2800,
+                2980,
                 3125,
                 3200,
+                3250,
                 3300,
-                3350
         };
 
         public static final double[] SHORT_RANGE_HOOD_POSITION = {
                 1,
-                0.7,
-                0.6,
+                1,
+                0.85,
+                0.65,
                 0.55,
                 0.45,
-                0.4,
                 0.3,
-                0.25,
-                0.15,
+                0.2,
                 0.1,
+                0,
                 0,
                 0
 
         };
 
         public static final double[] LONG_RANGE_DISTANCE = {
-                138.0012,
-                147.4787
+                118.0012,
+                127.4787
         };
 
         public static final int LONG_RANGE_DISTANCE_INTERVAL = 5;
@@ -81,7 +81,7 @@ public class Constants {
                 0
         };
 
-        public static final double LONGEST_SHORT_DISTANCE = 110;
+        public static final double LONGEST_SHORT_DISTANCE = 90;
 
 
     }

@@ -70,7 +70,7 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             ;
-    public static PathConstraints pathConstraints = new PathConstraints(0.997, 100, 1.5, 1.3);
+    public static PathConstraints pathConstraints = new PathConstraints(0.997, 100, 0.75, 1);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)

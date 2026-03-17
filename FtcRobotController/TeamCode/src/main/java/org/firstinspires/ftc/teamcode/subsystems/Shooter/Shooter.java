@@ -27,9 +27,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Overridable;
 @Config
 public class Shooter extends Overridable {
     public static class ShooterConfig {
-        public final double turretAngle;
-        public final double hoodPosition;
-        public final double flywheelRPM;
+        public double turretAngle;
+        public double hoodPosition;
+        public double flywheelRPM;
 
         public ShooterConfig(double turretAngle, double hoodPosition, double flywheelRPM) {
             this.turretAngle = turretAngle;
@@ -44,7 +44,8 @@ public class Shooter extends Overridable {
         SHOOTING,
     }
 
-    private final Gamepad gamepad;
+    private final Gamepad gamepad1;
+    private final Gamepad gamepad2;
     private final Turret turret;
     private final Hood hood;
     private final Flywheel flywheel;
@@ -52,10 +53,12 @@ public class Shooter extends Overridable {
     private ShooterConfig shooterConfig;
     public static double IDLE_RPM = 2600;
     public static double turretOffsetIncrement = 5;
+    public static double kvIncrement = 0.000005;
 
     // Constructor
-    public Shooter(Gamepad gamepad, DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
-        this.gamepad = gamepad;
+    public Shooter(Gamepad gamepad1, Gamepad gamepad2, DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
+        this.gamepad1 = gamepad1;
+        this.gamepad2 = gamepad2;
         turret = new Turret(turretMotor);
         hood = new Hood(hoodServo);
         flywheel = new Flywheel(flywheelMotor1, flywheelMotor2);
@@ -121,6 +124,10 @@ public class Shooter extends Overridable {
 
     public double getFlywheelMotor2RPM(){
         return flywheel.getRPM2();
+    }
+
+    public double getCurrentFlywheelKv() {
+        return PIDControllerFactory.FlywheelPIDController.kv;
     }
 
     public void initTurretEncoder(){
@@ -191,42 +198,18 @@ public class Shooter extends Overridable {
     }
 
     public Pose getGoalPose(boolean isRed){
-        return new Pose(isRed ? 144 - 4 : 4, 144 - 12);
+        return new Pose(isRed ? 144 - 4 : 4, 144 - 8);
     }
     @Override
     public void runWithoutOverride() {
-        if (gamepad.yWasPressed()) {
-            // y button changes the shooter state
-            if (getShooterState() == ShooterState.OFF) {
-                // Set the shooter state to IDLE when the current shooter state is OFF
-                setShooterState(ShooterState.IDLE);
-            } else {
-                // Set the shooter state to OFF when the current shooter state is IDLE
-                setShooterState(ShooterState.OFF);
-            }
-        }
 
-        if (gamepad.xWasPressed()) {
-            if (getShooterState() == ShooterState.IDLE) {
-                setShooterState(ShooterState.SHOOTING);
 
-            } else if (getShooterState() == ShooterState.SHOOTING) {
-                setShooterState(ShooterState.IDLE);
-            }
-        }
-
-        if (gamepad.dpadLeftWasPressed()) {
-            turret.addOffset(Math.toRadians(-turretOffsetIncrement));
-        }
-
-        if (gamepad.dpadRightWasPressed()) {
-            turret.addOffset(Math.toRadians(turretOffsetIncrement));
-        }
     }
 
     @Override
     public void runWhenStartingOverride(){
-        turret.center();
+        this.shooterConfig.flywheelRPM = 3125;
+        this.shooterConfig.hoodPosition = 0;
     }
 
     @Override
@@ -241,6 +224,46 @@ public class Shooter extends Overridable {
             case SHOOTING:
                 flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
+        }
+
+        if (gamepad2.aWasPressed()) {
+            toggleOverrideDriver();
+        }
+
+        if (gamepad1.yWasPressed()) {
+            // y button changes the shooter state
+            if (getShooterState() == ShooterState.OFF) {
+                // Set the shooter state to IDLE when the current shooter state is OFF
+                setShooterState(ShooterState.IDLE);
+            } else {
+                // Set the shooter state to OFF when the current shooter state is IDLE
+                setShooterState(ShooterState.OFF);
+            }
+        }
+
+        if (gamepad1.xWasPressed()) {
+            if (getShooterState() == ShooterState.IDLE) {
+                setShooterState(ShooterState.SHOOTING);
+
+            } else if (getShooterState() == ShooterState.SHOOTING) {
+                setShooterState(ShooterState.IDLE);
+            }
+        }
+
+        if (gamepad2.leftBumperWasPressed()) {
+            turret.addOffset(Math.toRadians(-turretOffsetIncrement));
+        }
+
+        if (gamepad2.rightBumperWasPressed()) {
+            turret.addOffset(Math.toRadians(turretOffsetIncrement));
+        }
+
+        if (gamepad2.dpadUpWasPressed()) {
+            PIDControllerFactory.FlywheelPIDController.addFlywheelKv(kvIncrement);
+        }
+
+        if (gamepad2.dpadDownWasPressed()) {
+            PIDControllerFactory.FlywheelPIDController.addFlywheelKv(-kvIncrement);
         }
 
         hood.setPosition(shooterConfig.hoodPosition);

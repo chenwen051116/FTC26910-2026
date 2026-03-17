@@ -1,49 +1,17 @@
 package org.firstinspires.ftc.teamcode.auto;
+import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.*;
 
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball1EndHeading;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball1EndX;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball1EndY;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball1StartHeading;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball1StartX;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball1StartY;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball2EndHeading;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball2EndX;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball2EndY;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball2StartHeading;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball2StartX;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball2StartY;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball3EndHeading;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball3EndX;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball3EndY;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball3StartHeading;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball3StartX;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.ball3StartY;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.shootHeading;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.shootX;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.shootY;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.startHeading;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.startX;
-import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.startY;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Red 12 Balls")
-public class RedAuto12Balls extends AutoBase{
-    PathChain startToShootingPath,
-            shootingToBall1StartPath,
-            ball1StartToBall1EndPath,
-            ball1EndToShootingPath,
-            shootingToBall2StartPath,
-            ball2StartToBall2EndPath,
-            ball2EndToShootingPath,
-            shootingToBall3StartPath,
-            ball3StartToBall3EndPath,
-            ball3EndToShootingPath;
-
+@Config
+@Autonomous(name = "Red Auto 12 Balls")
+public class RedAuto12Balls extends AutoBase {
     @Override
-    public void buildPath() {
+    public void initializePath() {
         // START POINT
         Pose startPose = new Pose(startX, startY, startHeading);
 
@@ -60,7 +28,7 @@ public class RedAuto12Balls extends AutoBase{
         Pose ball2StartPose = new Pose(ball2StartX, ball2StartY, ball2StartHeading);
 
         // BALL 2 END POINT
-        Pose ball2EndPose = new Pose(ball2EndX, ball2EndY, ball2EndHeading);
+        Pose ball2WithGatePose = new Pose(ball2WithGateX, ball2WithGateY, ball2WithGateHeading);
 
         // BALL 3 START POINT
         Pose ball3StartPose = new Pose(ball3StartX, ball3StartY, ball3StartHeading);
@@ -70,94 +38,55 @@ public class RedAuto12Balls extends AutoBase{
 
 
         // FROM START TO SHOOTING
-        startToShootingPath = buildShootingPath(startPose, shootPose);
+        PathChain startToShootingPath = buildPath(startPose, shootPose);
 
         // FROM SHOOTING TO BALL 1 BEGIN
-        shootingToBall1StartPath = buildIntakePath(shootPose, ball1StartPose);
+        PathChain shootingToBall1StartPath = buildPath(shootPose, ball1StartPose);
 
         // FROM BALL 1 BEGIN TO BALL 1 END
-        ball1StartToBall1EndPath = buildIntakePath(ball1StartPose, ball1EndPose);
+        PathChain ball1StartToBall1EndPath = buildPath(ball1StartPose, ball1EndPose);
 
         // FROM BALL 1 END TO SHOOTING
-        ball1EndToShootingPath = buildShootingPath(ball1EndPose, shootPose);
+        PathChain ball1EndToShootingPath = buildPath(ball1EndPose, shootPose);
 
         // FROM SHOOTING TO BALL 2 BEGIN
-        shootingToBall2StartPath = buildIntakePath(shootPose, ball2StartPose);
+        PathChain shootingToBall2StartPath = buildPath(shootPose, ball2StartPose);
 
         // FROM BALL 2 BEGIN TO BALL 2 END
-        ball2StartToBall2EndPath = buildIntakePath(ball2StartPose, ball2EndPose);
+        PathChain ball2StartToBall2WithGatePath = buildPath(ball2StartPose, ball2WithGatePose);
 
         // FROM BALL 2 END TO SHOOTING
-        ball2EndToShootingPath = buildShootingPath(ball2EndPose, shootPose);
+        PathChain ball2EndToShootingPath = buildPath(ball2WithGatePose, shootPose);
 
         // FROM SHOOTING TO BALL 3 BEGIN
-        shootingToBall3StartPath = buildIntakePath(shootPose, ball3StartPose);
+        PathChain shootingToBall3StartPath = buildPath(shootPose, ball3StartPose);
 
         // FROM BALL 3 BEGIN TO BALL 3 END
-        ball3StartToBall3EndPath = buildIntakePath(ball3StartPose, ball3EndPose);
+        PathChain ball3StartToBall3EndPath = buildPath(ball3StartPose, ball3EndPose);
 
         // FROM BALL 3 END TO SHOOTING
-        ball3EndToShootingPath = buildShootingPath(ball3EndPose, shootPose);
-    }
+        PathChain ball3EndToShootingPath = buildPath(ball3EndPose, shootPose);
 
-    @Override
-    public void updatePath() {
-        switch (this.pathState) {
-            case 1: // FROM START TO SHOOTING
-                follow(startToShootingPath);
-                break;
+        // Initialize Sequencer
+        // From Start pose to shooting pose
+        shoot(startToShootingPath);
 
-            case 2:
-                shoot();
-                break;
+        // From shooting pose to get first ball
+        intakeAtPos(shootingToBall1StartPath, ball1StartToBall1EndPath);
 
-            case 3:
-                follow(shootingToBall1StartPath);
-                break;
+        // Move from first ball pose to shooting
+        shoot(ball1EndToShootingPath);
 
-            case 4:
-                intake(ball1StartToBall1EndPath);
-                break;
+        // From shooting pose to get the second ball & open gate
+        intakeAtPos(shootingToBall2StartPath, ball2StartToBall2WithGatePath);
 
-            case 5:
-                follow(ball1EndToShootingPath);
-                break;
+        // Move from second ball pose to shooting
+        shoot(ball2EndToShootingPath);
 
-            case 6:
-                shoot();
-                break;
+        // Move from gate to third ball pose
+        intakeAtPos(shootingToBall3StartPath, ball3StartToBall3EndPath);
 
-            case 7:
-                follow(shootingToBall2StartPath);
-                break;
-
-            case 8:
-                intake(ball2StartToBall2EndPath);
-                break;
-
-            case 9:
-                follow(ball2EndToShootingPath);
-                break;
-
-            case 10:
-                shoot();
-                break;
-
-            case 11:
-                follow(shootingToBall3StartPath);
-                break;
-
-            case 12:
-                intake(ball3StartToBall3EndPath);
-                break;
-
-            case 13:
-                follow(ball3EndToShootingPath);
-                break;
-
-            case 14:
-                shoot();
-                break;
-        }
+        // Move from third ball pose to shooting
+        shoot(ball3EndToShootingPath);
     }
 }

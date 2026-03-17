@@ -21,7 +21,7 @@ public class PIDControllerFactory {
             setSetPoint(targetPosition);
             setTolerance(tolerance);
             setPIDF(kp, ki, kd, kf);
-            return Math.max(-0.5, Math.min(0.5, calculate(currentPosition)));
+            return Math.max(-1, Math.min(1, calculate(currentPosition)));
         }
     }
 
@@ -30,14 +30,19 @@ public class PIDControllerFactory {
         // PID FOR V = 12.5
         public static double kp = -0.24, ki = 0, kd = -0.003;
         public static double ks = 0;
-        public static double kv = 0.000245;
+        public static double kv = 0.000240;
         public static double threshold = 200, tolerance = 0;
+
 
         // 13.5V : KS = 0.165, vf = 0.000195
 
         private FlywheelPIDController() {
             super(kp, ki, kd);
             setTolerance(tolerance);
+        }
+
+        public static void addFlywheelKv(double increment) {
+            kv += increment;
         }
 
         public double calculatePower(double currentRPM, double targetRPM) {
