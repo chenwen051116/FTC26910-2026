@@ -1,28 +1,36 @@
-package org.firstinspires.ftc.teamcode.subsystems.Shooter;
+package org.firstinspires.ftc.teamcode.subsystems.shooter;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Constants;
-
+@Config
 public class Turret {
-    public static final double MOTOR_GEAR_RATIO = 1;
-    public static final double RADIANS_PER_TICK = 2 * Math.PI / Constants.ENCODER_TICKS_PER_REVOLUTION / MOTOR_GEAR_RATIO;
-    private double offset = 0; // IN RADIANS
+    public static double minAngleDegrees = -100;
+    public static double maxAngleDegrees = 100;
+    public static double centerPosition = 0.5;
+    public static double servoTravelDegrees = 300;
+    public static double minServoPosition = 0;
+    public static double maxServoPosition = 1;
 
-    private final DcMotor turretMotor;
-    private final PIDControllerFactory.TurretPIDController pidController;
+    private final Servo primaryServo;
+    private final Servo secondaryServo;
+
+    private double offset = 0;
     private double targetAngle = 0;
+    private double commandedAngle = 0;
+    private double commandedPosition = centerPosition;
 
-    public Turret(DcMotor motor) {
-        turretMotor = motor;
-        turretMotor.setDirection(DcMotor.Direction.FORWARD);
-        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        pidController = PIDControllerFactory.createTurretPIDController();
+    public Turret(Servo primaryServo, Servo secondaryServo) {
+        this.primaryServo = primaryServo;
+        this.secondaryServo = secondaryServo;
+
+        primaryServo.setDirection(Servo.Direction.FORWARD);
+        secondaryServo.setDirection(Servo.Direction.REVERSE);
+        center();
     }
 
     public void initEncoder() {
-        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        center();
     }
 
     public void setOffset(double offset) {
@@ -34,49 +42,59 @@ public class Turret {
     }
 
     public void addOffset(double increment) {
-        this.offset += increment;
+        offset += increment;
     }
 
     public void resetOffset() {
         offset = 0;
     }
 
-    // Get the current angle of the turret motor in radians
     public double getCurrentAngle() {
-        return turretMotor.getCurrentPosition() * RADIANS_PER_TICK / Constants.Shooter.TURRET_GEAR_RATIO + offset;
+        return commandedAngle;
     }
 
-    // Get the target angle of the turret motor in radians
     public double getTargetAngle() {
         return targetAngle;
     }
 
-    // Let the turret motor rotate to the desired angle in radians
+    public double getPosition() {
+        return commandedPosition;
+    }
+
     public void setAngle(double targetAngle) {
-        this.targetAngle = Math.max(Math.toRadians(-100), Math.min(Math.toRadians(100), (targetAngle % Math.PI * 2 - targetAngle)));
+        this.targetAngle = clampAngle(normalizeRadians(targetAngle));
     }
 
     public void center() {
         setAngle(0);
-    }
-
-    public boolean isRotatingLargeDegree() {
-        return Math.abs(targetAngle - getCurrentAngle()) > (double) 2 / 3 * Math.PI;
-    }
-
-    private double toTicks(double angleInRadians) {
-        return angleInRadians * Constants.Shooter.TURRET_GEAR_RATIO / RADIANS_PER_TICK;
-    }
-
-    public double getPower() {
-        return turretMotor.getPower();
+        periodic();
     }
 
     public void periodic() {
-        double targetPower = pidController.calculatePower(toTicks(getCurrentAngle()), toTicks(targetAngle));
-        targetPower *= isRotatingLargeDegree() ? 0.7 : 1;
-        turretMotor.setPower(targetPower);
+        commandedAngle = clampAngle(targetAngle + offset);
+        commandedPosition = angleToPosition(commandedAngle);
+        primaryServo.setPosition(commandedPosition);
+        secondaryServo.setPosition(commandedPosition);
+    }
 
-        // turretMotor.setPower(pidController.calculatePower(getCurrentAngle(), targetAngle));
+    private double angleToPosition(double angleRadians) {
+        double travelRadians = Math.toRadians(servoTravelDegrees);
+        if (travelRadians <= 0) {
+            return centerPosition;
+        }
+
+        return clamp(centerPosition + angleRadians / travelRadians, minServoPosition, maxServoPosition);
+    }
+
+    private double clampAngle(double angleRadians) {
+        return clamp(angleRadians, Math.toRadians(minAngleDegrees), Math.toRadians(maxAngleDegrees));
+    }
+
+    private double normalizeRadians(double angleRadians) {
+        return Math.atan2(Math.sin(angleRadians), Math.cos(angleRadians));
+    }
+
+    private double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
     }
 }

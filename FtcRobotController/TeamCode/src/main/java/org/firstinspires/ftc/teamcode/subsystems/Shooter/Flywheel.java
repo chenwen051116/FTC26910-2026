@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.Shooter;
+package org.firstinspires.ftc.teamcode.subsystems.shooter;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

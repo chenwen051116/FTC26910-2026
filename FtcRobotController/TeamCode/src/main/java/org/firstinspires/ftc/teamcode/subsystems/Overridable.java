@@ -6,11 +6,17 @@ public abstract class Overridable extends SubsystemBase {
     private boolean isOverrideDriver = false;
 
     public void overrideDriver() {
+        if (isOverrideDriver) {
+            return;
+        }
         isOverrideDriver = true;
         runWhenStartingOverride();
     }
 
     public void stopOverrideDriver() {
+        if (!isOverrideDriver) {
+            return;
+        }
         isOverrideDriver = false;
         runWhenStoppingOverride();
     }

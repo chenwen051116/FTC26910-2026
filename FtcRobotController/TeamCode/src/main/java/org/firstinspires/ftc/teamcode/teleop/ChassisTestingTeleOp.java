@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
 @Config
 @TeleOp(name = "ChassisTestingTeleOp")
 public class ChassisTestingTeleOp extends LinearOpMode {
@@ -25,10 +27,10 @@ public class ChassisTestingTeleOp extends LinearOpMode {
         DcMotor backLeftMotor = getMotor("back_left");
         DcMotor backRightMotor = getMotor("back_right");
 
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
-        backRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftMotor.setDirection(Constants.LEFT_DRIVE_DIRECTION);
+        backLeftMotor.setDirection(Constants.LEFT_DRIVE_DIRECTION);
+        frontRightMotor.setDirection(Constants.RIGHT_DRIVE_DIRECTION);
+        backRightMotor.setDirection(Constants.RIGHT_DRIVE_DIRECTION);
 
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

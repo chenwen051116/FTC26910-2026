@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+package org.firstinspires.ftc.teamcode.subsystems.drivetrain;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.auto.Drawing;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Overridable;
 
 @Config
@@ -20,7 +21,7 @@ public class Drivetrain extends Overridable {
     private final DcMotor backRightMotor;
     private final Gamepad gamepad;
     private final Follower follower;
-    public static Pose lastPose;
+    public static Pose lastPose = new Pose(0, 0, 0);
     public static double regularSpeedMultiplier = 1;
     public static double slowSpeedMultiplier = 0.3;
     public static double xAtPoseTolerance = 3;
@@ -35,10 +36,10 @@ public class Drivetrain extends Overridable {
         this.backLeftMotor = backLeftMotor;
         this.backRightMotor = backRightMotor ;
 
-        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
-        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(Constants.LEFT_DRIVE_DIRECTION);
+        backLeftMotor.setDirection(Constants.LEFT_DRIVE_DIRECTION);
+        frontRightMotor.setDirection(Constants.RIGHT_DRIVE_DIRECTION);
+        backRightMotor.setDirection(Constants.RIGHT_DRIVE_DIRECTION);
 
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -74,14 +75,14 @@ public class Drivetrain extends Overridable {
     }
 
     public void setLastPose(Pose lastPose) {
-        this.lastPose = lastPose;
+        Drivetrain.lastPose = lastPose == null ? new Pose(0, 0, 0) : lastPose;
     }
 
     public void initEncoder(){
         follower.startTeleopDrive();
-        follower.update();
-        follower.setStartingPose(new Pose(0, 0, 0));
+        follower.setStartingPose(lastPose);
         follower.setPose(lastPose);
+        follower.updatePose();
     }
 
     public Pose getCurrentPose(){
@@ -138,11 +139,12 @@ public class Drivetrain extends Overridable {
         double x = -gamepad.left_stick_x;
         double y = -gamepad.left_stick_y;
         double rx = -gamepad.right_stick_x;
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
-        double frontLeftPower = y - x - rx;
-        double frontRightPower = y + x + rx;
-        double backLeftPower = y + x - rx;
-        double backRightPower = y - x + rx;
+        double frontLeftPower = (y - x - rx) / denominator;
+        double frontRightPower = (y + x + rx) / denominator;
+        double backLeftPower = (y + x - rx) / denominator;
+        double backRightPower = (y - x + rx) / denominator;
 
         double speedMultiplier;
         if (gamepad.left_trigger > 0.3){

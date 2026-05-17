@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.Shooter;
+package org.firstinspires.ftc.teamcode.subsystems.shooter;
 
 import com.qualcomm.robotcore.hardware.Servo;
 

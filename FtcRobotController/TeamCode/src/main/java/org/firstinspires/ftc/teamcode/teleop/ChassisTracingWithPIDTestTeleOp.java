@@ -7,120 +7,68 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.LEDSet.LEDSet;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
+import org.firstinspires.ftc.teamcode.RobotHardware;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.transfer.Intake;
 
 @Config
 @TeleOp(name = "Red Chassis Tracing With PID Teleop")
 public class ChassisTracingWithPIDTestTeleOp extends LinearOpMode {
-    private DcMotorEx getMotor(String motorName) {
-        return hardwareMap.get(DcMotorEx.class, motorName);
-    }
-    private Servo getServo(String servoName) {
-        return hardwareMap.get(Servo.class, servoName);
-    }
-    private DistanceSensor getDistanceSensor(String sensorName) {
-        return hardwareMap.get(DistanceSensor.class, sensorName);
-    }
-
+    @Override
     public void runOpMode() {
-        DcMotor frontLeftMotor = getMotor("front_left");
-        DcMotor frontRightMotor = getMotor("front_right");
-        DcMotor backLeftMotor = getMotor("back_left");
-        DcMotor backRightMotor = getMotor("back_right");
-
-        Drivetrain drivetrain = new Drivetrain(gamepad1, frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, Constants.createFollower(hardwareMap));
-
-        DcMotor intakeMotor = getMotor("intake");
-        Servo gateServo = getServo("gate");
-        DistanceSensor[] sensors = {
-                getDistanceSensor("distance_sensor_0"),
-                getDistanceSensor("distance_sensor_1"),
-                getDistanceSensor("distance_sensor_2")
-        };
-
-        Transfer transfer = new Transfer(gamepad1, intakeMotor, gateServo, sensors);
-
-        DcMotorEx turretMotor = getMotor("turret");
-        Servo hoodServo = getServo("hood");
-        DcMotorEx flywheelMotor1 = getMotor("flywheel_1");
-        DcMotorEx flywheelMotor2 = getMotor("flywheel_2");
-
-        Shooter shooter = new Shooter(gamepad1, gamepad2, turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
-
-        Vector toTargetVector;
-        Servo ballIndicator1 = getServo("ball_indicator_1");
-        Servo ballIndicator2 = getServo("ball_indicator_2");
-        Servo shooterIndicator = getServo("shooter_indicator");
-
-        LEDSet ledSet = new LEDSet(ballIndicator1, ballIndicator2, shooterIndicator);
-
+        RobotHardware robot = new RobotHardware(hardwareMap, gamepad1, gamepad2);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.setMsTransmissionInterval(200);
 
-        drivetrain.setLastPose(new Pose(9, 9, 0));
-        drivetrain.initEncoder();
-        shooter.initTurretEncoder();
-
-        boolean isShooting = false;
+        robot.drivetrain.setLastPose(new Pose(9, 9, 0));
+        robot.drivetrain.initEncoder();
+        robot.shooter.initTurretEncoder();
 
         waitForStart();
         while (opModeIsActive()) {
-            toTargetVector = new Vector(shooter.getGoalPose(true).minus(drivetrain.getCurrentPose()));
+            Shooter.ShooterConfig shooterConfig = robot.shooter.calculateShooterConfig(
+                    robot.drivetrain.getCurrentPose(),
+                    robot.drivetrain.getCurrentVelocity(),
+                    robot.drivetrain.getCurrentAcceleration(),
+                    true
+            );
+            robot.shooter.setShooterConfig(shooterConfig);
+            robot.ledSet.setBallCount(robot.transfer.getBallCount());
+            robot.ledSet.setShooterState(Shooter.ShooterState.OFF);
 
-
-            ledSet.setBallCount(transfer.getBallCount());
-            ledSet.setShooterState(Shooter.ShooterState.OFF);
-
-            Shooter.ShooterConfig shooterConfig = shooter.calculateShooterConfig(drivetrain.getCurrentPose(),
-                    drivetrain.getCurrentVelocity(),
-                    drivetrain.getCurrentAcceleration(),
-                    true);
-            shooter.setShooterConfig(shooterConfig);
-
-            if (shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
-                transfer.overrideDriver();
-                if (shooter.isAtTargetRPM() && transfer.isGateOpen()){
-                    transfer.setIntakeState(Intake.IntakeState.TRANSFER);
+            if (robot.shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
+                robot.transfer.overrideDriver();
+                if (robot.shooter.isAtTargetRPM() && robot.transfer.isGateOpen()) {
+                    robot.transfer.setIntakeState(Intake.IntakeState.TRANSFER);
                 }
             } else {
-                transfer.stopOverrideDriver();
+                robot.transfer.stopOverrideDriver();
             }
 
+            robot.drivetrain.periodic();
+            robot.transfer.periodic();
+            robot.shooter.periodic();
+            robot.ledSet.periodic();
 
-
-            drivetrain.periodic();
-            transfer.periodic();
-            shooter.periodic();
-            ledSet.periodic();
-            shooter.periodic();
-
-            telemetry.addData("Follower X", drivetrain.getCurrentPose().getX());
-            telemetry.addData("Follower Y", drivetrain.getCurrentPose().getY());
-            telemetry.addData("Follower heading", drivetrain.getCurrentPose().getHeading());
-            telemetry.addData("Flywheel RPM", shooter.getFlywheelRPM());
+            Vector targetDisplacement = robot.shooter.getDisplacement(
+                    robot.shooter.getGoalPose(true),
+                    robot.drivetrain.getCurrentPose()
+            );
+            telemetry.addData("Follower X", robot.drivetrain.getCurrentPose().getX());
+            telemetry.addData("Follower Y", robot.drivetrain.getCurrentPose().getY());
+            telemetry.addData("Follower heading", robot.drivetrain.getCurrentPose().getHeading());
+            telemetry.addData("Flywheel RPM", robot.shooter.getFlywheelRPM());
             telemetry.addData("Target turret angle", shooterConfig.turretAngle);
-            telemetry.addData("Number of balls", transfer.getBallCount());
-            telemetry.addData("Turret angle", shooter.getTurretAngle());
-            telemetry.addData("Turret power", shooter.getTurretPower());
-            telemetry.addData("Flywheel power", shooter.getFlywheelPower());
-            telemetry.addData("Hood Position", shooter.getHoodPosition());
-            telemetry.addData("Target RPM", shooter.getShooterConfig().flywheelRPM);
-            telemetry.addData("Flywheel RPM1", shooter.getFlywheelMotor1RPM());
-            telemetry.addData("Flywheel RPM2", shooter.getFlywheelMotor2RPM());
-
-            telemetry.addData("Distance to RED goal",
-                    shooter.getDisplacement(shooter.getGoalPose(true), drivetrain.getCurrentPose()).getMagnitude());
-            telemetry.update();
+            telemetry.addData("Number of balls", robot.transfer.getBallCount());
+            telemetry.addData("Turret angle", robot.shooter.getTurretAngle());
+            telemetry.addData("Turret servo position", robot.shooter.getTurretPower());
+            telemetry.addData("Flywheel power", robot.shooter.getFlywheelPower());
+            telemetry.addData("Hood Position", robot.shooter.getHoodPosition());
+            telemetry.addData("Target RPM", robot.shooter.getShooterConfig().flywheelRPM);
+            telemetry.addData("Flywheel RPM1", robot.shooter.getFlywheelMotor1RPM());
+            telemetry.addData("Flywheel RPM2", robot.shooter.getFlywheelMotor2RPM());
+            telemetry.addData("Distance to RED goal", targetDisplacement.getMagnitude());
             telemetry.update();
         }
     }

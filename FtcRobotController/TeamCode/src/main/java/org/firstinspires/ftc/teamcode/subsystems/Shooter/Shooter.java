@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.Shooter;
+package org.firstinspires.ftc.teamcode.subsystems.shooter;
 
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_AX;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_AY;
@@ -56,13 +56,22 @@ public class Shooter extends Overridable {
     public static double kvIncrement = 0.000005;
 
     // Constructor
-    public Shooter(Gamepad gamepad1, Gamepad gamepad2, DcMotorEx turretMotor, Servo hoodServo, DcMotorEx flywheelMotor1, DcMotorEx flywheelMotor2) {
+    public Shooter(
+            Gamepad gamepad1,
+            Gamepad gamepad2,
+            Servo turretPrimaryServo,
+            Servo turretSecondaryServo,
+            Servo hoodServo,
+            DcMotorEx flywheelMotor1,
+            DcMotorEx flywheelMotor2
+    ) {
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
-        turret = new Turret(turretMotor);
+        turret = new Turret(turretPrimaryServo, turretSecondaryServo);
         hood = new Hood(hoodServo);
         flywheel = new Flywheel(flywheelMotor1, flywheelMotor2);
         shooterState = ShooterState.OFF;
+        shooterConfig = new ShooterConfig(0, 0, 0);
     }
 
     // Get the current shooter state
@@ -95,7 +104,7 @@ public class Shooter extends Overridable {
     }
 
     public double getTurretPower() {
-        return turret.getPower();
+        return turret.getPosition();
     }
 
     // Get the current position of hood from 0 to 1

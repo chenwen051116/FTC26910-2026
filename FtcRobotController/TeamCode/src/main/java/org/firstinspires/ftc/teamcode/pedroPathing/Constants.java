@@ -19,6 +19,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Configurable
 public class Constants {
+    public static final DcMotorSimple.Direction LEFT_DRIVE_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    public static final DcMotorSimple.Direction RIGHT_DRIVE_DIRECTION = DcMotorSimple.Direction.REVERSE;
+
     public static FollowerConstants followerConstants = new FollowerConstants()
             .useSecondaryHeadingPIDF(true)
             .useSecondaryDrivePIDF(true)
@@ -47,6 +50,7 @@ public class Constants {
 //            ;
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
+            // Measure these from the robot center; wrong offsets look like drivetrain PID drift.
             .forwardPodY(1)
             .strafePodX(0)
             .distanceUnit(DistanceUnit.INCH)
@@ -65,10 +69,10 @@ public class Constants {
             .rightFrontMotorName("front_right")
             .leftRearMotorName("back_left")
             .rightRearMotorName("back_right")
-            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftFrontMotorDirection(LEFT_DRIVE_DIRECTION)
+            .leftRearMotorDirection(LEFT_DRIVE_DIRECTION)
+            .rightFrontMotorDirection(RIGHT_DRIVE_DIRECTION)
+            .rightRearMotorDirection(RIGHT_DRIVE_DIRECTION)
             ;
     public static PathConstraints pathConstraints = new PathConstraints(0.997, 100, 0.75, 1);
 

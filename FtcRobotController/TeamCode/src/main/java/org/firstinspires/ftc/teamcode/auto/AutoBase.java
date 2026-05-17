@@ -13,17 +13,13 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.LEDSet.LEDSet;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
+import org.firstinspires.ftc.teamcode.RobotHardware;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrain.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.led.LEDSet;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.transfer.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.transfer.Transfer;
 
 @Config
 public class AutoBase extends OpMode {
@@ -36,18 +32,6 @@ public class AutoBase extends OpMode {
     protected Drivetrain drivetrain;
     protected static TelemetryManager telemetryM;
     protected boolean isRed = true;
-
-    private DcMotorEx getMotor(String motorName) {
-        return hardwareMap.get(DcMotorEx.class, motorName);
-    }
-
-    private Servo getServo(String servoName) {
-        return hardwareMap.get(Servo.class, servoName);
-    }
-
-    private DistanceSensor getDistanceSensor(String sensorName) {
-        return hardwareMap.get(DistanceSensor.class, sensorName);
-    }
 
 
     public static double defaultMoveMaxPower = 1, defaultIntakeMoveMaxPower = 1;
@@ -70,43 +54,15 @@ public class AutoBase extends OpMode {
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         Drawing.init();
 
-        follower = Constants.createFollower(hardwareMap);
+        RobotHardware robot = new RobotHardware(hardwareMap, gamepad1, gamepad2);
+        follower = robot.follower;
         follower.setStartingPose(startPose);
 
-        DcMotor frontLeftMotor = getMotor("front_left");
-        DcMotor frontRightMotor = getMotor("front_right");
-        DcMotor backLeftMotor = getMotor("back_left");
-        DcMotor backRightMotor = getMotor("back_right");
-
-        drivetrain = new Drivetrain(gamepad1, frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, follower);
-
-
-        // Initializing Intake
-        DcMotor intakeMotor = getMotor("intake");
-        Servo gateServo = getServo("gate");
-
-        DistanceSensor[] sensors = {
-                getDistanceSensor("distance_sensor_0"),
-                getDistanceSensor("distance_sensor_1"),
-                getDistanceSensor("distance_sensor_2")
-        };
-
-        transfer = new Transfer(gamepad1, intakeMotor, gateServo, sensors);
-
-        // Initializing Shooter
-        DcMotorEx turretMotor = getMotor("turret");
-        Servo hoodServo = getServo("hood");
-        DcMotorEx flywheelMotor1 = getMotor("flywheel_1");
-        DcMotorEx flywheelMotor2 = getMotor("flywheel_2");
-
-        shooter = new Shooter(gamepad1, gamepad2, turretMotor, hoodServo, flywheelMotor1, flywheelMotor2);
+        drivetrain = robot.drivetrain;
+        transfer = robot.transfer;
+        shooter = robot.shooter;
+        ledSet = robot.ledSet;
         shooter.initTurretEncoder();
-
-        Servo ballIndicator1 = getServo("ball_indicator_1");
-        Servo ballIndicator2 = getServo("ball_indicator_2");
-        Servo shooterIndicator = getServo("shooter_indicator");
-
-        ledSet = new LEDSet(ballIndicator1, ballIndicator2, shooterIndicator);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.setMsTransmissionInterval(200);
@@ -197,12 +153,8 @@ public class AutoBase extends OpMode {
     public void intakeAtPos(PathChain beginPathChain, PathChain endPathChain, double maxPower) {
         sequencer.run(() -> transfer.closeGate());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> follower.followPath(beginPathChain, maxPower, true));
-        sequencer.waitUntil(() -> follower.isBusy());
-        sequencer.waitUntil(() -> !follower.isBusy());
-        sequencer.run(() -> follower.followPath(endPathChain, maxPower, true));
-        sequencer.waitUntil(() -> follower.isBusy());
-        sequencer.waitUntil(() -> !follower.isBusy());
+        queuePath(beginPathChain, maxPower, true);
+        queuePath(endPathChain, maxPower, true);
     }
 
     public void intakeToPos(PathChain pathChain) {
@@ -216,9 +168,7 @@ public class AutoBase extends OpMode {
     public void intakeToPos(PathChain pathChain, int duration, double maxPower) {
         sequencer.run(() -> transfer.closeGate());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.INTAKE));
-        sequencer.run(() -> follower.followPath(pathChain, maxPower, true));
-        sequencer.waitUntil(() -> follower.isBusy());
-        sequencer.waitUntil(() -> !follower.isBusy());
+        queuePath(pathChain, maxPower, true);
         sequencer.wait(duration);
     }
 
@@ -228,7 +178,7 @@ public class AutoBase extends OpMode {
 
     public void shoot(PathChain pathChain, double maxPower) {
         sequencer.run(() -> shooter.setShooterState(Shooter.ShooterState.IDLE));
-        sequencer.run(() -> follower.followPath(pathChain, maxPower, true));
+        sequencer.run(() -> followPath(pathChain, maxPower, true));
         sequencer.wait(defaultOpenGateTime);
         sequencer.run(() -> transfer.openGate());
         sequencer.run(() -> transfer.setIntakeState(Intake.IntakeState.STOP));
@@ -254,6 +204,10 @@ public class AutoBase extends OpMode {
     }
 
     public void goTo(PathChain pathChain, double maxPower, boolean holdEnd){
+        queuePath(pathChain, maxPower, holdEnd);
+    }
+
+    private void queuePath(PathChain pathChain, double maxPower, boolean holdEnd) {
         sequencer.run(() -> followPath(pathChain, maxPower, holdEnd));
         sequencer.waitUntil(() -> follower.isBusy());
         sequencer.waitUntil(() -> !follower.isBusy());

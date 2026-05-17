@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.Transfer;
+package org.firstinspires.ftc.teamcode.subsystems.transfer;
 
 import com.qualcomm.robotcore.hardware.Servo;
 

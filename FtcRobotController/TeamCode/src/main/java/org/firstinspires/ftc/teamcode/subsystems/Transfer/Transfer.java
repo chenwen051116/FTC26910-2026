@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.Transfer;
+package org.firstinspires.ftc.teamcode.subsystems.transfer;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -11,18 +11,18 @@ public class Transfer extends Overridable {
     private final Intake intake;
     private final Gate gate;
     private final BallSensor ballSensor;
-    private boolean hasRanOnlyOnce = false;
-    public Transfer(Gamepad gamepad, DcMotor intakeMotor, Servo gateServo, DistanceSensor[] sensors) {
+
+    public Transfer(Gamepad gamepad, DcMotor intakeMotor, DcMotor transferMotor, Servo gateServo, DistanceSensor[] sensors) {
         if (sensors.length != 3) {
             throw new IllegalArgumentException();
         }
 
         this.gamepad = gamepad;
-        intake = new Intake(intakeMotor);
+        intake = new Intake(intakeMotor, transferMotor);
         gate = new Gate(gateServo);
         ballSensor = new BallSensor(sensors);
 
-        stopOverrideDriver();
+        intake.setIntakeState(Intake.IntakeState.STOP);
     }
 
     public int getBallCount() {
@@ -54,16 +54,12 @@ public class Transfer extends Overridable {
     public void runWhenStartingOverride() {
         intake.setIntakeState(Intake.IntakeState.STOP);
         gate.open();
-        hasRanOnlyOnce = false;
     }
 
     @Override
     public void runWhenStoppingOverride() {
         intake.setIntakeState(Intake.IntakeState.STOP);
-        if (!hasRanOnlyOnce){
-            gate.close();
-            hasRanOnlyOnce = true;
-        }
+        gate.close();
     }
 
     @Override
