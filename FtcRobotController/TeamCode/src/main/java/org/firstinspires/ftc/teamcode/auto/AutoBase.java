@@ -11,6 +11,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
+import com.pedropathing.paths.PathBuilder;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -23,6 +24,10 @@ import org.firstinspires.ftc.teamcode.subsystems.transfer.Transfer;
 
 @Config
 public class AutoBase extends OpMode {
+    protected enum HeadingInterpolation {
+        CONSTANT,
+        LINEAR
+    }
 
     protected final Sequencer sequencer = new Sequencer();
     protected Shooter shooter;
@@ -75,6 +80,19 @@ public class AutoBase extends OpMode {
                                Pose endPose) {
         return buildPath(startPose, endPose, defaultBrakingStrength, defaultBrakingStart);
     }
+
+    public PathChain buildPath(Pose startPose,
+                               Pose endPose,
+                               HeadingInterpolation headingInterpolation) {
+        return buildPath(startPose,
+                endPose,
+                defaultBrakingStrength,
+                defaultBrakingStart,
+                0.997,
+                headingInterpolation
+        );
+    }
+
     public PathChain buildPath(Pose startPose,
                                Pose endPose,
                                double brakingStrength,
@@ -87,51 +105,85 @@ public class AutoBase extends OpMode {
                                double brakingStrength,
                                double brakingStart,
                                double tValue) {
-        return follower.pathBuilder()
-                .addPath(new BezierLine(startPose, endPose))
-                .setConstantHeadingInterpolation(endPose.getHeading())
-                .setTValueConstraint(tValue)
-                .setBrakingStrength(brakingStrength)
-                .setBrakingStart(brakingStart)
-                .setGlobalDeceleration(brakingStrength)
-                .build();
-    }
-
-    public PathChain buildPathLinearInterpol(Pose startPose,
-                                             Pose endPose) {
-        return buildPathLinearInterpol(startPose,
-                endPose,
-                defaultBrakingStrength,
-                defaultBrakingStart
-        );
-    }
-
-    public PathChain buildPathLinearInterpol(Pose startPose,
-                                             Pose endPose,
-                                             double brakingStrength,
-                                             double brakingStart) {
-        return buildPathLinearInterpol(startPose,
+        return buildPath(startPose,
                 endPose,
                 brakingStrength,
                 brakingStart,
-                0.997
+                tValue,
+                HeadingInterpolation.CONSTANT
         );
     }
 
-    public PathChain buildPathLinearInterpol(Pose startPose,
-                                             Pose endPose,
-                                             double brakingStrength,
-                                             double brakingStart,
-                                             double tValue) {
-        return follower.pathBuilder()
-                .addPath(new BezierLine(startPose, endPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading())
-                .setTValueConstraint(tValue)
-                .setBrakingStrength(brakingStrength)
-                .setBrakingStart(brakingStart)
-                .setGlobalDeceleration(brakingStrength)
-                .build();
+    public PathChain buildPath(Pose startPose,
+                               Pose endPose,
+                               double brakingStrength,
+                               double brakingStart,
+                               HeadingInterpolation headingInterpolation) {
+        return buildPath(startPose,
+                endPose,
+                brakingStrength,
+                brakingStart,
+                0.997,
+                headingInterpolation
+        );
+    }
 
+    public PathChain buildPath(Pose startPose,
+                               Pose endPose,
+                               double tValue,
+                               HeadingInterpolation headingInterpolation,
+                               boolean applyBraking) {
+        return buildPath(startPose,
+                endPose,
+                defaultBrakingStrength,
+                defaultBrakingStart,
+                tValue,
+                headingInterpolation,
+                applyBraking
+        );
+    }
+
+    public PathChain buildPath(Pose startPose,
+                               Pose endPose,
+                               double brakingStrength,
+                               double brakingStart,
+                               double tValue,
+                               HeadingInterpolation headingInterpolation) {
+        return buildPath(startPose,
+                endPose,
+                brakingStrength,
+                brakingStart,
+                tValue,
+                headingInterpolation,
+                true
+        );
+    }
+
+    public PathChain buildPath(Pose startPose,
+                               Pose endPose,
+                               double brakingStrength,
+                               double brakingStart,
+                               double tValue,
+                               HeadingInterpolation headingInterpolation,
+                               boolean applyBraking) {
+        PathBuilder builder = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, endPose));
+
+        if (headingInterpolation == HeadingInterpolation.LINEAR) {
+            builder.setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading());
+        } else {
+            builder.setConstantHeadingInterpolation(endPose.getHeading());
+        }
+
+        builder.setTValueConstraint(tValue);
+
+        if (applyBraking) {
+            builder.setBrakingStrength(brakingStrength)
+                    .setBrakingStart(brakingStart)
+                    .setGlobalDeceleration(brakingStrength);
+        }
+
+        return builder.build();
     }
 
     public void intakeAtPos(PathChain beginPathChain, PathChain endPathChain) {

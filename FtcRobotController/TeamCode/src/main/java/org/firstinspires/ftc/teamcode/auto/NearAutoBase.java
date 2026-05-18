@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
@@ -92,12 +91,13 @@ public abstract class NearAutoBase extends AutoBase {
     public void initializePath() {
         NearPoses poses = getNearPoses();
 
-        PathChain startToShootingPath = buildPathLinearInterpol(
+        PathChain startToShootingPath = buildPath(
                 poses.start,
                 poses.shoot,
                 defaultBrakingStrength,
                 startToShootingBrakingStart,
-                shootingTValue
+                shootingTValue,
+                HeadingInterpolation.LINEAR
         );
 
         PathChain shootingToBall2StartPath = buildPath(
@@ -106,13 +106,24 @@ public abstract class NearAutoBase extends AutoBase {
                 ball2IntakeBrakingStrength,
                 ball2IntakeBrakingStart
         );
-        PathChain ball2StartToBall2EndPath = buildPathLinearInterpol(poses.ball2Start, poses.ball2End);
-        PathChain ball2EndToAvoidPath = buildAvoidPath(poses.ball2End, poses.avoid);
-        PathChain avoidToShootPath = buildPathLinearInterpol(
+        PathChain ball2StartToBall2EndPath = buildPath(
+                poses.ball2Start,
+                poses.ball2End,
+                HeadingInterpolation.LINEAR
+        );
+        PathChain ball2EndToAvoidPath = buildPath(
+                poses.ball2End,
+                poses.avoid,
+                avoidTValue,
+                HeadingInterpolation.LINEAR,
+                false
+        );
+        PathChain avoidToShootPath = buildPath(
                 poses.avoid,
                 poses.shoot,
                 avoidToShootingBrakingStrength,
-                avoidToShootingBrakingStart
+                avoidToShootingBrakingStart,
+                HeadingInterpolation.LINEAR
         );
 
         PathChain shootingToBeforeGatePath = buildPath(poses.shoot, poses.beforeGate);
@@ -123,10 +134,20 @@ public abstract class NearAutoBase extends AutoBase {
                 defaultBrakingStart,
                 gateTValue
         );
-        PathChain openGatePoseToAvoidPath = buildAvoidPath(poses.openGate, poses.avoid);
+        PathChain openGatePoseToAvoidPath = buildPath(
+                poses.openGate,
+                poses.avoid,
+                avoidTValue,
+                HeadingInterpolation.LINEAR,
+                false
+        );
 
         PathChain shootingToBall1StartPath = buildPath(poses.shoot, poses.ball1Start);
-        PathChain ball1StartToBall1EndPath = buildPathLinearInterpol(poses.ball1Start, poses.ball1End);
+        PathChain ball1StartToBall1EndPath = buildPath(
+                poses.ball1Start,
+                poses.ball1End,
+                HeadingInterpolation.LINEAR
+        );
         PathChain ball1EndToShootingPath = buildPath(
                 poses.ball1End,
                 poses.shoot,
@@ -140,7 +161,11 @@ public abstract class NearAutoBase extends AutoBase {
                 defaultBrakingStrength,
                 ball3IntakeBrakingStart
         );
-        PathChain ball3StartToBall3EndPath = buildPathLinearInterpol(poses.ball3Start, poses.ball3End);
+        PathChain ball3StartToBall3EndPath = buildPath(
+                poses.ball3Start,
+                poses.ball3End,
+                HeadingInterpolation.LINEAR
+        );
         PathChain ball3EndToShootingPath = buildPath(
                 poses.ball3End,
                 poses.shoot,
@@ -171,13 +196,5 @@ public abstract class NearAutoBase extends AutoBase {
         }
 
         goTo(shootingToLeavePath);
-    }
-
-    private PathChain buildAvoidPath(Pose startPose, Pose endPose) {
-        return follower.pathBuilder()
-                .addPath(new BezierLine(startPose, endPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading())
-                .setTValueConstraint(avoidTValue)
-                .build();
     }
 }

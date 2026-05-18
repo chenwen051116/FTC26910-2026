@@ -86,7 +86,7 @@
 //
 //
 //        // FROM START TO SHOOTING
-//        PathChain startToShootingPath = buildPathLinearInterpol(startPose, shootPose);
+//        PathChain startToShootingPath = buildPath(startPose, shootPose, HeadingInterpolation.LINEAR);
 //
 //        // FROM SHOOTING TO BALL 2 BEGIN
 //        PathChain shootingToBall2StartPath = buildPath(shootPose,
@@ -96,7 +96,7 @@
 //        );
 //
 //        // FROM BALL 2 BEGIN TO BALL 2 END
-//        PathChain ball2StartToBall2EndPath = buildPathLinearInterpol(ball2StartPose, ball2EndPose);
+//        PathChain ball2StartToBall2EndPath = buildPath(ball2StartPose, ball2EndPose, HeadingInterpolation.LINEAR);
 //
 //        // FROM BALL 2 END TO BALL 2 AFTER
 //        PathChain ball2EndToBall2AfterPath = buildPath(ball2EndPose, ball2AfterPose);
@@ -134,7 +134,7 @@
 //        PathChain shootingToBall1StartPath = buildPath(shootPose, ball1StartPose);
 //
 //        // FROM BALL 1 BEGIN TO BALL 1 END
-//        PathChain ball1StartToBall1EndPath = buildPathLinearInterpol(ball1StartPose, ball1EndPose);
+//        PathChain ball1StartToBall1EndPath = buildPath(ball1StartPose, ball1EndPose, HeadingInterpolation.LINEAR);
 //
 //        // FROM BALL 1 END TO SHOOTING
 //        PathChain ball1EndToShootingPath = buildPath(ball1EndPose, shootPose);
@@ -147,7 +147,7 @@
 //        );
 //
 //        // FROM BALL 3 BEGIN TO BALL 3 END
-//        PathChain ball3StartToBall3EndPath = buildPathLinearInterpol(ball3StartPose, ball3EndPose);
+//        PathChain ball3StartToBall3EndPath = buildPath(ball3StartPose, ball3EndPose, HeadingInterpolation.LINEAR);
 //
 //        // FROM BALL 3 END TO SHOOTING
 //        PathChain ball3EndToShootingPath = buildPath(ball3EndPose, shootPose);
