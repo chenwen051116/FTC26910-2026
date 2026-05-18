@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
@@ -52,17 +53,70 @@ public abstract class FarAutoBase extends AutoBase {
     public void initializePath() {
         FarPoses poses = getFarPoses();
 
-        PathChain startToShootingPath = buildPath(poses.start, poses.shoot);
-        PathChain shootingToBall3StartPath = buildPath(poses.shoot, poses.ball3Start);
-        PathChain ball3StartToBall3EndPath = buildPath(poses.ball3Start, poses.ball3End);
-        PathChain ball3EndToShootingPath = buildPath(poses.ball3End, poses.shoot);
-        PathChain shootingToHumanZoneGetStartPath = buildPath(poses.shoot, poses.humanZoneGetStart);
-        PathChain humanZoneGetStartToHumanZoneGetEndPath = buildPath(
-                poses.humanZoneGetStart,
-                poses.humanZoneGetEnd
-        );
-        PathChain humanZoneGetEndToShootingPath = buildPath(poses.humanZoneGetEnd, poses.shoot);
-        PathChain shootingToLeavePath = buildPath(poses.shoot, poses.leave);
+        PathChain startToShootingPath = follower.pathBuilder()
+                .addPath(new BezierLine(poses.start, poses.shoot))
+                .setConstantHeadingInterpolation(poses.shoot.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
+        PathChain shootingToBall3StartPath = follower.pathBuilder()
+                .addPath(new BezierLine(poses.shoot, poses.ball3Start))
+                .setConstantHeadingInterpolation(poses.ball3Start.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
+        PathChain ball3StartToBall3EndPath = follower.pathBuilder()
+                .addPath(new BezierLine(poses.ball3Start, poses.ball3End))
+                .setConstantHeadingInterpolation(poses.ball3End.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
+        PathChain ball3EndToShootingPath = follower.pathBuilder()
+                .addPath(new BezierLine(poses.ball3End, poses.shoot))
+                .setConstantHeadingInterpolation(poses.shoot.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
+        PathChain shootingToHumanZoneGetStartPath = follower.pathBuilder()
+                .addPath(new BezierLine(poses.shoot, poses.humanZoneGetStart))
+                .setConstantHeadingInterpolation(poses.humanZoneGetStart.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
+        PathChain humanZoneGetStartToHumanZoneGetEndPath = follower.pathBuilder()
+                .addPath(new BezierLine(poses.humanZoneGetStart, poses.humanZoneGetEnd))
+                .setConstantHeadingInterpolation(poses.humanZoneGetEnd.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
+        PathChain humanZoneGetEndToShootingPath = follower.pathBuilder()
+                .addPath(new BezierLine(poses.humanZoneGetEnd, poses.shoot))
+                .setConstantHeadingInterpolation(poses.shoot.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
+        PathChain shootingToLeavePath = follower.pathBuilder()
+                .addPath(new BezierLine(poses.shoot, poses.leave))
+                .setConstantHeadingInterpolation(poses.leave.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         shoot(startToShootingPath, startToShootingMaxPower);
         intakeAtPos(shootingToBall3StartPath, ball3StartToBall3EndPath);

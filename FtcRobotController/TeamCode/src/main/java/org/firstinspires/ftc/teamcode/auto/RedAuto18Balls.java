@@ -86,35 +86,35 @@
 //
 //
 //        // FROM START TO SHOOTING
-//        PathChain startToShootingPath = buildPath(startPose, shootPose, HeadingInterpolation.LINEAR);
+//        PathChain startToShootingPath = follower.pathBuilder();
 //
 //        // FROM SHOOTING TO BALL 2 BEGIN
-//        PathChain shootingToBall2StartPath = buildPath(shootPose,
+//        PathChain shootingToBall2StartPath = follower.pathBuilder();
 //                ball2StartPose,
 //                defaultBrakingStrength,
 //                ball2IntakeBrakingStart
 //        );
 //
 //        // FROM BALL 2 BEGIN TO BALL 2 END
-//        PathChain ball2StartToBall2EndPath = buildPath(ball2StartPose, ball2EndPose, HeadingInterpolation.LINEAR);
+//        PathChain ball2StartToBall2EndPath = follower.pathBuilder();
 //
 //        // FROM BALL 2 END TO BALL 2 AFTER
-//        PathChain ball2EndToBall2AfterPath = buildPath(ball2EndPose, ball2AfterPose);
+//        PathChain ball2EndToBall2AfterPath = follower.pathBuilder();
 //
 //        // FROM BALL 2 AFTER TO SHOOTING
-//        PathChain ball2AfterToShootingPath = buildPath(ball2AfterPose, shootPose);
+//        PathChain ball2AfterToShootingPath = follower.pathBuilder();
 //
 //        // FROM BALL 2 END TO SHOOTING
-//        PathChain ball2EndToShootingPath = buildPath(ball2EndPose, shootPose);
+//        PathChain ball2EndToShootingPath = follower.pathBuilder();
 //
 //        // FROM SHOOTING TO BEFORE GATE POSE
-//        PathChain shootingToBeforeGatePath = buildPath(shootPose, beforeGatePose);
+//        PathChain shootingToBeforeGatePath = follower.pathBuilder();
 //
 //        // FROM BEFORE GATE POSE TO OPEN GATE POSE
-//        PathChain beforeGateToOpenGatePath = buildPath(beforeGatePose, openGatePose);
+//        PathChain beforeGateToOpenGatePath = follower.pathBuilder();
 //
 //        // FROM OPEN GATE POSE TO GATE INTAKE POSE
-//        PathChain openGateToGetGateBallPath = buildPath(openGatePose,
+//        PathChain openGateToGetGateBallPath = follower.pathBuilder();
 //                getGateBallPose,
 //                defaultBrakingStrength,
 //                defaultBrakingStart,
@@ -122,35 +122,35 @@
 //                );
 //
 //        // FROM GATE INTAKE POSE TO BEFORE GATE POSE
-//        PathChain getGateBallToBeforeGatePath = buildPath(getGateBallPose, beforeGatePose);
+//        PathChain getGateBallToBeforeGatePath = follower.pathBuilder();
 //
 //        // FROM BEFORE GATE POSE TO SHOOTING POSE
-//        PathChain beforeGateToShootingPath = buildPath(beforeGatePose, shootPose);
+//        PathChain beforeGateToShootingPath = follower.pathBuilder();
 //
 //        // FROM GATE INTAKE POS TO SHOOTING POSE
-//        PathChain getGateBallToShootingPath = buildPath(getGateBallPose, shootPose);
+//        PathChain getGateBallToShootingPath = follower.pathBuilder();
 //
 //        // FROM SHOOTING TO BALL 1 BEGIN
-//        PathChain shootingToBall1StartPath = buildPath(shootPose, ball1StartPose);
+//        PathChain shootingToBall1StartPath = follower.pathBuilder();
 //
 //        // FROM BALL 1 BEGIN TO BALL 1 END
-//        PathChain ball1StartToBall1EndPath = buildPath(ball1StartPose, ball1EndPose, HeadingInterpolation.LINEAR);
+//        PathChain ball1StartToBall1EndPath = follower.pathBuilder();
 //
 //        // FROM BALL 1 END TO SHOOTING
-//        PathChain ball1EndToShootingPath = buildPath(ball1EndPose, shootPose);
+//        PathChain ball1EndToShootingPath = follower.pathBuilder();
 //
 //        // FROM SHOOTING TO BALL 3 BEGIN
-//        PathChain shootingToBall3StartPath = buildPath(shootPose,
+//        PathChain shootingToBall3StartPath = follower.pathBuilder();
 //                ball3StartPose,
 //                defaultBrakingStrength,
 //                ball3IntakeBrakingStart
 //        );
 //
 //        // FROM BALL 3 BEGIN TO BALL 3 END
-//        PathChain ball3StartToBall3EndPath = buildPath(ball3StartPose, ball3EndPose, HeadingInterpolation.LINEAR);
+//        PathChain ball3StartToBall3EndPath = follower.pathBuilder();
 //
 //        // FROM BALL 3 END TO SHOOTING
-//        PathChain ball3EndToShootingPath = buildPath(ball3EndPose, shootPose);
+//        PathChain ball3EndToShootingPath = follower.pathBuilder();
 //
 //        // Initialize Sequencer
 //        // From start pose to shooting pose

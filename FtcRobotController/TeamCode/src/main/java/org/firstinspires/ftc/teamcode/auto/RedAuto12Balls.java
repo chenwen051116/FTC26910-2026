@@ -3,6 +3,7 @@ import static org.firstinspires.ftc.teamcode.auto.AutoConstants.RedNear.*;
 
 
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -38,34 +39,104 @@ public class RedAuto12Balls extends AutoBase {
 
 
         // FROM START TO SHOOTING
-        PathChain startToShootingPath = buildPath(startPose, shootPose);
+        PathChain startToShootingPath = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, shootPose))
+                .setConstantHeadingInterpolation(shootPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM SHOOTING TO BALL 1 BEGIN
-        PathChain shootingToBall1StartPath = buildPath(shootPose, ball1StartPose);
+        PathChain shootingToBall1StartPath = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, ball1StartPose))
+                .setConstantHeadingInterpolation(ball1StartPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM BALL 1 BEGIN TO BALL 1 END
-        PathChain ball1StartToBall1EndPath = buildPath(ball1StartPose, ball1EndPose);
+        PathChain ball1StartToBall1EndPath = follower.pathBuilder()
+                .addPath(new BezierLine(ball1StartPose, ball1EndPose))
+                .setConstantHeadingInterpolation(ball1EndPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM BALL 1 END TO SHOOTING
-        PathChain ball1EndToShootingPath = buildPath(ball1EndPose, shootPose);
+        PathChain ball1EndToShootingPath = follower.pathBuilder()
+                .addPath(new BezierLine(ball1EndPose, shootPose))
+                .setConstantHeadingInterpolation(shootPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM SHOOTING TO BALL 2 BEGIN
-        PathChain shootingToBall2StartPath = buildPath(shootPose, ball2StartPose);
+        PathChain shootingToBall2StartPath = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, ball2StartPose))
+                .setConstantHeadingInterpolation(ball2StartPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM BALL 2 BEGIN TO BALL 2 END
-        PathChain ball2StartToBall2WithGatePath = buildPath(ball2StartPose, ball2WithGatePose);
+        PathChain ball2StartToBall2WithGatePath = follower.pathBuilder()
+                .addPath(new BezierLine(ball2StartPose, ball2WithGatePose))
+                .setConstantHeadingInterpolation(ball2WithGatePose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM BALL 2 END TO SHOOTING
-        PathChain ball2EndToShootingPath = buildPath(ball2WithGatePose, shootPose);
+        PathChain ball2EndToShootingPath = follower.pathBuilder()
+                .addPath(new BezierLine(ball2WithGatePose, shootPose))
+                .setConstantHeadingInterpolation(shootPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM SHOOTING TO BALL 3 BEGIN
-        PathChain shootingToBall3StartPath = buildPath(shootPose, ball3StartPose);
+        PathChain shootingToBall3StartPath = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, ball3StartPose))
+                .setConstantHeadingInterpolation(ball3StartPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM BALL 3 BEGIN TO BALL 3 END
-        PathChain ball3StartToBall3EndPath = buildPath(ball3StartPose, ball3EndPose);
+        PathChain ball3StartToBall3EndPath = follower.pathBuilder()
+                .addPath(new BezierLine(ball3StartPose, ball3EndPose))
+                .setConstantHeadingInterpolation(ball3EndPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // FROM BALL 3 END TO SHOOTING
-        PathChain ball3EndToShootingPath = buildPath(ball3EndPose, shootPose);
+        PathChain ball3EndToShootingPath = follower.pathBuilder()
+                .addPath(new BezierLine(ball3EndPose, shootPose))
+                .setConstantHeadingInterpolation(shootPose.getHeading())
+                .setTValueConstraint(0.997)
+                .setBrakingStrength(defaultBrakingStrength)
+                .setBrakingStart(defaultBrakingStart)
+                .setGlobalDeceleration(defaultBrakingStrength)
+                .build();
 
         // Initialize Sequencer
         // From Start pose to shooting pose
