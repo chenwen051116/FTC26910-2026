@@ -9,6 +9,7 @@ import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.RobotHardware;
+import org.firstinspires.ftc.teamcode.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.transfer.Intake;
 
@@ -39,11 +40,19 @@ abstract class AllianceTeleOp extends LinearOpMode {
         configureBeforeStart(robot);
 
         boolean isShooting = false;
+        boolean resetPoseButtonWasDown = false;
 
         waitForStart();
         while (opModeIsActive()) {
-            Pose robotPose = robot.drivetrain.getCurrentPose();
             boolean isRed = isRedAlliance();
+
+            boolean resetPoseButtonDown = gamepad1.back;
+            if (resetPoseButtonDown && !resetPoseButtonWasDown) {
+                robot.drivetrain.resetPose(wallResetPose(isRed));
+            }
+            resetPoseButtonWasDown = resetPoseButtonDown;
+
+            Pose robotPose = robot.drivetrain.getCurrentPose();
             Vector targetDisplacement = robot.shooter.getDisplacement(robot.shooter.getGoalPose(isRed), robotPose);
 
             robot.ledSet.setBallCount(robot.transfer.getBallCount());
@@ -79,6 +88,22 @@ abstract class AllianceTeleOp extends LinearOpMode {
 
             addTelemetry(robot, shooterConfig, targetDisplacement);
         }
+    }
+
+    private Pose wallResetPose(boolean isRed) {
+        if (isRed) {
+            return new Pose(
+                    AutoConstants.BlueFar.humanZoneGetEndX,
+                    AutoConstants.BlueFar.humanZoneGetEndY,
+                    AutoConstants.BlueFar.humanZoneGetEndHeading
+            );
+        }
+
+        return new Pose(
+                AutoConstants.RedFar.humanZoneGetEndX,
+                AutoConstants.RedFar.humanZoneGetEndY,
+                AutoConstants.RedFar.humanZoneGetEndHeading
+        );
     }
 
     protected void addTelemetry(RobotHardware robot, Shooter.ShooterConfig shooterConfig, Vector targetDisplacement) {

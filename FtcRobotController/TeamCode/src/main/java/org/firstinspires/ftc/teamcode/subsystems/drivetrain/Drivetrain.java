@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystems.drivetrain;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
@@ -78,6 +77,13 @@ public class Drivetrain extends Overridable {
         Drivetrain.lastPose = lastPose == null ? new Pose(0, 0, 0) : lastPose;
     }
 
+    public void resetPose(Pose pose) {
+        Pose resetPose = pose == null ? new Pose(0, 0, 0) : pose;
+        follower.setPose(resetPose);
+        follower.updatePose();
+        setLastPose(resetPose);
+    }
+
     public void initEncoder(){
         follower.startTeleopDrive();
         follower.setStartingPose(lastPose);
@@ -108,20 +114,6 @@ public class Drivetrain extends Overridable {
     public void followPath(PathChain pathChain, double maxPower) {
         follower.followPath(pathChain, maxPower, true);
     }
-
-    public PathChain buildPath(Pose startPose,
-                               Pose endPose,
-                               double brakingStrength,
-                               double brakingStart) {
-        return follower.pathBuilder()
-                .addPath(new BezierLine(startPose, endPose))
-                .setConstantHeadingInterpolation(endPose.getHeading())
-                .setGlobalDeceleration(brakingStrength)
-                .setTValueConstraint(0.997)
-                .setBrakingStart(brakingStart)
-                .build();
-    }
-
 
     public void draw() {
         Drawing.drawDebug(follower);
