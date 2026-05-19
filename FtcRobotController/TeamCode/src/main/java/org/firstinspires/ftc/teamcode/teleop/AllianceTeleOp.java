@@ -46,7 +46,7 @@ abstract class AllianceTeleOp extends LinearOpMode {
         while (opModeIsActive()) {
             boolean isRed = isRedAlliance();
 
-            boolean resetPoseButtonDown = gamepad1.back;
+            boolean resetPoseButtonDown = gamepad2.right_trigger > 0.3;
             if (resetPoseButtonDown && !resetPoseButtonWasDown) {
                 robot.drivetrain.resetPose(wallResetPose(isRed));
             }

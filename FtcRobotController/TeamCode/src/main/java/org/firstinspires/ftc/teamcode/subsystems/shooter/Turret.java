@@ -11,6 +11,9 @@ public class Turret {
     public static double servoTravelDegrees = 300;
     public static double minServoPosition = 0;
     public static double maxServoPosition = 1;
+    public static double manualMaxSpeedDegreesPerSecond = 120;
+    public static double manualDeadband = 0.05;
+    public static double manualDirection = 1;
 
     private final Servo primaryServo;
     private final Servo secondaryServo;
@@ -19,6 +22,7 @@ public class Turret {
     private double targetAngle = 0;
     private double commandedAngle = 0;
     private double commandedPosition = centerPosition;
+    private long lastManualControlTimeNanos = 0;
 
     public Turret(Servo primaryServo, Servo secondaryServo) {
         this.primaryServo = primaryServo;
@@ -30,7 +34,7 @@ public class Turret {
     }
 
     public void initEncoder() {
-        center();
+        zero();
     }
 
     public void setOffset(double offset) {
@@ -63,6 +67,28 @@ public class Turret {
 
     public void setAngle(double targetAngle) {
         this.targetAngle = clampAngle(normalizeRadians(targetAngle));
+    }
+
+    public void manualControl(double stickX) {
+        double input = Math.abs(stickX) < manualDeadband ? 0 : stickX;
+        long now = System.nanoTime();
+
+        if (lastManualControlTimeNanos == 0) {
+            lastManualControlTimeNanos = now;
+        }
+
+        double seconds = (now - lastManualControlTimeNanos) / 1_000_000_000.0;
+        lastManualControlTimeNanos = now;
+
+        double angleDelta = Math.toRadians(manualMaxSpeedDegreesPerSecond) * manualDirection * input * seconds;
+        setAngle(targetAngle + angleDelta);
+        periodic();
+    }
+
+    public void zero() {
+        resetOffset();
+        lastManualControlTimeNanos = 0;
+        center();
     }
 
     public void center() {
