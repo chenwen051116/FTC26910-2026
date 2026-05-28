@@ -4,13 +4,10 @@ import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_AX;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_AY;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_VX;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.C_VY;
-import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONGEST_SHORT_DISTANCE;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_DISTANCE;
-import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_DISTANCE_INTERVAL;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_HOOD_POSITION;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONG_RANGE_RPM;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTANCE;
-import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTANCE_INTERVAL;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_HOOD_POSITION;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_RPM;
 import static org.firstinspires.ftc.teamcode.Constants.Shooter.TURRET_OFFSET;
@@ -21,6 +18,7 @@ import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.subsystems.Overridable;
 
@@ -51,16 +49,17 @@ public class Shooter extends Overridable {
     private final Flywheel flywheel;
     private ShooterState shooterState;
     private ShooterConfig shooterConfig;
-    public static double IDLE_RPM = 2600;
-    public static double turretOffsetIncrement = 5;
+    public static double turretOffsetIncrement = 2;
     public static double kvIncrement = 0.000005;
+    public static double turretTrackingDirection = -1;
+    public static double turretAngleMultiplier = 0.875;
 
     // Constructor
     public Shooter(
             Gamepad gamepad1,
             Gamepad gamepad2,
-            Servo turretPrimaryServo,
-            Servo turretSecondaryServo,
+            ServoImplEx turretPrimaryServo,
+            ServoImplEx turretSecondaryServo,
             Servo hoodServo,
             DcMotorEx flywheelMotor1,
             DcMotorEx flywheelMotor2
@@ -105,6 +104,10 @@ public class Shooter extends Overridable {
 
     public double getTurretPower() {
         return turret.getPosition();
+    }
+
+    public void resetTurretOffset() {
+        turret.resetOffset();
     }
 
     // Get the current position of hood from 0 to 1
@@ -157,53 +160,105 @@ public class Shooter extends Overridable {
 
         Vector displacement = getDisplacement(goalPose, robotPose);
         double distance = displacement.getMagnitude();
-        int index;
-        double targetHoodAngle;
-        double targetRPM;
-
-        // Using linear approximation to find the ideal RPM
-
-        if (distance < LONGEST_SHORT_DISTANCE) {
-            index = (int)Math.floor((distance - SHORT_RANGE_DISTANCE[0]) / SHORT_RANGE_DISTANCE_INTERVAL);
-            index = Math.max(0, Math.min(index, SHORT_RANGE_DISTANCE.length - 2));
-
-            targetHoodAngle = (SHORT_RANGE_HOOD_POSITION[index + 1] - SHORT_RANGE_HOOD_POSITION[index])/
-                    (SHORT_RANGE_DISTANCE[index + 1] - SHORT_RANGE_DISTANCE[index]) *
-                    (distance - SHORT_RANGE_DISTANCE[index]) +
-                    SHORT_RANGE_HOOD_POSITION[index];
-
-            targetRPM = (double)(SHORT_RANGE_RPM[index + 1] - SHORT_RANGE_RPM[index])/
-                    (SHORT_RANGE_DISTANCE[index + 1] - SHORT_RANGE_DISTANCE[index]) *
-                    (distance - SHORT_RANGE_DISTANCE[index]) +
-                    SHORT_RANGE_RPM[index];
-        } else {
-            index = (int) Math.floor((distance - LONG_RANGE_DISTANCE[0]) / LONG_RANGE_DISTANCE_INTERVAL);
-            index = Math.max(0, Math.min(index, LONG_RANGE_DISTANCE.length - 2));
-
-            targetHoodAngle = (LONG_RANGE_HOOD_POSITION[index + 1] - LONG_RANGE_HOOD_POSITION[index]) /
-                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
-                    (distance - LONG_RANGE_DISTANCE[index]) +
-                    LONG_RANGE_HOOD_POSITION[index];
-
-            targetRPM = (LONG_RANGE_RPM[index + 1] - LONG_RANGE_RPM[index]) /
-                    (LONG_RANGE_DISTANCE[index + 1] - LONG_RANGE_DISTANCE[index]) *
-                    (distance - LONG_RANGE_DISTANCE[index]) +
-                    LONG_RANGE_RPM[index];
-        }
-
-
+        ShotProfile shotProfile = calculateShotProfile(distance);
+        double relativeTurretAngle = normalizeRadians(displacement.getTheta() - robotPose.getHeading());
 
         return new ShooterConfig(
-                displacement.getTheta() - robotPose.getHeading(),
-                targetHoodAngle,
-                targetRPM
+                turretTrackingDirection * turretAngleMultiplier * relativeTurretAngle,
+                shotProfile.hoodPosition,
+                shotProfile.flywheelRPM
+        );
+    }
+
+    private ShotProfile calculateShotProfile(double distance) {
+        double shortestDistance = SHORT_RANGE_DISTANCE[0];
+        double longestShortDistance = SHORT_RANGE_DISTANCE[SHORT_RANGE_DISTANCE.length - 1];
+        double shortestLongDistance = LONG_RANGE_DISTANCE[0];
+        double longestLongDistance = LONG_RANGE_DISTANCE[LONG_RANGE_DISTANCE.length - 1];
+        double transitionDistance = (longestShortDistance + shortestLongDistance) / 2.0;
+
+        if (distance <= longestShortDistance) {
+            return interpolateShotProfile(
+                    clamp(distance, shortestDistance, longestShortDistance),
+                    SHORT_RANGE_DISTANCE,
+                    SHORT_RANGE_HOOD_POSITION,
+                    SHORT_RANGE_RPM
+            );
+        }
+
+        if (distance < shortestLongDistance) {
+            if (distance < transitionDistance) {
+                return interpolateShotProfile(
+                        longestShortDistance,
+                        SHORT_RANGE_DISTANCE,
+                        SHORT_RANGE_HOOD_POSITION,
+                        SHORT_RANGE_RPM
+                );
+            }
+
+            return interpolateShotProfile(
+                    shortestLongDistance,
+                    LONG_RANGE_DISTANCE,
+                    LONG_RANGE_HOOD_POSITION,
+                    LONG_RANGE_RPM
+            );
+        }
+
+        return interpolateShotProfile(
+                clamp(distance, shortestLongDistance, longestLongDistance),
+                LONG_RANGE_DISTANCE,
+                LONG_RANGE_HOOD_POSITION,
+                LONG_RANGE_RPM
+        );
+    }
+
+    private ShotProfile interpolateShotProfile(
+            double distance,
+            double[] distances,
+            double[] hoodPositions,
+            int[] rpms
+    ) {
+        int index = 0;
+        while (index < distances.length - 2 && distance > distances[index + 1]) {
+            index++;
+        }
+
+        double startDistance = distances[index];
+        double endDistance = distances[index + 1];
+        double progress = (distance - startDistance) / (endDistance - startDistance);
+        double hoodPosition = hoodPositions[index] + (hoodPositions[index + 1] - hoodPositions[index]) * progress;
+        double flywheelRPM = rpms[index] + (rpms[index + 1] - rpms[index]) * progress;
+
+        return new ShotProfile(hoodPosition, flywheelRPM);
+    }
+
+    private static class ShotProfile {
+        final double hoodPosition;
+        final double flywheelRPM;
+
+        ShotProfile(double hoodPosition, double flywheelRPM) {
+            this.hoodPosition = hoodPosition;
+            this.flywheelRPM = flywheelRPM;
+        }
+    }
+
+    public Pose getTurretPose(Pose robotPose) {
+        // Positive TURRET_OFFSET is behind the robot center, opposite the heading vector.
+        return new Pose(
+                robotPose.getX() - TURRET_OFFSET * Math.cos(robotPose.getHeading()),
+                robotPose.getY() - TURRET_OFFSET * Math.sin(robotPose.getHeading()),
+                robotPose.getHeading()
         );
     }
 
     public Vector getDisplacement(Pose goalPose, Pose robotPose){
-        double v1 = goalPose.getY() - (robotPose.getY() - TURRET_OFFSET * Math.sin(robotPose.getHeading()));
-        double v2 = goalPose.getX() - (robotPose.getX() - TURRET_OFFSET * Math.cos(robotPose.getHeading()));
-        return new Vector(Math.hypot(v2, v1), Math.atan2(v1, v2));
+        Pose turretPose = getTurretPose(robotPose);
+        double yDisplacement = goalPose.getY() - turretPose.getY();
+        double xDisplacement = goalPose.getX() - turretPose.getX();
+        return new Vector(
+                Math.hypot(xDisplacement, yDisplacement),
+                Math.atan2(yDisplacement, xDisplacement)
+        );
     }
 
     public Pose getGoalPose(boolean isRed){
@@ -228,7 +283,7 @@ public class Shooter extends Overridable {
                 flywheel.setRPM(0);
                 break;
             case IDLE:
-                flywheel.setRPM(IDLE_RPM);
+                flywheel.setRPM(shooterConfig.flywheelRPM);
                 break;
             case SHOOTING:
                 flywheel.setRPM(shooterConfig.flywheelRPM);
@@ -279,5 +334,13 @@ public class Shooter extends Overridable {
         turret.setAngle(shooterConfig.turretAngle);
         turret.periodic();
         flywheel.periodic();
+    }
+
+    private double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    private double normalizeRadians(double angleRadians) {
+        return Math.atan2(Math.sin(angleRadians), Math.cos(angleRadians));
     }
 }

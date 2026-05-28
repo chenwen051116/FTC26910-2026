@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotHardware;
+import org.firstinspires.ftc.teamcode.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.transfer.Intake;
 
@@ -28,15 +29,27 @@ public class ShooterTestingTeleOp extends LinearOpMode {
         robot.drivetrain.initEncoder();
         robot.shooter.initTurretEncoder();
 
+        boolean resetPoseButtonWasDown = false;
         boolean isShooting = false;
 
         waitForStart();
         while (opModeIsActive()) {
+            robot.clearBulkCache();
             robot.shooter.setShooterConfig(new Shooter.ShooterConfig(
                     tuningTurretAngle,
                     tuningHoodPosition,
                     tuningFlywheelRPM
             ));
+
+            boolean resetPoseButtonDown = gamepad2.right_trigger > 0.3;
+            if (resetPoseButtonDown && !resetPoseButtonWasDown) {
+                robot.drivetrain.resetPose(new Pose(AutoConstants.RedNear.startX,
+                        AutoConstants.RedNear.startY,
+                        AutoConstants.RedNear.startHeading));
+                robot.shooter.resetTurretOffset();
+            }
+            resetPoseButtonWasDown = resetPoseButtonDown;
+
 
             if (robot.shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 robot.transfer.overrideDriver();

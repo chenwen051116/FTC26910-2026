@@ -6,21 +6,15 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.paths.PathConstraints;
 
 public abstract class NearAutoBase extends AutoBase {
-    public static double startToShootingBrakingStart = 1.4;
-    public static double ball2IntakeBrakingStart = 1.7;
-    public static double ball3IntakeBrakingStart = 1.8;
-    public static double ball1EndToShootingBrakingStart = 1.7;
-    public static double avoidToShootingBrakingStart = 1.75;
-    public static double ball3EndToShootingBrakingStart = 1.8;
     public static double gateTValue = 0.987;
     public static double shootingTValue = 0.99;
     public static double avoidTValue = 0.987;
-    public static double gateGetBallPower = 0.8;
-    public static double ball2IntakeMaxPower = 0.8;
+    public static double gateGetBallPower = 1.0;
+    public static double ball2IntakeMaxPower = 1.0;
     public static double ball2IntakeBrakingStrength = 0.6;
     public static double ball3EndToShootingBrakingStrength = 0.6;
     public static double avoidToShootingBrakingStrength = 0.7;
-    public static double avoidToShootingMaxPower = 0.8;
+    public static double avoidToShootingMaxPower = 1.0;
 
     protected static class NearPoses {
         final Pose start;
@@ -98,20 +92,20 @@ public abstract class NearAutoBase extends AutoBase {
                 .setLinearHeadingInterpolation(poses.start.getHeading(), poses.shoot.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        startToShootingPath.setConstraintsForAll(new PathConstraints(shootingTValue, 100, defaultBrakingStrength, startToShootingBrakingStart));
+        startToShootingPath.setConstraintsForAll(new PathConstraints(shootingTValue, 100));
 
         PathChain shootingToBall2StartPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.shoot, poses.ball2Start))
                 .setConstantHeadingInterpolation(poses.ball2Start.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToBall2StartPath.setConstraintsForAll(new PathConstraints(0.997, 100, ball2IntakeBrakingStrength, ball2IntakeBrakingStart));
+        shootingToBall2StartPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain ball2StartToBall2EndPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.ball2Start, poses.ball2End))
                 .setLinearHeadingInterpolation(poses.ball2Start.getHeading(), poses.ball2End.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball2StartToBall2EndPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball2StartToBall2EndPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain ball2EndToAvoidPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.ball2End, poses.avoid))
                 .setLinearHeadingInterpolation(poses.ball2End.getHeading(), poses.avoid.getHeading())
@@ -122,20 +116,20 @@ public abstract class NearAutoBase extends AutoBase {
                 .setLinearHeadingInterpolation(poses.avoid.getHeading(), poses.shoot.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        avoidToShootPath.setConstraintsForAll(new PathConstraints(0.997, 100, avoidToShootingBrakingStrength, avoidToShootingBrakingStart));
+        avoidToShootPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         PathChain shootingToBeforeGatePath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.shoot, poses.beforeGate))
                 .setConstantHeadingInterpolation(poses.beforeGate.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToBeforeGatePath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToBeforeGatePath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain beforeGateToOpenGatePath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.beforeGate, poses.openGate))
                 .setConstantHeadingInterpolation(poses.openGate.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        beforeGateToOpenGatePath.setConstraintsForAll(new PathConstraints(gateTValue, 100, defaultBrakingStrength, defaultBrakingStart));
+        beforeGateToOpenGatePath.setConstraintsForAll(new PathConstraints(gateTValue, 100));
         PathChain openGatePoseToAvoidPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.openGate, poses.avoid))
                 .setLinearHeadingInterpolation(poses.openGate.getHeading(), poses.avoid.getHeading())
@@ -147,45 +141,45 @@ public abstract class NearAutoBase extends AutoBase {
                 .setConstantHeadingInterpolation(poses.ball1Start.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToBall1StartPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToBall1StartPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain ball1StartToBall1EndPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.ball1Start, poses.ball1End))
                 .setLinearHeadingInterpolation(poses.ball1Start.getHeading(), poses.ball1End.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball1StartToBall1EndPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball1StartToBall1EndPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain ball1EndToShootingPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.ball1End, poses.shoot))
                 .setConstantHeadingInterpolation(poses.shoot.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball1EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, ball1EndToShootingBrakingStart));
+        ball1EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         PathChain shootingToBall3StartPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.shoot, poses.ball3Start))
                 .setConstantHeadingInterpolation(poses.ball3Start.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToBall3StartPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, ball3IntakeBrakingStart));
+        shootingToBall3StartPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain ball3StartToBall3EndPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.ball3Start, poses.ball3End))
                 .setLinearHeadingInterpolation(poses.ball3Start.getHeading(), poses.ball3End.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball3StartToBall3EndPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball3StartToBall3EndPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain ball3EndToShootingPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.ball3End, poses.shoot))
                 .setConstantHeadingInterpolation(poses.shoot.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball3EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, ball3EndToShootingBrakingStrength, ball3EndToShootingBrakingStart));
+        ball3EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         PathChain shootingToLeavePath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.shoot, poses.leave))
                 .setConstantHeadingInterpolation(poses.leave.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToLeavePath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToLeavePath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         shoot(startToShootingPath);
         intakeAtPos(shootingToBall2StartPath, ball2StartToBall2EndPath, ball2IntakeMaxPower);

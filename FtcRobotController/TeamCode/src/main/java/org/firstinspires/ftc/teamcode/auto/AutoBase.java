@@ -28,14 +28,15 @@ public class AutoBase extends OpMode {
     protected LEDSet ledSet;
     protected Follower follower;
     protected Drivetrain drivetrain;
+    protected RobotHardware robot;
     protected static TelemetryManager telemetryM;
     protected boolean isRed = true;
 
 
     public static double defaultMoveMaxPower = 1, defaultIntakeMoveMaxPower = 1;
-    public static double defaultBrakingStart = 1;
-    public static double defaultBrakingStrength = 0.75;
-    public static int defaultIntakeDuration = 1500;
+    private static final double UNRESTRICTED_MAX_POWER = 1.0;
+    public static double defaultBrakingStrength = 0.5;
+    public static int defaultIntakeDuration = 1100;
     public static int defaultShootingDuration = 400;
     public static int defaultTimeBeforeShooting = 0;
     public static int defaultOpenGateTime = 400;
@@ -46,13 +47,13 @@ public class AutoBase extends OpMode {
 
     @Override
     public void init() {
+        setIsRed();
         setStartPose();
         setShootPose();
-        setIsRed();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         Drawing.init();
 
-        RobotHardware robot = new RobotHardware(hardwareMap, gamepad1, gamepad2);
+        robot = new RobotHardware(hardwareMap, gamepad1, gamepad2);
         follower = robot.follower;
         follower.setStartingPose(startPose);
 
@@ -165,7 +166,7 @@ public class AutoBase extends OpMode {
         followPath(pathChain, maxPower, true);
     }
     public void followPath(PathChain pathChain, double maxPower, boolean holdEnd) {
-        follower.followPath(pathChain, maxPower, holdEnd);
+        follower.followPath(pathChain, UNRESTRICTED_MAX_POWER, holdEnd);
     }
 
     public Pose getCurrentPose(){
@@ -182,6 +183,7 @@ public class AutoBase extends OpMode {
 
     @Override
     public void loop() {
+        robot.clearBulkCache();
 
         Shooter.ShooterConfig config = shooter.calculateShooterConfig(getCurrentPose(),
                 getCurrentVelocity(),
@@ -193,12 +195,6 @@ public class AutoBase extends OpMode {
         drivetrain.setLastPose(follower.getPose());
 
         sequencer.update();
-
-        Shooter.IDLE_RPM = shooter.calculateShooterConfig(shootPose,
-                getCurrentVelocity(),
-                getCurrentAcceleration(),
-                isRed
-                ).flywheelRPM;
 
         draw();
         transfer.alwaysRunning();

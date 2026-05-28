@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.subsystems.Overridable;
 
 public class Transfer extends Overridable {
+    private static final int TRANSFER_STOP_BALL_COUNT = 1;
+
     private final Gamepad gamepad;
     private final Intake intake;
     private final Gate gate;
@@ -30,7 +32,15 @@ public class Transfer extends Overridable {
     }
 
     public void setIntakeState(Intake.IntakeState intakeState) {
-        intake.setIntakeState(intakeState);
+        intake.setIntakeState(limitIntakeState(intakeState));
+    }
+
+    public void feedShooter() {
+        intake.setIntakeState(Intake.IntakeState.TRANSFER);
+    }
+
+    public Intake.IntakeState getIntakeState() {
+        return intake.getIntakeState();
     }
 
     public void openGate() {
@@ -65,22 +75,39 @@ public class Transfer extends Overridable {
     @Override
     public void runWithoutOverride() {
         if (gamepad.right_trigger > 0.1) {
-            intake.setIntakeState(Intake.IntakeState.INTAKE);
+            setIntakeState(Intake.IntakeState.INTAKE);
         } else if (gamepad.dpad_up) {
-            intake.setIntakeState(Intake.IntakeState.REVERSE);
+            setIntakeState(Intake.IntakeState.REVERSE);
         } else {
-            intake.setIntakeState(Intake.IntakeState.STOP);
+            setIntakeState(Intake.IntakeState.STOP);
         }
 
-        if (gamepad.dpadDownWasPressed()) {
+        if (gateToggleWasPressed()) {
             gate.toggle();
         }
     }
 
     @Override
     public void alwaysRunning() {
-        intake.periodic();
         ballSensor.periodic();
+        if (!isOverriding()) {
+            intake.setIntakeState(limitIntakeState(intake.getIntakeState()));
+        }
+        intake.periodic();
+    }
+
+    private Intake.IntakeState limitIntakeState(Intake.IntakeState intakeState) {
+        if (!isOverriding()
+                && intakeState == Intake.IntakeState.INTAKE
+                && getBallCount() >= TRANSFER_STOP_BALL_COUNT) {
+            return Intake.IntakeState.INTAKE_WITHOUT_TRANSFER;
+        }
+
+        return intakeState;
+    }
+
+    private boolean gateToggleWasPressed() {
+        return gamepad.dpadDownWasPressed();
     }
 }
 

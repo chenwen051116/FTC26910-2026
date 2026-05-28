@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.hardware.HardwareCommandCache;
 import org.firstinspires.ftc.teamcode.pedropathing.Constants;
 
 @Config
@@ -21,6 +22,7 @@ public class ChassisTestingTeleOp extends LinearOpMode {
     public static double BRpower = 0;
 
     public void runOpMode() {
+        HardwareCommandCache.resetCommandCache();
 
         DcMotor frontLeftMotor = getMotor("front_left");
         DcMotor frontRightMotor = getMotor("front_right");
@@ -43,10 +45,10 @@ public class ChassisTestingTeleOp extends LinearOpMode {
         backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         waitForStart();
         while (opModeIsActive()) {
-            frontLeftMotor.setPower(FLpower);
-            frontRightMotor.setPower(FRpower);
-            backLeftMotor.setPower(BLpower);
-            backRightMotor.setPower(BRpower);
+            HardwareCommandCache.setMotorPower(frontLeftMotor, FLpower);
+            HardwareCommandCache.setMotorPower(frontRightMotor, FRpower);
+            HardwareCommandCache.setMotorPower(backLeftMotor, BLpower);
+            HardwareCommandCache.setMotorPower(backRightMotor, BRpower);
         }
     }
 }

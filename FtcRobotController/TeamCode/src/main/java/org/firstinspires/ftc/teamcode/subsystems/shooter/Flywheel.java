@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.hardware.HardwareCommandCache;
 
 @Config
 public class Flywheel {
@@ -61,8 +62,8 @@ public class Flywheel {
 
     // Set the power of both motor to motorPower
     private void setBothMotorPower(double motorPower) {
-        flywheelMotor1.setPower(motorPower);
-        flywheelMotor2.setPower(motorPower);
+        HardwareCommandCache.setMotorPower(flywheelMotor1, motorPower);
+        HardwareCommandCache.setMotorPower(flywheelMotor2, motorPower);
     }
 
     public boolean isAtTargetRPM() {

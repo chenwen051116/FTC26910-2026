@@ -15,6 +15,11 @@ public class BlueNearAuto15Balls extends NearAutoBase {
     }
 
     @Override
+    protected double getGateGetBallPower() {
+        return 0.6;
+    }
+
+    @Override
     protected NearPoses getNearPoses() {
         return new NearPoses(
                 new Pose(startX, startY, startHeading),

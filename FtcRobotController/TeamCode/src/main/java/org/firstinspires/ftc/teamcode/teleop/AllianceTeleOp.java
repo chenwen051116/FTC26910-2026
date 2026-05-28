@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import static org.firstinspires.ftc.teamcode.Constants.Shooter.LONGEST_SHORT_DISTANCE;
+import static org.firstinspires.ftc.teamcode.Constants.Shooter.SHORT_RANGE_DISTANCE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -21,7 +21,6 @@ abstract class AllianceTeleOp extends LinearOpMode {
     }
 
     protected void configureBeforeStart(RobotHardware robot) {
-        Shooter.IDLE_RPM = 2800;
     }
 
     @Override
@@ -39,16 +38,18 @@ abstract class AllianceTeleOp extends LinearOpMode {
         robot.shooter.initTurretEncoder();
         configureBeforeStart(robot);
 
-        boolean isShooting = false;
         boolean resetPoseButtonWasDown = false;
+        boolean shortRangeBurstStarted = false;
 
         waitForStart();
         while (opModeIsActive()) {
+            robot.clearBulkCache();
             boolean isRed = isRedAlliance();
 
             boolean resetPoseButtonDown = gamepad2.right_trigger > 0.3;
             if (resetPoseButtonDown && !resetPoseButtonWasDown) {
                 robot.drivetrain.resetPose(wallResetPose(isRed));
+                robot.shooter.resetTurretOffset();
             }
             resetPoseButtonWasDown = resetPoseButtonDown;
 
@@ -68,16 +69,25 @@ abstract class AllianceTeleOp extends LinearOpMode {
 
             if (robot.shooter.getShooterState() == Shooter.ShooterState.SHOOTING) {
                 robot.transfer.overrideDriver();
-                boolean isCloseShot = targetDisplacement.getMagnitude() < LONGEST_SHORT_DISTANCE;
-                if (isCloseShot && robot.shooter.isAtTargetRPM() && robot.transfer.isGateOpen()) {
-                    isShooting = true;
+                robot.transfer.openGate();
+
+                boolean shortRangeShot = isShortRange(targetDisplacement.getMagnitude());
+                if (!shortRangeShot) {
+                    shortRangeBurstStarted = false;
                 }
 
-                if ((isCloseShot && isShooting) || (!isCloseShot && robot.shooter.isAtTargetRPM())) {
-                    robot.transfer.setIntakeState(Intake.IntakeState.TRANSFER);
+                if (shortRangeShot && robot.shooter.isAtTargetRPM()) {
+                    shortRangeBurstStarted = true;
+                }
+
+                if ((shortRangeShot && shortRangeBurstStarted)
+                        || (!shortRangeShot && robot.shooter.isAtTargetRPM())) {
+                    robot.transfer.feedShooter();
+                } else {
+                    robot.transfer.setIntakeState(Intake.IntakeState.STOP);
                 }
             } else {
-                isShooting = false;
+                shortRangeBurstStarted = false;
                 robot.transfer.stopOverrideDriver();
             }
 
@@ -93,31 +103,40 @@ abstract class AllianceTeleOp extends LinearOpMode {
     private Pose wallResetPose(boolean isRed) {
         if (isRed) {
             return new Pose(
-                    AutoConstants.BlueFar.humanZoneGetEndX,
-                    AutoConstants.BlueFar.humanZoneGetEndY,
-                    AutoConstants.BlueFar.humanZoneGetEndHeading
-            );
+                    AutoConstants.RedNear.startX,
+                    AutoConstants.RedNear.startY,
+                    AutoConstants.RedNear.startHeading
+                    );
         }
 
         return new Pose(
-                AutoConstants.RedFar.humanZoneGetEndX,
-                AutoConstants.RedFar.humanZoneGetEndY,
-                AutoConstants.RedFar.humanZoneGetEndHeading
+                AutoConstants.BlueNear.startX,
+                AutoConstants.BlueNear.startY,
+
+                AutoConstants.BlueNear.startHeading
         );
+    }
+
+    private boolean isShortRange(double distance) {
+        return distance <= SHORT_RANGE_DISTANCE[SHORT_RANGE_DISTANCE.length - 1];
     }
 
     protected void addTelemetry(RobotHardware robot, Shooter.ShooterConfig shooterConfig, Vector targetDisplacement) {
         telemetry.addData("!!! Current kv", robot.shooter.getCurrentFlywheelKv() * 100000);
         telemetry.addData("!!! Flywheel RPM", robot.shooter.getFlywheelRPM());
         telemetry.addData("!!! Target RPM", shooterConfig.flywheelRPM);
+        telemetry.addData("!!! At Target RPM", robot.shooter.isAtTargetRPM());
+        telemetry.addData("!!! Short Range", isShortRange(targetDisplacement.getMagnitude()));
         telemetry.addData("!!! Overriding Shooter", robot.shooter.isOverriding());
         telemetry.addData("Follower X", robot.drivetrain.getCurrentPose().getX());
         telemetry.addData("Follower Y", robot.drivetrain.getCurrentPose().getY());
         telemetry.addData("Follower heading", robot.drivetrain.getCurrentPose().getHeading());
         telemetry.addData("Target turret angle", shooterConfig.turretAngle);
         telemetry.addData("Number of balls", robot.transfer.getBallCount());
+        telemetry.addData("Intake state", robot.transfer.getIntakeState());
         telemetry.addData("Turret angle", robot.shooter.getTurretAngle());
         telemetry.addData("Turret servo position", robot.shooter.getTurretPower());
+        telemetry.addData("Gate open", robot.transfer.isGateOpen());
         telemetry.addData("Flywheel power", robot.shooter.getFlywheelPower());
         telemetry.addData("Hood Position", robot.shooter.getHoodPosition());
         telemetry.addData("Flywheel RPM1", robot.shooter.getFlywheelMotor1RPM());

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.auto.Drawing;
+import org.firstinspires.ftc.teamcode.hardware.HardwareCommandCache;
 import org.firstinspires.ftc.teamcode.pedropathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Overridable;
 
@@ -144,10 +145,10 @@ public class Drivetrain extends Overridable {
         } else{
             speedMultiplier = regularSpeedMultiplier;
         }
-        frontLeftMotor.setPower(frontLeftPower * speedMultiplier);
-        frontRightMotor.setPower(frontRightPower * speedMultiplier);
-        backLeftMotor.setPower(backLeftPower * speedMultiplier);
-        backRightMotor.setPower(backRightPower * speedMultiplier);
+        HardwareCommandCache.setMotorPower(frontLeftMotor, frontLeftPower * speedMultiplier);
+        HardwareCommandCache.setMotorPower(frontRightMotor, frontRightPower * speedMultiplier);
+        HardwareCommandCache.setMotorPower(backLeftMotor, backLeftPower * speedMultiplier);
+        HardwareCommandCache.setMotorPower(backRightMotor, backRightPower * speedMultiplier);
     }
 
     @Override

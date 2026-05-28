@@ -10,7 +10,7 @@ public class PIDControllerFactory {
         // PID FOR V = 12.5
         public static double kp = -0.24, ki = 0, kd = -0.003;
         public static double ks = 0;
-        public static double kv = 0.000240;
+        public static double kv = 0.00029;
         public static double threshold = 200, tolerance = 0;
 
 

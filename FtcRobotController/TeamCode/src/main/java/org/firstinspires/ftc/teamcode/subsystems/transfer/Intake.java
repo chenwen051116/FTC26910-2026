@@ -2,11 +2,14 @@ package org.firstinspires.ftc.teamcode.subsystems.transfer;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.hardware.HardwareCommandCache;
+
 
 public class Intake {
     public enum IntakeState {
-        TRANSFER(0.9, 0.9),
-        INTAKE(1, 1),
+        TRANSFER(1, 1),
+        INTAKE(1, 0.7),
+        INTAKE_WITHOUT_TRANSFER(1, 0),
         STOP(0, 0),
         REVERSE(-0.8, -0.8);
 
@@ -49,7 +52,7 @@ public class Intake {
     }
 
     public void periodic() {
-        intakeMotor.setPower(intakeState.intakePower);
-        transferMotor.setPower(intakeState.transferPower);
+        HardwareCommandCache.setMotorPower(intakeMotor, intakeState.intakePower);
+        HardwareCommandCache.setMotorPower(transferMotor, intakeState.transferPower);
     }
 }

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.transfer;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.hardware.HardwareCommandCache;
+
 public class Gate {
     private final double CLOSED_POSITION = 0, OPEN_POSITION = 0.8;
     private final double tolerance = 0.1;
@@ -11,7 +13,7 @@ public class Gate {
     public Gate(Servo gateServo) {
         this.gateServo = gateServo;
         gateServo.setDirection(Servo.Direction.FORWARD);
-        gateServo.setPosition(CLOSED_POSITION);
+        HardwareCommandCache.setServoPosition(gateServo, CLOSED_POSITION);
         isOpen = false;
     }
 
@@ -25,12 +27,12 @@ public class Gate {
     }
 
     public void open() {
-        gateServo.setPosition(OPEN_POSITION);
+        HardwareCommandCache.setServoPosition(gateServo, OPEN_POSITION);
         isOpen = true;
     }
 
     public void close() {
-        gateServo.setPosition(CLOSED_POSITION);
+        HardwareCommandCache.setServoPosition(gateServo, CLOSED_POSITION);
         isOpen = false;
     }
 

@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems.shooter;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
+
+import org.firstinspires.ftc.teamcode.hardware.HardwareCommandCache;
 
 @Config
 public class Turret {
@@ -14,22 +18,27 @@ public class Turret {
     public static double manualMaxSpeedDegreesPerSecond = 120;
     public static double manualDeadband = 0.05;
     public static double manualDirection = 1;
+    public static double pwmMin = 500;
+    public static double pwmMax = 2500;
 
-    private final Servo primaryServo;
-    private final Servo secondaryServo;
+    private final ServoImplEx primaryServo;
+    private final ServoImplEx secondaryServo;
 
-    private double offset = 0;
+    private double defaultOffset = 0.05;
+    public static double offset = 0.05;
     private double targetAngle = 0;
     private double commandedAngle = 0;
     private double commandedPosition = centerPosition;
     private long lastManualControlTimeNanos = 0;
 
-    public Turret(Servo primaryServo, Servo secondaryServo) {
+    public Turret(ServoImplEx primaryServo, ServoImplEx secondaryServo) {
         this.primaryServo = primaryServo;
         this.secondaryServo = secondaryServo;
 
         primaryServo.setDirection(Servo.Direction.FORWARD);
-        secondaryServo.setDirection(Servo.Direction.REVERSE);
+        secondaryServo.setDirection(Servo.Direction.FORWARD);
+        primaryServo.setPwmRange(new PwmControl.PwmRange(pwmMin, pwmMax));
+        secondaryServo.setPwmRange(new PwmControl.PwmRange(pwmMin, pwmMax));
         center();
     }
 
@@ -41,16 +50,16 @@ public class Turret {
         this.offset = offset;
     }
 
+    public void resetOffset() {
+        this.offset = defaultOffset;
+    }
+
     public double getOffset() {
         return offset;
     }
 
     public void addOffset(double increment) {
         offset += increment;
-    }
-
-    public void resetOffset() {
-        offset = 0;
     }
 
     public double getCurrentAngle() {
@@ -66,7 +75,7 @@ public class Turret {
     }
 
     public void setAngle(double targetAngle) {
-        this.targetAngle = clampAngle(normalizeRadians(targetAngle));
+        this.targetAngle = clampAngle    (normalizeRadians(targetAngle));
     }
 
     public void manualControl(double stickX) {
@@ -99,8 +108,8 @@ public class Turret {
     public void periodic() {
         commandedAngle = clampAngle(targetAngle + offset);
         commandedPosition = angleToPosition(commandedAngle);
-        primaryServo.setPosition(commandedPosition);
-        secondaryServo.setPosition(commandedPosition);
+        HardwareCommandCache.setServoPosition(primaryServo, commandedPosition);
+        HardwareCommandCache.setServoPosition(secondaryServo, commandedPosition);
     }
 
     private double angleToPosition(double angleRadians) {

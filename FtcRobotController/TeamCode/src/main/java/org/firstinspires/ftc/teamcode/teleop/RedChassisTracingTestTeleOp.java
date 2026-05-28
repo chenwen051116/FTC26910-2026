@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @Config
 @TeleOp(name = "Red Chassis Tracing Teleop")
-public class ChassisTracingTestTeleOp extends AllianceTeleOp {
+public class RedChassisTracingTestTeleOp extends AllianceTeleOp {
     @Override
     protected boolean isRedAlliance() {
         return true;

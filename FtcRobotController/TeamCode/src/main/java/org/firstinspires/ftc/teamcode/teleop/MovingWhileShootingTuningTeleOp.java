@@ -29,6 +29,7 @@ public class MovingWhileShootingTuningTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            robot.clearBulkCache();
             robot.shooter.setShooterConfig(new Shooter.ShooterConfig(
                     tuningTurretAngle,
                     tuningHoodPosition,

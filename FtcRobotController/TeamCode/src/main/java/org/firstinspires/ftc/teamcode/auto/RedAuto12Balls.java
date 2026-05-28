@@ -45,7 +45,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(shootPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        startToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        startToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM SHOOTING TO BALL 1 BEGIN
         PathChain shootingToBall1StartPath = follower.pathBuilder()
@@ -53,7 +53,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(ball1StartPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToBall1StartPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToBall1StartPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM BALL 1 BEGIN TO BALL 1 END
         PathChain ball1StartToBall1EndPath = follower.pathBuilder()
@@ -61,7 +61,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(ball1EndPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball1StartToBall1EndPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball1StartToBall1EndPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM BALL 1 END TO SHOOTING
         PathChain ball1EndToShootingPath = follower.pathBuilder()
@@ -69,7 +69,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(shootPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball1EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball1EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM SHOOTING TO BALL 2 BEGIN
         PathChain shootingToBall2StartPath = follower.pathBuilder()
@@ -77,7 +77,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(ball2StartPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToBall2StartPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToBall2StartPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM BALL 2 BEGIN TO BALL 2 END
         PathChain ball2StartToBall2WithGatePath = follower.pathBuilder()
@@ -85,7 +85,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(ball2WithGatePose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball2StartToBall2WithGatePath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball2StartToBall2WithGatePath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM BALL 2 END TO SHOOTING
         PathChain ball2EndToShootingPath = follower.pathBuilder()
@@ -93,7 +93,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(shootPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball2EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball2EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM SHOOTING TO BALL 3 BEGIN
         PathChain shootingToBall3StartPath = follower.pathBuilder()
@@ -101,7 +101,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(ball3StartPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToBall3StartPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToBall3StartPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM BALL 3 BEGIN TO BALL 3 END
         PathChain ball3StartToBall3EndPath = follower.pathBuilder()
@@ -109,7 +109,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(ball3EndPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball3StartToBall3EndPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball3StartToBall3EndPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // FROM BALL 3 END TO SHOOTING
         PathChain ball3EndToShootingPath = follower.pathBuilder()
@@ -117,7 +117,7 @@ public class RedAuto12Balls extends AutoBase {
                 .setConstantHeadingInterpolation(shootPose.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball3EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball3EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         // Initialize Sequencer
         // From Start pose to shooting pose

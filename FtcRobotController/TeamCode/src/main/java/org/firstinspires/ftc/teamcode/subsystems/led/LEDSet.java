@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.led;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.hardware.HardwareCommandCache;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter.ShooterState;
 
 public class LEDSet extends SubsystemBase {
@@ -53,8 +54,8 @@ public class LEDSet extends SubsystemBase {
 
     @Override
     public void periodic() {
-        ballIndicator1.setPosition(colorByBallCount[ballCount].pwm);
-        ballIndicator2.setPosition(colorByBallCount[ballCount].pwm);
+        HardwareCommandCache.setServoPosition(ballIndicator1, colorByBallCount[ballCount].pwm);
+        HardwareCommandCache.setServoPosition(ballIndicator2, colorByBallCount[ballCount].pwm);
 
         Color shooterStateDisplayColor = Color.OFF;
         switch (shooterState) {
@@ -65,6 +66,6 @@ public class LEDSet extends SubsystemBase {
                 shooterStateDisplayColor = Color.BLUE;
                 break;
         }
-        shooterIndicator.setPosition(shooterStateDisplayColor.pwm);
+        HardwareCommandCache.setServoPosition(shooterIndicator, shooterStateDisplayColor.pwm);
     }
 }

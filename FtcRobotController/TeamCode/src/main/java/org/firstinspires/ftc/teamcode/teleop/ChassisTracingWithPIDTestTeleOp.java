@@ -27,6 +27,7 @@ public class ChassisTracingWithPIDTestTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            robot.clearBulkCache();
             Shooter.ShooterConfig shooterConfig = robot.shooter.calculateShooterConfig(
                     robot.drivetrain.getCurrentPose(),
                     robot.drivetrain.getCurrentVelocity(),

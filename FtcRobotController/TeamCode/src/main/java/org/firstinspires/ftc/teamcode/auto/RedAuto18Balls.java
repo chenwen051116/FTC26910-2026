@@ -43,8 +43,6 @@
 //@Autonomous(name = "!!INCOMPLETE!! Red Auto 18 Balls")
 //public class RedAuto18Balls extends AutoBase{
 //
-//    public static double ball2IntakeBrakingStart = 1.3;
-//    public static double ball3IntakeBrakingStart = 1.6;
 //    public static double gateTValue = 0.99;
 //
 //    @Override
@@ -91,8 +89,6 @@
 //        // FROM SHOOTING TO BALL 2 BEGIN
 //        PathChain shootingToBall2StartPath = follower.pathBuilder();
 //                ball2StartPose,
-//                defaultBrakingStrength,
-//                ball2IntakeBrakingStart
 //        );
 //
 //        // FROM BALL 2 BEGIN TO BALL 2 END
@@ -116,8 +112,6 @@
 //        // FROM OPEN GATE POSE TO GATE INTAKE POSE
 //        PathChain openGateToGetGateBallPath = follower.pathBuilder();
 //                getGateBallPose,
-//                defaultBrakingStrength,
-//                defaultBrakingStart,
 //                gateTValue
 //                );
 //
@@ -142,8 +136,6 @@
 //        // FROM SHOOTING TO BALL 3 BEGIN
 //        PathChain shootingToBall3StartPath = follower.pathBuilder();
 //                ball3StartPose,
-//                defaultBrakingStrength,
-//                ball3IntakeBrakingStart
 //        );
 //
 //        // FROM BALL 3 BEGIN TO BALL 3 END

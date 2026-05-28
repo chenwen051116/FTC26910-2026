@@ -6,9 +6,9 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.paths.PathConstraints;
 
 public abstract class FarAutoBase extends AutoBase {
-    public static double ball3EndToShootingMaxPower = 0.5;
-    public static double humanZoneGetEndToShootingMaxPower = 0.5;
-    public static double startToShootingMaxPower = 0.5;
+    public static double ball3EndToShootingMaxPower = 1.0;
+    public static double humanZoneGetEndToShootingMaxPower = 1.0;
+    public static double startToShootingMaxPower = 1.0;
 
     protected static class FarPoses {
         final Pose start;
@@ -59,49 +59,49 @@ public abstract class FarAutoBase extends AutoBase {
                 .setConstantHeadingInterpolation(poses.shoot.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        startToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        startToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain shootingToBall3StartPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.shoot, poses.ball3Start))
                 .setConstantHeadingInterpolation(poses.ball3Start.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToBall3StartPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToBall3StartPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain ball3StartToBall3EndPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.ball3Start, poses.ball3End))
                 .setConstantHeadingInterpolation(poses.ball3End.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball3StartToBall3EndPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball3StartToBall3EndPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain ball3EndToShootingPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.ball3End, poses.shoot))
                 .setConstantHeadingInterpolation(poses.shoot.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        ball3EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        ball3EndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain shootingToHumanZoneGetStartPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.shoot, poses.humanZoneGetStart))
                 .setConstantHeadingInterpolation(poses.humanZoneGetStart.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToHumanZoneGetStartPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToHumanZoneGetStartPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain humanZoneGetStartToHumanZoneGetEndPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.humanZoneGetStart, poses.humanZoneGetEnd))
                 .setConstantHeadingInterpolation(poses.humanZoneGetEnd.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        humanZoneGetStartToHumanZoneGetEndPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        humanZoneGetStartToHumanZoneGetEndPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain humanZoneGetEndToShootingPath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.humanZoneGetEnd, poses.shoot))
                 .setConstantHeadingInterpolation(poses.shoot.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        humanZoneGetEndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        humanZoneGetEndToShootingPath.setConstraintsForAll(new PathConstraints(0.997, 100));
         PathChain shootingToLeavePath = follower.pathBuilder()
                 .addPath(new BezierLine(poses.shoot, poses.leave))
                 .setConstantHeadingInterpolation(poses.leave.getHeading())
                 .setGlobalDeceleration()
                 .build();
-        shootingToLeavePath.setConstraintsForAll(new PathConstraints(0.997, 100, defaultBrakingStrength, defaultBrakingStart));
+        shootingToLeavePath.setConstraintsForAll(new PathConstraints(0.997, 100));
 
         shoot(startToShootingPath, startToShootingMaxPower);
         intakeAtPos(shootingToBall3StartPath, ball3StartToBall3EndPath);
